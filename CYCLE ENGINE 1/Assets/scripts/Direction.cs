@@ -10,6 +10,7 @@ public class IndicatorMouseClickFast : MonoBehaviour
     public float sensitivity = 0.05f;
     [Range(0f, 1f)] public float positionNormalized = 0.5f;
     public float snapThreshold = 0.05f;
+    public float maxGrabDistance = 3f; // distance max pour attraper ou survoler
 
     [Header("Surbrillance")]
     public Color highlightColor = Color.yellow; // couleur au survol
@@ -37,7 +38,7 @@ public class IndicatorMouseClickFast : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, 10f))
+            if (Physics.Raycast(ray, out RaycastHit hit, maxGrabDistance))
             {
                 if (hit.collider.gameObject == gameObject)
                     isGrabbed = true;
@@ -71,7 +72,7 @@ public class IndicatorMouseClickFast : MonoBehaviour
     void HandleHover()
     {
         Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, 10f) && hit.collider.gameObject == gameObject)
+        if (Physics.Raycast(ray, out RaycastHit hit, maxGrabDistance) && hit.collider.gameObject == gameObject)
         {
             if (!isHovered)
             {

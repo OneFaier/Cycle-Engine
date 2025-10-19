@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI; // nécessaire pour le Slider
+using UnityEngine.UI;
 
 public class ENGINEMovements : MonoBehaviour
 {
@@ -23,8 +23,9 @@ public class ENGINEMovements : MonoBehaviour
     public float fallGravity = 15f;
     public LayerMask groundLayer;
 
-    [Header("Slider externe")]
-    public Slider externalSpeedSlider; // assigné dans l'inspecteur
+    [Header("Sliders externes (optionnels)")]
+    public Slider externalSpeedSlider;     // Vitesse
+    public Slider externalDirectionSlider; // Direction
 
     private float currentSpeed = 0f;
     private float currentSteer = 0f;
@@ -49,14 +50,21 @@ public class ENGINEMovements : MonoBehaviour
         else
         {
             speedNormalized = 0f;
-            directionNormalized = 0.5f;
+            directionNormalized = 0.5f; // centre
         }
 
-        // ---- Si le slider externe est à 0, bloque la vitesse ----
+        // ---- Bloquer la vitesse si slider externe à 0 ----
         if (externalSpeedSlider != null && externalSpeedSlider.value <= 0f)
         {
             speedNormalized = 0f;
             speedCube.positionNormalized = 0f;
+        }
+
+        // ---- Bloquer la direction si slider externe direction à 0 ----
+        if (externalDirectionSlider != null && externalDirectionSlider.value <= 0f)
+        {
+            directionNormalized = 0.5f; // recentre le cube
+            directionCube.positionNormalized = 0.5f;
         }
 
         // ---- Direction ----
@@ -85,21 +93,31 @@ public class ENGINEMovements : MonoBehaviour
             speedCube.positionNormalized = 0f;
         }
 
-        // ---- Rotation + déplacement ----
-        transform.Rotate(Vector3.up, currentSteer * turnSpeed * Time.deltaTime);
+        // ---- Déplacement horizontal (avant/arrière) ----
         transform.position += transform.forward * currentSpeed * Time.deltaTime;
 
-        // ---- Gestion de la hauteur ----
+        // ---- Rotation Y (joueur) ----
+        transform.Rotate(Vector3.up, currentSteer * turnSpeed * Time.deltaTime);
+
+        // ---- Gestion de la hauteur + inclinaison ----
         Vector3 rayOrigin = transform.position + transform.forward * hoverForwardOffset + Vector3.up;
         if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, maxHoverDistance, groundLayer))
         {
+            // Ajuste la hauteur
             float targetY = hit.point.y + hoverHeight;
             float newY = Mathf.Lerp(transform.position.y, targetY, Time.deltaTime * hoverFollowSpeed);
             transform.position = new Vector3(transform.position.x, newY, transform.position.z);
             verticalVelocity = 0f;
+
+            // Rotation X/Z : suit la pente mais Y reste joueur
+            Quaternion slopeRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+            Vector3 euler = slopeRotation.eulerAngles;
+            euler.y = transform.eulerAngles.y; // conserve la rotation Y
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(euler), Time.deltaTime * 3f);
         }
         else
         {
+            // Pas de sol → chute libre
             verticalVelocity -= fallGravity * Time.deltaTime;
             transform.position += Vector3.up * verticalVelocity * Time.deltaTime;
         }
