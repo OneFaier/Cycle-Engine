@@ -169,5 +169,5 @@ MonoBehaviour:
   directionCube: {fileID: 0}
   healthIndicatorCube: {fileID: 1174661621287416985}
   maxHealth: 100
-  depletionRate: 10
-  passiveDepletionRate: 5
+  depletionRate: 0.5
+  passiveDepletionRate: 2

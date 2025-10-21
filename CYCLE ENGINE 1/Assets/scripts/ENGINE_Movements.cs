@@ -99,28 +99,28 @@ public class ENGINEMovements : MonoBehaviour
         // ---- Rotation Y (joueur) ----
         transform.Rotate(Vector3.up, currentSteer * turnSpeed * Time.deltaTime);
 
-        // ---- Gestion de la hauteur + inclinaison ----
-        Vector3 rayOrigin = transform.position + transform.forward * hoverForwardOffset + Vector3.up;
-        if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, maxHoverDistance, groundLayer))
-        {
-            // Ajuste la hauteur
-            float targetY = hit.point.y + hoverHeight;
-            float newY = Mathf.Lerp(transform.position.y, targetY, Time.deltaTime * hoverFollowSpeed);
-            transform.position = new Vector3(transform.position.x, newY, transform.position.z);
-            verticalVelocity = 0f;
-
-            // Rotation X/Z : suit la pente mais Y reste joueur
-            Quaternion slopeRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-            Vector3 euler = slopeRotation.eulerAngles;
-            euler.y = transform.eulerAngles.y; // conserve la rotation Y
-            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(euler), Time.deltaTime * 3f);
-        }
-        else
-        {
-            // Pas de sol → chute libre
-            verticalVelocity -= fallGravity * Time.deltaTime;
-            transform.position += Vector3.up * verticalVelocity * Time.deltaTime;
-        }
+    // ---- Gestion de la hauteur + inclinaison ----
+    Vector3 rayOrigin = transform.position + transform.forward * hoverForwardOffset + Vector3.up;
+    if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, maxHoverDistance, groundLayer))
+    {
+        // Ajuste la hauteur
+        float targetY = hit.point.y + hoverHeight;
+        float newY = Mathf.Lerp(transform.position.y, targetY, Time.deltaTime * hoverFollowSpeed);
+        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+        verticalVelocity = 0f;
+    
+        // Rotation X/Z : suit la pente mais Y reste joueur
+        Quaternion slopeRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
+        Vector3 euler = slopeRotation.eulerAngles;
+        euler.y = transform.eulerAngles.y; // conserve la rotation Y
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(euler), Time.deltaTime * 3f);
+    }
+    else
+    {
+        // Pas de sol → chute libre
+        verticalVelocity -= fallGravity * Time.deltaTime;
+        transform.position += Vector3.up * verticalVelocity * Time.deltaTime;
+    }
     }
 
     void OnDrawGizmosSelected()
