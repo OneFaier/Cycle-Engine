@@ -18,14 +18,19 @@ public class ENGINEMovements : MonoBehaviour
     [Header("Paramètres de survol")]
     public float hoverHeight = 2f;
     public float hoverFollowSpeed = 8f;
-    public float hoverForwardOffset = 2f;
     public float maxHoverDistance = 8f;
     public float fallGravity = 15f;
     public LayerMask groundLayer;
 
     [Header("Sliders externes (optionnels)")]
-    public Slider externalSpeedSlider;     // Vitesse
-    public Slider externalDirectionSlider; // Direction
+    public Slider externalSpeedSlider;
+    public Slider externalDirectionSlider;
+
+    [Header("Points de raycast (coins du véhicule)")]
+    public Transform frontLeft;
+    public Transform frontRight;
+    public Transform rearLeft;
+    public Transform rearRight;
 
     private float currentSpeed = 0f;
     private float currentSteer = 0f;
@@ -53,25 +58,25 @@ public class ENGINEMovements : MonoBehaviour
             directionNormalized = 0.5f; // centre
         }
 
-        // ---- Bloquer la vitesse si slider externe à 0 ----
+        // ---- Bloquer la vitesse si slider externe à 0 
         if (externalSpeedSlider != null && externalSpeedSlider.value <= 0f)
         {
             speedNormalized = 0f;
             speedCube.positionNormalized = 0f;
         }
 
-        // ---- Bloquer la direction si slider externe direction à 0 ----
+        // Bloquer la direction si slider externe direction à 0 
         if (externalDirectionSlider != null && externalDirectionSlider.value <= 0f)
         {
             directionNormalized = 0.5f; // recentre le cube
             directionCube.positionNormalized = 0.5f;
         }
 
-        // ---- Direction ----
+        // Direction 
         float targetSteer = Mathf.Lerp(-1f, 1f, directionNormalized);
         currentSteer = Mathf.Lerp(currentSteer, targetSteer, Time.deltaTime * steerSmoothing);
 
-        // ---- Vitesse ----
+        // Vitesse 
         float targetSpeed = speedNormalized * maxSpeed;
 
         if (isEngineOn)
@@ -86,41 +91,74 @@ public class ENGINEMovements : MonoBehaviour
             currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, deceleration * Time.deltaTime);
         }
 
-        // ---- Si la vitesse atteint 0, bloque le cube à 0 ----
+        //Si la vitesse atteint 0, bloque le cube à 0 
         if (currentSpeed <= 0.01f)
         {
             currentSpeed = 0f;
             speedCube.positionNormalized = 0f;
         }
 
-        // ---- Déplacement horizontal (avant/arrière) ----
+        // Déplacement avant/arrière 
         transform.position += transform.forward * currentSpeed * Time.deltaTime;
 
-        // ---- Rotation Y (joueur) ----
+        // Rotation Y (direction)
         transform.Rotate(Vector3.up, currentSteer * turnSpeed * Time.deltaTime);
 
-    // ---- Gestion de la hauteur + inclinaison ----
-    Vector3 rayOrigin = transform.position + transform.forward * hoverForwardOffset + Vector3.up;
-    if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, maxHoverDistance, groundLayer))
-    {
-        // Ajuste la hauteur
-        float targetY = hit.point.y + hoverHeight;
-        float newY = Mathf.Lerp(transform.position.y, targetY, Time.deltaTime * hoverFollowSpeed);
-        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
-        verticalVelocity = 0f;
-    
-        // Rotation X/Z : suit la pente mais Y reste joueur
-        Quaternion slopeRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-        Vector3 euler = slopeRotation.eulerAngles;
-        euler.y = transform.eulerAngles.y; // conserve la rotation Y
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(euler), Time.deltaTime * 3f);
-    }
-    else
-    {
-        // Pas de sol → chute libre
-        verticalVelocity -= fallGravity * Time.deltaTime;
-        transform.position += Vector3.up * verticalVelocity * Time.deltaTime;
-    }
+        // GESTION DU SURVOL AVEC 4 RAYCASTS 
+        Vector3[] positions = new Vector3[4];
+        Vector3[] normals = new Vector3[4];
+        Transform[] points = { frontLeft, frontRight, rearLeft, rearRight };
+        bool[] hits = new bool[4];
+
+        int hitCount = 0;
+        for (int i = 0; i < 4; i++)
+        {
+            if (points[i] == null) continue;
+
+            if (Physics.Raycast(points[i].position, Vector3.down, out RaycastHit hit, maxHoverDistance, groundLayer))
+            {
+                positions[i] = hit.point;
+                normals[i] = hit.normal;
+                hits[i] = true;
+                hitCount++;
+            }
+        }
+
+        if (hitCount > 0)
+        {
+            // Moyenne des positions touchées
+            Vector3 avgPos = Vector3.zero;
+            Vector3 avgNormal = Vector3.zero;
+
+            for (int i = 0; i < 4; i++)
+            {
+                if (!hits[i]) continue;
+                avgPos += positions[i];
+                avgNormal += normals[i];
+            }
+
+            avgPos /= hitCount;
+            avgNormal.Normalize();
+
+            float targetY = avgPos.y + hoverHeight;
+            float newY = Mathf.Lerp(transform.position.y, targetY, Time.deltaTime * hoverFollowSpeed);
+
+            // Mise à jour position
+            transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+            verticalVelocity = 0f;
+
+            // Rotation selon la pente moyenne
+            Quaternion slopeRotation = Quaternion.FromToRotation(Vector3.up, avgNormal);
+            Vector3 euler = slopeRotation.eulerAngles;
+            euler.y = transform.eulerAngles.y;
+            transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(euler), Time.deltaTime * 3f);
+        }
+        else
+        {
+            // Pas de sol détecté → chute
+            verticalVelocity -= fallGravity * Time.deltaTime;
+            transform.position += Vector3.up * verticalVelocity * Time.deltaTime;
+        }
     }
 
     void OnDrawGizmosSelected()
@@ -129,7 +167,11 @@ public class ENGINEMovements : MonoBehaviour
             return;
 
         Gizmos.color = Color.cyan;
-        Vector3 rayOrigin = transform.position + transform.forward * hoverForwardOffset + Vector3.up;
-        Gizmos.DrawLine(rayOrigin, rayOrigin + Vector3.down * maxHoverDistance);
+        Transform[] points = { frontLeft, frontRight, rearLeft, rearRight };
+        foreach (var p in points)
+        {
+            if (p == null) continue;
+            Gizmos.DrawLine(p.position, p.position + Vector3.down * maxHoverDistance);
+        }
     }
 }

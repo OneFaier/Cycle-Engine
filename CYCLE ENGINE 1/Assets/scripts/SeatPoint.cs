@@ -12,10 +12,20 @@ public class SeatPoint : MonoBehaviour
     private SimpleFPSController playerController;
     private Rigidbody playerRb;
     private bool isSeated = false;
+    public GameObject overH;
+    private ENGINEMovements overH_script;
+    
+    void Start()
+    {
+        overH_script = overH.GetComponent<ENGINEMovements>(); 
+    }
 
     private void OnTriggerEnter(Collider other)
     {
         if (isSeated) return;
+        {
+            overH_script.hoverHeight = 4f;
+        }
         if (!other.CompareTag("Player")) return;
 
         playerObject = other.gameObject;
@@ -24,24 +34,28 @@ public class SeatPoint : MonoBehaviour
 
         if (playerController == null || playerRb == null) return;
 
-        // --- Désactive le mouvement mais garde la caméra active ---
+        
         playerController.canMove = false;
         playerRb.isKinematic = true;
+        
 
-        // --- Parent au véhicule ---
+        //Parent au véhicule 
         playerObject.transform.SetParent(vehicle);
 
-        // --- Teleporte le joueur sur le siège ---
+        //Teleporte le joueur sur le siège 
         playerObject.transform.position = seatPosition.position;
         playerObject.transform.rotation = seatPosition.rotation;
 
         isSeated = true;
+        
+        
     }
 
     private void Update()
     {
         if (isSeated && Input.GetKeyDown(exitKey))
         {
+            overH_script.hoverHeight = 2f;
             ExitSeat();
         }
     }
