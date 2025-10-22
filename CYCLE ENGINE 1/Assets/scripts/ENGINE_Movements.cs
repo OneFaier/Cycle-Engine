@@ -46,7 +46,7 @@ public class ENGINEMovements : MonoBehaviour
         float speedNormalized;
         float directionNormalized;
 
-        // ---- Gestion des cubes selon moteur ----
+        
         if (isEngineOn)
         {
             speedNormalized = Mathf.Clamp01(speedCube.positionNormalized);
@@ -58,14 +58,14 @@ public class ENGINEMovements : MonoBehaviour
             directionNormalized = 0.5f; // centre
         }
 
-        // ---- Bloquer la vitesse si slider externe à 0 
+        //  Bloque la vitesse avec les slider externe
         if (externalSpeedSlider != null && externalSpeedSlider.value <= 0f)
         {
             speedNormalized = 0f;
             speedCube.positionNormalized = 0f;
         }
 
-        // Bloquer la direction si slider externe direction à 0 
+        // Bloquer la direction
         if (externalDirectionSlider != null && externalDirectionSlider.value <= 0f)
         {
             directionNormalized = 0.5f; // recentre le cube
@@ -91,20 +91,20 @@ public class ENGINEMovements : MonoBehaviour
             currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, deceleration * Time.deltaTime);
         }
 
-        //Si la vitesse atteint 0, bloque le cube à 0 
+        //bloque cube a 0
         if (currentSpeed <= 0.01f)
         {
             currentSpeed = 0f;
             speedCube.positionNormalized = 0f;
         }
 
-        // Déplacement avant/arrière 
+        // move avant arriere
         transform.position += transform.forward * currentSpeed * Time.deltaTime;
 
         // Rotation Y (direction)
         transform.Rotate(Vector3.up, currentSteer * turnSpeed * Time.deltaTime);
 
-        // GESTION DU SURVOL AVEC 4 RAYCASTS 
+        // survol avec les 4 ray 
         Vector3[] positions = new Vector3[4];
         Vector3[] normals = new Vector3[4];
         Transform[] points = { frontLeft, frontRight, rearLeft, rearRight };
@@ -143,11 +143,11 @@ public class ENGINEMovements : MonoBehaviour
             float targetY = avgPos.y + hoverHeight;
             float newY = Mathf.Lerp(transform.position.y, targetY, Time.deltaTime * hoverFollowSpeed);
 
-            // Mise à jour position
+            //position MAJ
             transform.position = new Vector3(transform.position.x, newY, transform.position.z);
             verticalVelocity = 0f;
 
-            // Rotation selon la pente moyenne
+            // Rotation selon la pentee
             Quaternion slopeRotation = Quaternion.FromToRotation(Vector3.up, avgNormal);
             Vector3 euler = slopeRotation.eulerAngles;
             euler.y = transform.eulerAngles.y;
@@ -155,7 +155,7 @@ public class ENGINEMovements : MonoBehaviour
         }
         else
         {
-            // Pas de sol détecté → chute
+            //chutelibre
             verticalVelocity -= fallGravity * Time.deltaTime;
             transform.position += Vector3.up * verticalVelocity * Time.deltaTime;
         }
