@@ -9,6 +9,7 @@ TagManager:
   - Grabbable
   - Levier
   - SnapPoint
+  - NoCarCollision
   layers:
   - Default
   - TransparentFX

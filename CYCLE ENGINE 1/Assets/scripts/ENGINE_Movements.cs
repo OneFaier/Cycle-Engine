@@ -1,135 +1,185 @@
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 
+[RequireComponent(typeof(Rigidbody))]
 public class ENGINEMovements : MonoBehaviour
 {
-    [Header("Références des cubes")]
-    public IndicatorMouseClickFast directionCube;
-    public IndicatorMouseClickFast speedCube;
+    [Header("Boost Particles")]
+    public ParticleSystem boostParticles; 
+
+    [Header("Meshes des roues")]
+    public Transform frontLeftWheel;
+    public Transform frontRightWheel;
+    public Transform rearLeftWheel;
+    public Transform rearRightWheel;
+
+    [Header("WheelColliders")]
+    public WheelCollider frontLeftCollider;
+    public WheelCollider frontRightCollider;
+    public WheelCollider rearLeftCollider;
+    public WheelCollider rearRightCollider;
 
     [Header("Paramètres véhicule")]
-    public float CurrentSpeed => currentSpeed;
-    public float maxSpeed = 15f;
-    public float acceleration = 8f;
-    public float deceleration = 6f;
-    public float turnSpeed = 60f;
-    public float steerSmoothing = 5f;
+    public float acceleration = 18000f;
+    public float turnPower = 250f;
+    public float maxSpeed = 50f;
+    public float groundDrag = 0.98f;
+    public float airControl = 0.4f;
 
-    [Header("Paramètres de survol")]
-    public float hoverHeight = 2f;
-    public float hoverFollowSpeed = 8f;
-    public float hoverForwardOffset = 2f;
-    public float maxHoverDistance = 8f;
-    public float fallGravity = 15f;
+    [Header("Boost")]
+    public float boostForce = 35000f;
+    public KeyCode boostKey = KeyCode.LeftShift;
+
+    [Header("Physique")]
+    public float gravityForce = 50f;
+    public float groundCheckDistance = 1.2f;
     public LayerMask groundLayer;
 
-    [Header("Sliders externes (optionnels)")]
-    public Slider externalSpeedSlider;     // Vitesse
-    public Slider externalDirectionSlider; // Direction
+    [Header("Visuel roues")]
+    public float wheelRotationSpeed = 5f;
+    public float maxSteerAngle = 35f;
 
-    private float currentSpeed = 0f;
-    private float currentSteer = 0f;
-    private float verticalVelocity = 0f;
+    [Header("Reset Vehicle")]
+    public KeyCode resetKey = KeyCode.R;
+    public float resetHeight = 1.0f;
 
-    [HideInInspector] public bool isEngineOn = true;
+    [Header("UI")]
+    public TextMeshProUGUI speedText;
+
+    [HideInInspector] public bool canControl = false; // contrôle activé seulement quand joueur assis
+    [HideInInspector] public Rigidbody rb;
+
+    private bool grounded;
+    private float steerInput;
+    private float moveInput;
+
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
+
+    void Start()
+    {
+        rb.mass = 1200f;
+        rb.linearDamping = 0.05f;
+        rb.angularDamping = 0.3f;
+        rb.centerOfMass = new Vector3(0, -0.6f, 0);
+
+        // Bloque la voiture au départ
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        rb.isKinematic = true;
+        canControl = false;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("NoCarCollision"))
+            Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
+    }
 
     void Update()
     {
-        if (directionCube == null || speedCube == null)
-            return;
+        if (!canControl) return;
 
-        float speedNormalized;
-        float directionNormalized;
+        moveInput = Input.GetAxis("Vertical");
+        steerInput = Input.GetAxis("Horizontal");
+        grounded = Physics.Raycast(transform.position + Vector3.up * 0.2f, Vector3.down, groundCheckDistance, groundLayer);
 
-        // ---- Gestion des cubes selon moteur ----
-        if (isEngineOn)
+        // Boost
+        if (Input.GetKey(boostKey))
         {
-            speedNormalized = Mathf.Clamp01(speedCube.positionNormalized);
-            directionNormalized = Mathf.Clamp01(directionCube.positionNormalized);
+            rb.AddForce(transform.forward * boostForce * Time.fixedDeltaTime, ForceMode.Force);
+            if (boostParticles != null && !boostParticles.isPlaying)
+                boostParticles.Play();
+        }
+        else if (boostParticles != null && boostParticles.isPlaying)
+            boostParticles.Stop();
+
+        // Reset voiture
+        if (Input.GetKeyDown(resetKey))
+            ResetVehicle();
+
+        // Mise à jour vitesse TMP
+        if (speedText != null)
+        {
+            float speed = rb.linearVelocity.magnitude * 3.6f;
+            speedText.text = "Vitesse : " + speed.ToString("F1") + " km/h";
+        }
+
+        // Visuel roues
+        UpdateWheelVisuals();
+        UpdateWheelColliders();
+    }
+
+    void FixedUpdate()
+    {
+        if (!canControl) return;
+
+        // Accélération
+        if (moveInput != 0f)
+        {
+            Vector3 force = transform.forward * moveInput * acceleration * Time.fixedDeltaTime;
+            if (rb.linearVelocity.magnitude < maxSpeed)
+                rb.AddForce(force, ForceMode.Force);
+        }
+
+        // Rotation
+        if (grounded)
+        {
+            rb.AddTorque(Vector3.up * steerInput * turnPower * Time.fixedDeltaTime, ForceMode.Force);
+            rb.linearVelocity *= groundDrag;
         }
         else
-        {
-            speedNormalized = 0f;
-            directionNormalized = 0.5f; // centre
-        }
+            rb.AddTorque(Vector3.up * steerInput * turnPower * airControl * Time.fixedDeltaTime, ForceMode.Force);
 
-        // ---- Bloquer la vitesse si slider externe à 0 ----
-        if (externalSpeedSlider != null && externalSpeedSlider.value <= 0f)
-        {
-            speedNormalized = 0f;
-            speedCube.positionNormalized = 0f;
-        }
-
-        // ---- Bloquer la direction si slider externe direction à 0 ----
-        if (externalDirectionSlider != null && externalDirectionSlider.value <= 0f)
-        {
-            directionNormalized = 0.5f; // recentre le cube
-            directionCube.positionNormalized = 0.5f;
-        }
-
-        // ---- Direction ----
-        float targetSteer = Mathf.Lerp(-1f, 1f, directionNormalized);
-        currentSteer = Mathf.Lerp(currentSteer, targetSteer, Time.deltaTime * steerSmoothing);
-
-        // ---- Vitesse ----
-        float targetSpeed = speedNormalized * maxSpeed;
-
-        if (isEngineOn)
-        {
-            if (targetSpeed > currentSpeed)
-                currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, acceleration * Time.deltaTime);
-            else
-                currentSpeed = Mathf.MoveTowards(currentSpeed, targetSpeed, deceleration * Time.deltaTime);
-        }
-        else
-        {
-            currentSpeed = Mathf.MoveTowards(currentSpeed, 0f, deceleration * Time.deltaTime);
-        }
-
-        // ---- Si la vitesse atteint 0, bloque le cube à 0 ----
-        if (currentSpeed <= 0.01f)
-        {
-            currentSpeed = 0f;
-            speedCube.positionNormalized = 0f;
-        }
-
-        // ---- Déplacement horizontal (avant/arrière) ----
-        transform.position += transform.forward * currentSpeed * Time.deltaTime;
-
-        // ---- Rotation Y (joueur) ----
-        transform.Rotate(Vector3.up, currentSteer * turnSpeed * Time.deltaTime);
-
-    // ---- Gestion de la hauteur + inclinaison ----
-    Vector3 rayOrigin = transform.position + transform.forward * hoverForwardOffset + Vector3.up;
-    if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit, maxHoverDistance, groundLayer))
-    {
-        // Ajuste la hauteur
-        float targetY = hit.point.y + hoverHeight;
-        float newY = Mathf.Lerp(transform.position.y, targetY, Time.deltaTime * hoverFollowSpeed);
-        transform.position = new Vector3(transform.position.x, newY, transform.position.z);
-        verticalVelocity = 0f;
-    
-        // Rotation X/Z : suit la pente mais Y reste joueur
-        Quaternion slopeRotation = Quaternion.FromToRotation(Vector3.up, hit.normal);
-        Vector3 euler = slopeRotation.eulerAngles;
-        euler.y = transform.eulerAngles.y; // conserve la rotation Y
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(euler), Time.deltaTime * 3f);
+        // Gravité supplémentaire
+        rb.AddForce(Vector3.down * gravityForce, ForceMode.Acceleration);
     }
-    else
+
+    void UpdateWheelVisuals()
     {
-        // Pas de sol → chute libre
-        verticalVelocity -= fallGravity * Time.deltaTime;
-        transform.position += Vector3.up * verticalVelocity * Time.deltaTime;
+        float wheelSpin = rb.linearVelocity.magnitude * wheelRotationSpeed * Time.deltaTime;
+
+        if (frontLeftWheel != null) frontLeftWheel.Rotate(Vector3.right, wheelSpin, Space.Self);
+        if (frontRightWheel != null) frontRightWheel.Rotate(Vector3.right, wheelSpin, Space.Self);
+        if (rearLeftWheel != null) rearLeftWheel.Rotate(Vector3.right, wheelSpin, Space.Self);
+        if (rearRightWheel != null) rearRightWheel.Rotate(Vector3.right, wheelSpin, Space.Self);
+
+        float steerAngle = steerInput * maxSteerAngle;
+        if (frontLeftWheel != null)
+        {
+            Vector3 rot = frontLeftWheel.localEulerAngles;
+            rot.y = steerAngle;
+            frontLeftWheel.localEulerAngles = rot;
+        }
+        if (frontRightWheel != null)
+        {
+            Vector3 rot = frontRightWheel.localEulerAngles;
+            rot.y = steerAngle;
+            frontRightWheel.localEulerAngles = rot;
+        }
     }
+
+    void UpdateWheelColliders()
+    {
+        float steerAngle = steerInput * maxSteerAngle;
+        if (frontLeftCollider != null) frontLeftCollider.steerAngle = steerAngle;
+        if (frontRightCollider != null) frontRightCollider.steerAngle = steerAngle;
+    }
+
+    void ResetVehicle()
+    {
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+        transform.rotation = Quaternion.Euler(0f, transform.eulerAngles.y, 0f);
+        transform.position = new Vector3(transform.position.x, resetHeight, transform.position.z);
     }
 
     void OnDrawGizmosSelected()
     {
-        if (!Application.isPlaying)
-            return;
-
-        Gizmos.color = Color.cyan;
-        Vector3 rayOrigin = transform.position + transform.forward * hoverForwardOffset + Vector3.up;
-        Gizmos.DrawLine(rayOrigin, rayOrigin + Vector3.down * maxHoverDistance);
+        Gizmos.color = grounded ? Color.green : Color.red;
+        Gizmos.DrawLine(transform.position + Vector3.up * 0.2f,
+                        transform.position + Vector3.up * 0.2f + Vector3.down * groundCheckDistance);
     }
 }
