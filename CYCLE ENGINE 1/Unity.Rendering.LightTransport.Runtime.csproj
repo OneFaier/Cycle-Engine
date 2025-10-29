@@ -17,7 +17,7 @@
     <LangVersion>9.0</LangVersion>
     <RootNamespace></RootNamespace>
     <OutputType>Library</OutputType>
-    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <AssemblyName>Unity.Rendering.LightTransport.Runtime</AssemblyName>
     <TargetFramework>netstandard2.1</TargetFramework>
     <BaseDirectory>.</BaseDirectory>
   </PropertyGroup>
@@ -48,96 +48,77 @@
     <Analyzer Include="C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\Tools\Unity.SourceGenerators\Unity.UIToolkit.SourceGenerator.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventHandler.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\EnvMapAnimator.cs" />
-    <Compile Include="Assets\scripts\Direction.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
-    <Compile Include="Assets\scripts\ObjectGrab.cs" />
-    <Compile Include="Assets\scripts\snap with surface.cs" />
-    <Compile Include="Assets\scripts\SPAWNER PIECES.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
-    <Compile Include="Assets\scripts\NewMonoBehaviourScript.cs" />
-    <Compile Include="Assets\scripts\engine toggle.cs" />
-    <Compile Include="Assets\scripts\Vitesse UI.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
-    <Compile Include="Assets\scripts\LEVIER.cs" />
-    <Compile Include="Assets\scripts\EjectButton.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_UiFrameRateCounter.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
-    <Compile Include="Assets\scripts\SeatSnap.cs" />
-    <Compile Include="Assets\scripts\Player.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />
-    <Compile Include="Assets\scripts\SeatPoint.cs" />
-    <Compile Include="Assets\scripts\direction helth cube.cs" />
-    <Compile Include="Assets\scripts\cubes manager.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
-    <Compile Include="Assets\scripts\Object Categorie.cs" />
-    <Compile Include="Assets\scripts\wheel.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
-    <Compile Include="Assets\scripts\cam.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_DigitValidator.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_FrameRateCounter.cs" />
-    <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
-    <Compile Include="Assets\scripts\CHANGE COLOR.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
-    <Compile Include="Assets\scripts\snp point direction.cs" />
-    <Compile Include="Assets\scripts\ENGINE_Movements.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextConsoleSimulator.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
-    <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
-    <Compile Include="Assets\scripts\WheelColliderVisualizer.cs" />
-    <Compile Include="Assets\scripts\button boost.cs" />
-    <Compile Include="Assets\scripts\switch cam.cs" />
-    <Compile Include="Assets\scripts\SPEED HEALTH.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\Utilities\PersistentGPUArray.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\RayTracingResources.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\ComputeRayTracingBackend.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Hardware\HardwareRayTracingShader.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\Sampling\SamplingResources.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\HlbvhBuilder.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\Utilities\BlockAllocator.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\IRayTracingBackend.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\Utilities\BackendHelpers.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Hardware\HardwareRayTracingAccelStruct.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\BLASPositionsPool.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\GeometryPool\GeometryPoolDefs.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\RayTracingContext.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\AccelStructAdapter.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\TerrainToMesh.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\AccelStructInstances.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\Common.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\ComputeRayTracingShader.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\StringIDs.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\GeometryPool\GeometryPool.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\IRayTracingShader.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\RestructureBvh.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\Utilities\GraphicsHelpers.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\ComputeRayTracingAccelStruct.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\IRayTracingAccelStruct.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\Utilities\Utils.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\UnifiedRayTracingException.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\Scan.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\RadeonRaysAPI.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\AssemblyInfo.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\RadixSort.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\HlbvhTopLevelBuilder.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\Sampling\SobolData.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\BvhCheck.cs" />
+    <Compile Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Hardware\HardwareRayTracingBackend.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
-    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Roboto-Bold - License.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile-2-Pass.shader" />
-    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Unity - OFL.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
-    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Oswald-Bold - OFL.txt" />
-    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Roboto-Bold - AFL.txt" />
-    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Anton OFL.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF SSD.shader" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
-    <None Include="Assets\TextMesh Pro\Shaders\SDFFunctions.hlsl" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface.shader" />
-    <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF.shader" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile SSD.shader" />
-    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
-    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Masking.shader" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
-    <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
-    <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
-    <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Bangers - OFL.txt" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\GeometryPool\GeometryPoolDefs.cs.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\Sampling\SobolSampling.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\transform.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\Unity.Rendering.LightTransport.Runtime.asmdef" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Bindings.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\Sampling\QuasiRandom.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\bit_histogram.compute" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\README.txt" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\Utilities\CopyBuffer.compute" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\FetchGeometry.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\Sampling\Common.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\intersector_common.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Hardware\HWRayTracingMaterial.shader" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\block_scan.compute" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\GeometryPool\GeometryPoolKernels.compute" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\triangle_mesh.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Hardware\HardwareRaygenShader.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\restructure_bvh.compute" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\Sampling\SamplingResources.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\Sampling\SobolBluenoiseSampling.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\scatter.compute" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common\GeometryPool\GeometryPool.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\ComputeRaygenShader.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\bvh2il.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\build_hlbvh.compute" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\TraceRay.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\trace_ray.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\aabb.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\CopyPositions.compute" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Common.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\Sampling\Hashes.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\math.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\intersect_structures.hlsl" />
+    <None Include="Library\PackageCache\com.unity.rendering.light-transport@2c9279f90d7c\Runtime\UnifiedRayTracing\Compute\RadeonRays\kernels\block_reduce_part.compute" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -628,6 +609,18 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\Managed\UnityEngine\UnityEditor.XRModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEditor.Graphs">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\Managed\UnityEditor.Graphs.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEditor.WindowsStandalone.Extensions">
+      <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.YamlDotNet">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
       <HintPath>Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
       <Private>False</Private>
@@ -636,12 +629,36 @@
       <HintPath>Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Unity.Plastic.Antlr3.Runtime">
+      <HintPath>Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\Unity.Plastic.Antlr3.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.Plastic.Newtonsoft.Json">
+      <HintPath>Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\Unity.Plastic.Newtonsoft.Json.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="log4netPlastic">
+      <HintPath>Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\log4netPlastic.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.IonicZip">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="unityplastic">
+      <HintPath>Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\unityplastic.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System.IO.Hashing">
       <HintPath>Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
       <HintPath>Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.TextureAssets">
+      <HintPath>Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Mono.Cecil">
@@ -1142,55 +1159,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Unity.RenderPipelines.Core.Editor.csproj" />
-    <ProjectReference Include="Unity.TextMeshPro.csproj" />
-    <ProjectReference Include="Unity.AI.Navigation.csproj" />
-    <ProjectReference Include="Unity.RenderPipelines.Core.ShaderLibrary.csproj" />
-    <ProjectReference Include="Unity.VisualScripting.SettingsProvider.Editor.csproj" />
-    <ProjectReference Include="Unity.RenderPipelines.Universal.Editor.csproj" />
-    <ProjectReference Include="Unity.AI.Navigation.Updater.csproj" />
-    <ProjectReference Include="Unity.Timeline.csproj" />
-    <ProjectReference Include="Unity.AI.Navigation.Editor.csproj" />
-    <ProjectReference Include="PPv2URPConverters.csproj" />
-    <ProjectReference Include="Unity.RenderPipelines.Core.Runtime.Shared.csproj" />
-    <ProjectReference Include="Unity.RenderPipelines.Universal.2D.Runtime.csproj" />
-    <ProjectReference Include="Unity.VisualScripting.Shared.Editor.csproj" />
-    <ProjectReference Include="Unity.Searcher.Editor.csproj" />
-    <ProjectReference Include="Unity.PlasticSCM.Editor.csproj" />
-    <ProjectReference Include="Unity.Burst.Editor.csproj" />
-    <ProjectReference Include="Unity.VisualScripting.Core.csproj" />
-    <ProjectReference Include="Unity.Mathematics.Editor.csproj" />
-    <ProjectReference Include="Unity.Rendering.LightTransport.Editor.csproj" />
-    <ProjectReference Include="Unity.Rider.Editor.csproj" />
-    <ProjectReference Include="Unity.AI.Navigation.Editor.ConversionSystem.csproj" />
-    <ProjectReference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.csproj" />
-    <ProjectReference Include="Unity.RenderPipelines.Core.Runtime.csproj" />
-    <ProjectReference Include="Unity.VisualScripting.Flow.csproj" />
-    <ProjectReference Include="Unity.TextMeshPro.Editor.csproj" />
-    <ProjectReference Include="Unity.VisualScripting.Flow.Editor.csproj" />
-    <ProjectReference Include="Unity.VisualStudio.Editor.csproj" />
-    <ProjectReference Include="Unity.Collections.csproj" />
-    <ProjectReference Include="Unity.InputSystem.ForUI.csproj" />
-    <ProjectReference Include="Unity.RenderPipelines.GPUDriven.Runtime.csproj" />
-    <ProjectReference Include="Unity.Timeline.Editor.csproj" />
-    <ProjectReference Include="Unity.VisualScripting.State.Editor.csproj" />
     <ProjectReference Include="Unity.Mathematics.csproj" />
-    <ProjectReference Include="Unity.RenderPipelines.Universal.Shaders.csproj" />
-    <ProjectReference Include="UnityEngine.UI.csproj" />
-    <ProjectReference Include="Unity.Multiplayer.Center.Common.csproj" />
+    <ProjectReference Include="Unity.Collections.csproj" />
     <ProjectReference Include="Unity.Burst.csproj" />
-    <ProjectReference Include="Unity.VisualScripting.Core.Editor.csproj" />
-    <ProjectReference Include="Unity.Multiplayer.Center.Editor.csproj" />
-    <ProjectReference Include="Unity.RenderPipelines.Universal.Runtime.csproj" />
-    <ProjectReference Include="Unity.Rendering.LightTransport.Runtime.csproj" />
-    <ProjectReference Include="Unity.VisualScripting.State.csproj" />
-    <ProjectReference Include="Unity.RenderPipelines.Universal.Config.Runtime.csproj" />
-    <ProjectReference Include="Unity.RenderPipeline.Universal.ShaderLibrary.csproj" />
-    <ProjectReference Include="Unity.Collections.Editor.csproj" />
-    <ProjectReference Include="Unity.ShaderGraph.Editor.csproj" />
-    <ProjectReference Include="Unity.RenderPipelines.Core.Editor.Shared.csproj" />
-    <ProjectReference Include="Unity.InputSystem.csproj" />
     <ProjectReference Include="UnityEditor.UI.csproj" />
+    <ProjectReference Include="UnityEngine.UI.csproj" />
   </ItemGroup>
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
   <ItemGroup>
