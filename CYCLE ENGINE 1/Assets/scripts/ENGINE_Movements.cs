@@ -35,9 +35,6 @@ public class ENGINEMovements : MonoBehaviour
     public float groundCheckDistance = 1.2f;
     public LayerMask groundLayer;
 
-    [Header("Centre de masse")]
-    public Transform centerOfMassObject; // ✅ Empty public visible dans l’inspecteur
-
     [Header("Visuel roues")]
     public float wheelRotationSpeed = 5f;
     public float maxSteerAngle = 35f;
@@ -49,8 +46,8 @@ public class ENGINEMovements : MonoBehaviour
     [Header("UI")]
     public TextMeshProUGUI speedText;
 
-    [HideInInspector] public bool canControl = false;
-    public Rigidbody rb; // rendu public pour SeatPoint
+    [HideInInspector] public bool canControl = false; // contrôle activé seulement quand joueur assis
+    [HideInInspector] public Rigidbody rb;
 
     private bool grounded;
     private float steerInput;
@@ -66,13 +63,9 @@ public class ENGINEMovements : MonoBehaviour
         rb.mass = 1200f;
         rb.linearDamping = 0.05f;
         rb.angularDamping = 0.3f;
+        rb.centerOfMass = new Vector3(0, -0.6f, 0);
 
-        // ✅ Centre de masse via Empty public
-        if (centerOfMassObject != null)
-            rb.centerOfMass = transform.InverseTransformPoint(centerOfMassObject.position);
-        else
-            rb.centerOfMass = new Vector3(0, -0.6f, 0);
-
+        // Bloque la voiture au départ
         rb.linearVelocity = Vector3.zero;
         rb.angularVelocity = Vector3.zero;
         rb.isKinematic = true;
@@ -114,6 +107,7 @@ public class ENGINEMovements : MonoBehaviour
             speedText.text = "Vitesse : " + speed.ToString("F1") + " km/h";
         }
 
+        // Visuel roues
         UpdateWheelVisuals();
         UpdateWheelColliders();
     }
