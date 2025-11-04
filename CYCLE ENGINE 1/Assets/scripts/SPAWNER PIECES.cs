@@ -5,11 +5,15 @@ public class PickupSpawner : MonoBehaviour
     [Header("Prefabs de pickups")]
     public GameObject speedPickupPrefab;
     public GameObject directionPickupPrefab;
+    public GameObject elevationPickupPrefab; // 🆕 Nouveau prefab d’élévation
+
+    [Header("Références de scène")]
     public Transform player;
 
     [Header("Cubes de la scène")]
     public IndicatorMouseClickFast directionCubeInScene; // cube direction
     public IndicatorMouseClickFast speedCubeInScene;     // cube vitesse
+    public IndicatorMouseClickFast elevationCubeInScene; // 🆕 cube élévation
 
     [Header("Paramètres de spawn")]
     public float spawnRadius = 5f;
@@ -35,24 +39,45 @@ public class PickupSpawner : MonoBehaviour
 
     void SpawnRandomPickup()
     {
-        GameObject prefab = (Random.value < 0.5f) ? speedPickupPrefab : directionPickupPrefab;
+        // 🌀 Choix aléatoire entre les 3 types
+        float rand = Random.value;
+        GameObject prefab;
 
-        Vector2 rand = Random.insideUnitCircle * spawnRadius;
-        Vector3 spawnPos = new Vector3(player.position.x + rand.x, player.position.y + spawnHeight, player.position.z + rand.y);
+        if (rand < 0.33f)
+            prefab = speedPickupPrefab;
+        else if (rand < 0.66f)
+            prefab = directionPickupPrefab;
+        else
+            prefab = elevationPickupPrefab; // 🆕
+
+        // Position de spawn autour du joueur
+        Vector2 offset = Random.insideUnitCircle * spawnRadius;
+        Vector3 spawnPos = new Vector3(
+            player.position.x + offset.x,
+            player.position.y + spawnHeight,
+            player.position.z + offset.y
+        );
 
         GameObject newPickup = Instantiate(prefab, spawnPos, Quaternion.identity);
 
-        if (prefab == directionPickupPrefab)
+        // 🧠 Liaison automatique du bon cube selon le prefab
+        if (prefab == speedPickupPrefab)
+        {
+            CubeHealth speedHealth = newPickup.GetComponent<CubeHealth>();
+            if (speedHealth != null && speedCubeInScene != null)
+                speedHealth.cube = speedCubeInScene;
+        }
+        else if (prefab == directionPickupPrefab)
         {
             DirectionCubeHealth dirHealth = newPickup.GetComponent<DirectionCubeHealth>();
             if (dirHealth != null && directionCubeInScene != null)
                 dirHealth.directionCube = directionCubeInScene;
         }
-        else if (prefab == speedPickupPrefab)
+        else if (prefab == elevationPickupPrefab)
         {
-            CubeHealth speedHealth = newPickup.GetComponent<CubeHealth>();
-            if (speedHealth != null && speedCubeInScene != null)
-                speedHealth.cube = speedCubeInScene;
+            ElevationCubeHealth elevHealth = newPickup.GetComponent<ElevationCubeHealth>();
+            if (elevHealth != null && elevationCubeInScene != null)
+                elevHealth.elevationCube = elevationCubeInScene;
         }
 
         currentPickups++;

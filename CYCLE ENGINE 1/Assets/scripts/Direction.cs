@@ -10,16 +10,20 @@ public class IndicatorMouseClickFast : MonoBehaviour
     public float sensitivity = 0.05f;
     [Range(0f, 1f)] public float positionNormalized = 0.5f;
     public float snapThreshold = 0.05f;
-    public float maxGrabDistance = 3f; // distance max pour attraper ou survoler
+    public float maxGrabDistance = 3f;
 
     [Header("Surbrillance")]
-    public Color highlightColor = Color.yellow; // couleur au survol
-    private Color baseColor;                    // couleur d'origine
-    private Renderer rend;                      // renderer du cube
+    public Color highlightColor = Color.yellow;
+    private Color baseColor;
+    private Renderer rend;
 
     private Camera playerCamera;
     private bool isGrabbed = false;
     private bool isHovered = false;
+
+    // 🔧 Anti-clignotement
+    private float lastValidHoverTime = -1f;
+    private float hoverMemoryDuration = 0.1f; // temps de "mémoire" du survol
 
     void Start()
     {
@@ -31,25 +35,17 @@ public class IndicatorMouseClickFast : MonoBehaviour
 
     void Update()
     {
-        // Vérifie le survol avec raycast
         HandleHover();
 
-        // Commence à attraper le cube
-        if (Input.GetMouseButtonDown(0))
-        {
-            Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit, maxGrabDistance))
-            {
-                if (hit.collider.gameObject == gameObject)
-                    isGrabbed = true;
-            }
-        }
+        // Commencer le grab
+        if (Input.GetMouseButtonDown(0) && isHovered)
+            isGrabbed = true;
 
-        // Relâche
+        // Relâcher
         if (Input.GetMouseButtonUp(0))
             isGrabbed = false;
 
-        // Déplacer si attrapé
+        // Déplacement si attrapé
         if (isGrabbed)
         {
             float mouseX = Input.GetAxis("Mouse X");
@@ -57,7 +53,7 @@ public class IndicatorMouseClickFast : MonoBehaviour
             positionNormalized = Mathf.Clamp01(positionNormalized);
         }
 
-        // Snap automatique si proche des points clés
+        // Snap auto
         if (!isGrabbed)
         {
             if (Mathf.Abs(positionNormalized - 0f) < snapThreshold) positionNormalized = 0f;
@@ -65,25 +61,45 @@ public class IndicatorMouseClickFast : MonoBehaviour
             else if (Mathf.Abs(positionNormalized - 1f) < snapThreshold) positionNormalized = 1f;
         }
 
-        // Appliquer la position sur le rail
+        // Position sur le rail
         transform.position = Vector3.Lerp(railStart.position, railEnd.position, positionNormalized);
     }
 
     void HandleHover()
     {
         Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, maxGrabDistance) && hit.collider.gameObject == gameObject)
+        bool hitThisFrame = false;
+
+        // Raycast classique
+        if (Physics.Raycast(ray, out RaycastHit hit, maxGrabDistance))
         {
-            if (!isHovered)
+            if (hit.collider.gameObject == gameObject)
             {
-                isHovered = true;
-                SetHighlight(true);
+                hitThisFrame = true;
+                lastValidHoverTime = Time.time;
             }
         }
-        else if (isHovered)
+
+        // 🔄 Hover “persistant” pendant un court instant
+        bool shouldBeHovered = hitThisFrame || (Time.time - lastValidHoverTime < hoverMemoryDuration);
+
+        // 🔍 Si pas de hit, vérifie la distance à la ligne de visée
+        if (!shouldBeHovered)
         {
-            isHovered = false;
-            SetHighlight(false);
+            Vector3 screenPoint = playerCamera.WorldToScreenPoint(transform.position);
+            float distToMouse = Vector2.Distance(Input.mousePosition, screenPoint);
+            if (distToMouse < 40f) // pixels tolérés
+            {
+                shouldBeHovered = true;
+                lastValidHoverTime = Time.time;
+            }
+        }
+
+        // ✅ Changement d’état stable
+        if (shouldBeHovered != isHovered)
+        {
+            isHovered = shouldBeHovered;
+            SetHighlight(isHovered);
         }
     }
 

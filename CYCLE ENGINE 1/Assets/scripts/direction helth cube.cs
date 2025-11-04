@@ -13,6 +13,8 @@ public class DirectionCubeHealth : MonoBehaviour
 
     private float currentHealth;
 
+    [HideInInspector] public bool isInMachine = false; // ⚡️ Flag pour contrôler l’usure
+
     void Start()
     {
         currentHealth = maxHealth;
@@ -23,10 +25,7 @@ public class DirectionCubeHealth : MonoBehaviour
 
     void Update()
     {
-        if (directionCube == null) return;
-
-        // Ne gérer la santé que si le cube est snapé (a un parent)
-        if (transform.parent == null) return;
+        if (!isInMachine || directionCube == null) return; // ⬅️ N’use le cube que s’il est dans la machine
 
         // Intensité basée sur l'écart par rapport au centre (0.5 = centre)
         float intensity = Mathf.Abs(directionCube.positionNormalized - 0.5f) * 2f; // 0 = centre, 1 = extrême
@@ -41,6 +40,10 @@ public class DirectionCubeHealth : MonoBehaviour
             float ratio = currentHealth / maxHealth;
             healthIndicatorCube.material.color = Color.Lerp(Color.red, Color.green, ratio);
         }
+
+        // Détruire le cube si mort
+        if (currentHealth <= 0f)
+            Destroy(gameObject);
     }
 
     public bool IsDead() => currentHealth <= 0f;

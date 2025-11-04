@@ -938,6 +938,11 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 747958134}
   m_CullTransparentMesh: 1
+--- !u!4 &787947216 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5504507508107705160, guid: 4c53fe48a03b1a745ab573e31ff47d6e, type: 3}
+  m_PrefabInstance: {fileID: 2075808667206539201}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &795658584
 GameObject:
   m_ObjectHideFlags: 0
@@ -2662,9 +2667,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PickupSpawner
   speedPickupPrefab: {fileID: 5652860523411047472, guid: bef2b69ca8ead534a8260d7698fb0442, type: 3}
   directionPickupPrefab: {fileID: 7924736704184475524, guid: e071a55c8fbab67438cc0b3a2ed017d2, type: 3}
+  elevationPickupPrefab: {fileID: 0}
   player: {fileID: 1784945049}
   directionCubeInScene: {fileID: 1707389221223840392}
   speedCubeInScene: {fileID: 3666469741668248543}
+  elevationCubeInScene: {fileID: 0}
   spawnRadius: 20
   spawnHeight: 2
   spawnInterval: 4
@@ -3400,7 +3407,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1003331241424274500, guid: 7ee35880c5d98114d8f84a65b078bff6, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 36.44
+      value: 36.97
       objectReference: {fileID: 0}
     - target: {fileID: 1003331241424274500, guid: 7ee35880c5d98114d8f84a65b078bff6, type: 3}
       propertyPath: m_LocalPosition.y
@@ -3408,7 +3415,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1003331241424274500, guid: 7ee35880c5d98114d8f84a65b078bff6, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -36.67
+      value: -36.93
       objectReference: {fileID: 0}
     - target: {fileID: 1003331241424274500, guid: 7ee35880c5d98114d8f84a65b078bff6, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3537,6 +3544,14 @@ PrefabInstance:
       propertyPath: enterTextUI
       value: 
       objectReference: {fileID: 1796893423}
+    - target: {fileID: 1993225887908688653, guid: 4c53fe48a03b1a745ab573e31ff47d6e, type: 3}
+      propertyPath: vehicleRoot
+      value: 
+      objectReference: {fileID: 2090763695}
+    - target: {fileID: 1993225887908688653, guid: 4c53fe48a03b1a745ab573e31ff47d6e, type: 3}
+      propertyPath: seatTransform
+      value: 
+      objectReference: {fileID: 787947216}
     - target: {fileID: 1993225887908688653, guid: 4c53fe48a03b1a745ab573e31ff47d6e, type: 3}
       propertyPath: vehicleController
       value: 

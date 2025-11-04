@@ -1,30 +1,32 @@
 using UnityEngine;
 using TMPro;
 
-public class SeatPoint : MonoBehaviour
+public class VehicleSeatPoint : MonoBehaviour
 {
-    [Header("Références")]
-    public Transform vehicle;              // Racine du véhicule
-    public Transform seatPosition;         // Position d'assise
-    public Transform exitPoint;            // Point de sortie
-    public KeyCode enterKey = KeyCode.F;   // Touche pour entrer
-    public KeyCode exitKey = KeyCode.E;    // Touche pour sortir
+    [Header("Références véhicule")]
+    public Transform vehicleRoot;
+    public Transform seatTransform;
+    public Transform exitPoint;
 
-    [Header("Contrôle véhicule")]
-    public ENGINEMovements vehicleController; // Script de conduite
+    [Header("Touches")]
+    public KeyCode enterKey = KeyCode.F;
+    public KeyCode exitKey = KeyCode.E;
+
+    [Header("Contrôle du véhicule")]
+    public ENGINEMovements vehicleController;
 
     [Header("UI")]
-    public TextMeshProUGUI enterTextUI; // TMP qui s'affiche quand le joueur peut entrer
+    public TextMeshProUGUI enterTextUI;
 
     private GameObject playerObject;
     private SimpleFPSController playerController;
     private Rigidbody playerRb;
-    private bool isSeated = false;
-    private bool canEnter = false;
 
-    // Pour gérer l'ignoreCollision
     private Collider[] playerColliders;
     private Collider[] vehicleColliders;
+
+    private bool isSeated = false;
+    private bool canEnter = false;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -34,7 +36,7 @@ public class SeatPoint : MonoBehaviour
         playerController = playerObject.GetComponent<SimpleFPSController>();
         playerRb = playerObject.GetComponent<Rigidbody>();
 
-        if (playerController != null && playerRb != null)
+        if (playerController && playerRb && vehicleController)
             canEnter = true;
     }
 
@@ -43,86 +45,74 @@ public class SeatPoint : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         canEnter = false;
+        if (enterTextUI) enterTextUI.gameObject.SetActive(false);
     }
 
     private void Update()
     {
-        // --- Entrer dans le véhicule ---
         if (!isSeated && canEnter && Input.GetKeyDown(enterKey))
-            SitPlayer();
+            EnterVehicle();
 
-        // --- Sortir du véhicule ---
         if (isSeated && Input.GetKeyDown(exitKey))
-            ExitSeat();
+            ExitVehicle();
 
-        // --- TMP visibilité ---
-        if (enterTextUI != null)
+        if (enterTextUI)
             enterTextUI.gameObject.SetActive(canEnter && !isSeated);
     }
 
-    private void SitPlayer()
+    private void EnterVehicle()
     {
-        if (playerObject == null || vehicleController == null) return;
+        if (!playerObject || !vehicleController) return;
 
-        // Désactive mouvements FPS
+        // Bloque les contrôles du joueur
         playerController.canMove = false;
         playerRb.isKinematic = true;
 
-        // Parent et positionnement
-        playerObject.transform.SetParent(vehicle);
-        playerObject.transform.SetPositionAndRotation(seatPosition.position, seatPosition.rotation);
+        // Place le joueur sur le siège
+        playerObject.transform.SetParent(vehicleRoot);
+        playerObject.transform.SetPositionAndRotation(seatTransform.position, seatTransform.rotation);
 
-        // Active le contrôle et la physique de la voiture
+        // Active le contrôle du véhicule
         vehicleController.canControl = true;
-        vehicleController.rb.isKinematic = false;
 
-        // Désactive collisions joueur ↔ véhicule
+        // Ignore collisions joueur ↔ véhicule
         playerColliders = playerObject.GetComponentsInChildren<Collider>();
-        vehicleColliders = vehicle.GetComponentsInChildren<Collider>();
-        foreach (Collider pCol in playerColliders)
-        {
-            foreach (Collider vCol in vehicleColliders)
-            {
+        vehicleColliders = vehicleRoot.GetComponentsInChildren<Collider>();
+        foreach (var pCol in playerColliders)
+            foreach (var vCol in vehicleColliders)
                 Physics.IgnoreCollision(pCol, vCol, true);
-            }
-        }
 
         isSeated = true;
         canEnter = false;
+
+        if (enterTextUI) enterTextUI.gameObject.SetActive(false);
     }
 
-    private void ExitSeat()
+    private void ExitVehicle()
     {
-        if (playerObject == null) return;
+        if (!playerObject || !vehicleController) return;
 
-        // Réactive collisions joueur ↔ véhicule
+        // Réactive collisions
         if (playerColliders != null && vehicleColliders != null)
-        {
-            foreach (Collider pCol in playerColliders)
-            {
-                foreach (Collider vCol in vehicleColliders)
-                {
+            foreach (var pCol in playerColliders)
+                foreach (var vCol in vehicleColliders)
                     Physics.IgnoreCollision(pCol, vCol, false);
-                }
-            }
-        }
 
-        // Détache du véhicule
+        // Détache le joueur et replace au point de sortie
         playerObject.transform.SetParent(null);
+        Vector3 exitPos = exitPoint ? exitPoint.position : seatTransform.position + seatTransform.right * 2f;
+        playerObject.transform.SetPositionAndRotation(exitPos, seatTransform.rotation);
 
-        // Position de sortie
-        Vector3 exitPos = exitPoint ? exitPoint.position : seatPosition.position + seatPosition.right * 2f;
-        playerObject.transform.SetPositionAndRotation(exitPos, seatPosition.rotation);
-
-        // Réactive FPS
+        // Réactive le joueur
         playerRb.isKinematic = false;
         playerController.canMove = true;
 
-        // Désactive contrôle véhicule et bloque la physique
+        // Désactive le contrôle véhicule
         vehicleController.canControl = false;
-        vehicleController.rb.isKinematic = true;
 
         isSeated = false;
         canEnter = false;
+
+        if (enterTextUI) enterTextUI.gameObject.SetActive(false);
     }
 }

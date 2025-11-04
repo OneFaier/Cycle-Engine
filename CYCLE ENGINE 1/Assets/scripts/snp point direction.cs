@@ -1,54 +1,52 @@
 using UnityEngine;
 
-public class SnapPointDirection : MonoBehaviour
+public class SimpleModuleSpawner : MonoBehaviour
 {
-    public string snapCategory = "Direction"; // Catégorie du SnapPoint
-    public float snapRange = 3f;              // Rayon d’attraction
-    public float snapSpeed = 10f;             // Vitesse de l’attraction
-    public float attachDistance = 0.1f;       // Distance pour fixer l’objet
+    [Header("Prefab du module à spawn")]
+    public GameObject modulePrefab;
 
-    private void FixedUpdate()
+    [Header("Point de spawn (Empty)")]
+    public Transform spawnPoint;
+
+    [Header("Cube dans la scène")]
+    public IndicatorMouseClickFast sceneCube; // vitesse ou direction
+
+    [Header("Paramètres")]
+    public float spawnInterval = 5f;
+
+    private float timer = 0f;
+
+    private void Update()
     {
-        Rigidbody[] grabbables = FindObjectsOfType<Rigidbody>();
-        foreach (Rigidbody rb in grabbables)
+        if (modulePrefab == null || spawnPoint == null) return;
+
+        timer += Time.deltaTime;
+        if (timer >= spawnInterval)
         {
-            if (!rb.CompareTag("Grabbable")) continue;
-
-            // Vérifie la catégorie de l'objet
-            ObjectCategory objCategory = rb.GetComponent<ObjectCategory>();
-            if (objCategory == null) continue;
-            if (objCategory.category != snapCategory) continue;
-
-            float distance = Vector3.Distance(rb.position, transform.position);
-
-            if (distance <= snapRange)
-            {
-                // Attire l’objet vers le SnapPoint
-                Vector3 direction = (transform.position - rb.position).normalized;
-                rb.linearVelocity = direction * snapSpeed;
-
-                // Snap complet si proche
-                if (distance <= attachDistance)
-                {
-                    rb.position = transform.position;
-                    rb.rotation = transform.rotation;
-                    rb.linearVelocity = Vector3.zero;
-                    rb.useGravity = false;
-
-                    // **DEVIENT ENFANT DU SNAPPOINT**
-                    if (rb.transform.parent != transform)
-                        rb.transform.SetParent(transform);
-                }
-            }
-            else
-            {
-                // Détache si trop loin
-                if (rb.transform.parent == transform)
-                {
-                    rb.transform.SetParent(null);
-                    rb.useGravity = true;
-                }
-            }
+            SpawnModule();
+            timer = 0f;
         }
+    }
+
+    private void SpawnModule()
+    {
+        GameObject newModule = Instantiate(modulePrefab, spawnPoint.position, spawnPoint.rotation);
+        newModule.transform.SetParent(spawnPoint);
+        
+        // Assignation automatique du cube correspondant
+        CubeHealth cubeHealth = newModule.GetComponent<CubeHealth>();
+        if (cubeHealth != null && sceneCube != null)
+        {
+            cubeHealth.cube = sceneCube;
+        }
+
+        // Si c'est un module direction
+        DirectionCubeHealth dirHealth = newModule.GetComponent<DirectionCubeHealth>();
+        if (dirHealth != null && sceneCube != null)
+        {
+            dirHealth.directionCube = sceneCube;
+        }
+
+        newModule.tag = modulePrefab.tag; // garde le tag défini dans le prefab
     }
 }
