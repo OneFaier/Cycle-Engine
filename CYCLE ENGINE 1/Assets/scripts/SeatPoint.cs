@@ -12,9 +12,6 @@ public class VehicleSeatPoint : MonoBehaviour
     public KeyCode enterKey = KeyCode.F;
     public KeyCode exitKey = KeyCode.E;
 
-    [Header("Contrôle du véhicule")]
-    public ENGINEMovements vehicleController;
-
     [Header("UI")]
     public TextMeshProUGUI enterTextUI;
 
@@ -27,6 +24,31 @@ public class VehicleSeatPoint : MonoBehaviour
 
     private bool isSeated = false;
     private bool canEnter = false;
+
+    // Référence dynamique (s’adapte à n’importe quel script de véhicule)
+    private MonoBehaviour vehicleController;
+    private System.Reflection.FieldInfo controlField;
+
+    private void Start()
+    {
+        // Recherche automatique d’un script de véhicule sur la racine
+        if (vehicleRoot != null)
+        {
+            vehicleController = vehicleRoot.GetComponent<MonoBehaviour>();
+            if (vehicleController == null)
+            {
+                // Cherche dans les enfants au cas où
+                vehicleController = vehicleRoot.GetComponentInChildren<MonoBehaviour>();
+            }
+
+            if (vehicleController != null)
+            {
+                // Cherche un champ commun : isPiloting ou canControl
+                controlField = vehicleController.GetType().GetField("isPiloting") ??
+                               vehicleController.GetType().GetField("canControl");
+            }
+        }
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -50,6 +72,8 @@ public class VehicleSeatPoint : MonoBehaviour
 
     private void Update()
     {
+        if (!vehicleController) return;
+
         if (!isSeated && canEnter && Input.GetKeyDown(enterKey))
             EnterVehicle();
 
@@ -73,7 +97,7 @@ public class VehicleSeatPoint : MonoBehaviour
         playerObject.transform.SetPositionAndRotation(seatTransform.position, seatTransform.rotation);
 
         // Active le contrôle du véhicule
-        vehicleController.canControl = true;
+        SetVehicleControl(true);
 
         // Ignore collisions joueur ↔ véhicule
         playerColliders = playerObject.GetComponentsInChildren<Collider>();
@@ -84,7 +108,6 @@ public class VehicleSeatPoint : MonoBehaviour
 
         isSeated = true;
         canEnter = false;
-
         if (enterTextUI) enterTextUI.gameObject.SetActive(false);
     }
 
@@ -108,11 +131,18 @@ public class VehicleSeatPoint : MonoBehaviour
         playerController.canMove = true;
 
         // Désactive le contrôle véhicule
-        vehicleController.canControl = false;
+        SetVehicleControl(false);
 
         isSeated = false;
         canEnter = false;
-
         if (enterTextUI) enterTextUI.gameObject.SetActive(false);
+    }
+
+    private void SetVehicleControl(bool state)
+    {
+        if (vehicleController == null || controlField == null) return;
+
+        // Affecte le champ trouvé (isPiloting ou canControl)
+        controlField.SetValue(vehicleController, state);
     }
 }

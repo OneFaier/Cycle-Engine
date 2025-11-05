@@ -3674,7 +3674,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SimpleOverboard
   maxForwardSpeed: 30
-  acceleration: 20
+  acceleration: 25
   turnSpeed: 15
   turnSmooth: 5
   speedCube: {fileID: 2022021935}
@@ -4142,7 +4142,6 @@ MonoBehaviour:
   exitPoint: {fileID: 0}
   enterKey: 102
   exitKey: 101
-  spaceshipController: {fileID: 0}
   enterTextUI: {fileID: 0}
 --- !u!65 &935304394
 BoxCollider:
@@ -7826,7 +7825,6 @@ MonoBehaviour:
   exitPoint: {fileID: 373683222}
   enterKey: 102
   exitKey: 101
-  spaceshipController: {fileID: 812272930}
   enterTextUI: {fileID: 1243369354}
 --- !u!1 &1638459880
 GameObject:
