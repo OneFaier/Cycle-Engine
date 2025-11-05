@@ -20,7 +20,7 @@ public class DirectionCubeHealth : MonoBehaviour
         currentHealth = maxHealth;
 
         if (healthIndicatorCube != null)
-            healthIndicatorCube.material.color = Color.green;
+            healthIndicatorCube.material.color = Color.yellow;
     }
 
     void Update()
@@ -38,7 +38,7 @@ public class DirectionCubeHealth : MonoBehaviour
         if (healthIndicatorCube != null)
         {
             float ratio = currentHealth / maxHealth;
-            healthIndicatorCube.material.color = Color.Lerp(Color.red, Color.green, ratio);
+            healthIndicatorCube.material.color = Color.Lerp(Color.red, Color.yellow, ratio);
         }
 
         // Détruire le cube si mort
@@ -53,6 +53,6 @@ public class DirectionCubeHealth : MonoBehaviour
     {
         currentHealth = maxHealth;
         if (healthIndicatorCube != null)
-            healthIndicatorCube.material.color = Color.green;
+            healthIndicatorCube.material.color = Color.yellow;
     }
 }
