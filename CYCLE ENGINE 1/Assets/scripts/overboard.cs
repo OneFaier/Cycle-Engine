@@ -4,28 +4,31 @@ using UnityEngine;
 public class HoverSpaceshipAdvanced : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float maxForwardSpeed = 60f;    // vitesse max
-    public float acceleration = 80f;       // accélération max (m/s²)
-    public float turnSpeed = 40f;          // vitesse de rotation
-    public float turnSmooth = 5f;          // lissage rotation
+    public float maxForwardSpeed = 60f;    
+    public float acceleration = 80f;       
+    public float turnSpeed = 40f;          
+    public float turnSmooth = 5f;
 
     [Header("Hover Settings")]
-    public float hoverHeight = 2f;         // hauteur de sustentation
-    public float hoverForce = 250f;        // force de sustentation
-    public float hoverDamping = 3f;        // amortissement vertical
-    public LayerMask groundLayer;          // couche du sol
+    public float hoverHeight = 2f;         
+    public float hoverForce = 250f;        
+    public float hoverDamping = 3f;        
+    public LayerMask groundLayer;
 
     [Header("Control Cubes")]
     public IndicatorMouseClickFast speedCube;
     public IndicatorMouseClickFast directionCube;
 
     [Header("Pilotage")]
-    public bool isPiloting = false;
+    public bool isPiloting = true;  // 🔹 toujours true par défaut
 
     [Header("Gravité personnalisée")]
-    public float gravityForce = 30f;       // intensité de la gravité
-    public float gravityMultiplier = 2f;   // multiplicateur de gravité quand on est loin du sol
-    public float maxGravityDistance = 20f; // portée max de la gravité vers le sol
+    public float gravityForce = 30f;       
+    public float gravityMultiplier = 2f;   
+    public float maxGravityDistance = 20f; 
+
+    [Header("Recul Canon")]
+    public float cannonImpulseForce = 50f; 
 
     private Rigidbody rb;
     private float yawInputSmooth = 0f;
@@ -34,7 +37,7 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.useGravity = false; // on gère la gravité nous-mêmes
+        rb.useGravity = false;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
         rb.mass = 200f;
         rb.linearDamping = 0.5f;
@@ -51,31 +54,25 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
 
     void MoveAndTurn()
     {
-        // Lecture des cubes
         float speedVal = speedCube ? speedCube.positionNormalized : 0f;
         float dirVal = directionCube ? directionCube.positionNormalized : 0.5f;
 
-        // Calcul direction de déplacement (suivre la pente)
         Vector3 forward = transform.forward;
 
-        // Projection du vecteur de déplacement sur le plan du sol
         if (Physics.Raycast(transform.position, -transform.up, out groundHit, hoverHeight * 2f, groundLayer))
         {
             Vector3 groundNormal = groundHit.normal;
             forward = Vector3.ProjectOnPlane(forward, groundNormal).normalized;
         }
 
-        // Vitesse désirée
         Vector3 desiredVelocity = forward * (speedVal * maxForwardSpeed);
 
-        // Accélération limitée
         Vector3 requiredAccel = (desiredVelocity - rb.linearVelocity) / Time.fixedDeltaTime;
         if (requiredAccel.magnitude > acceleration)
             requiredAccel = requiredAccel.normalized * acceleration;
 
         rb.AddForce(requiredAccel, ForceMode.Acceleration);
 
-        // Rotation (yaw)
         float yawInput = Mathf.Lerp(-1f, 1f, dirVal);
         yawInputSmooth = Mathf.Lerp(yawInputSmooth, yawInput, Time.fixedDeltaTime * turnSmooth);
         rb.AddTorque(Vector3.up * yawInputSmooth * turnSpeed, ForceMode.Acceleration);
@@ -88,25 +85,18 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
         if (grounded)
         {
             float heightError = hoverHeight - groundHit.distance;
-
-            // vitesse verticale signée (dot = + quand on monte, - quand on descend)
             float verticalSpeed = Vector3.Dot(rb.linearVelocity, transform.up);
-
             float lift = heightError * hoverForce - verticalSpeed * hoverDamping;
 
-            // Force de sustentation
             rb.AddForce(transform.up * lift, ForceMode.Acceleration);
 
-            // Aligner la rotation avec la normale du sol (suivi des pentes)
             Quaternion targetRotation = Quaternion.FromToRotation(transform.up, groundHit.normal) * transform.rotation;
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.fixedDeltaTime * 5f));
         }
 
-        // --- Gravité réaliste améliorée ---
         Vector3 gravityDirection = Vector3.down;
         float gravityStrength = gravityForce;
 
-        // Si le sol est détecté, moduler la gravité selon la distance
         if (Physics.Raycast(transform.position, Vector3.down, out groundHit, maxGravityDistance, groundLayer))
         {
             float dist = groundHit.distance;
@@ -114,8 +104,13 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
             gravityStrength = gravityForce * Mathf.Lerp(0.5f, gravityMultiplier, t);
         }
 
-        // Appliquer la gravité vers le bas du monde
         rb.AddForce(gravityDirection * gravityStrength, ForceMode.Acceleration);
+    }
+
+    public void ApplyCannonImpulse(Vector3 cannonDirection)
+    {
+        if (rb != null)
+            rb.AddForce(-cannonDirection.normalized * cannonImpulseForce, ForceMode.Impulse);
     }
 
 #if UNITY_EDITOR
