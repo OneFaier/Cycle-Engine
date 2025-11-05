@@ -25,7 +25,7 @@ public class VehicleSeatPoint : MonoBehaviour
     private bool isSeated = false;
     private bool canEnter = false;
 
-    // Référence dynamique (s’adapte à n’importe quel script de véhicule)
+    // Référence dynamique (isPiloting ou canControl)
     private MonoBehaviour vehicleController;
     private System.Reflection.FieldInfo controlField;
 
@@ -36,14 +36,10 @@ public class VehicleSeatPoint : MonoBehaviour
         {
             vehicleController = vehicleRoot.GetComponent<MonoBehaviour>();
             if (vehicleController == null)
-            {
-                // Cherche dans les enfants au cas où
                 vehicleController = vehicleRoot.GetComponentInChildren<MonoBehaviour>();
-            }
 
             if (vehicleController != null)
             {
-                // Cherche un champ commun : isPiloting ou canControl
                 controlField = vehicleController.GetType().GetField("isPiloting") ??
                                vehicleController.GetType().GetField("canControl");
             }
@@ -115,22 +111,46 @@ public class VehicleSeatPoint : MonoBehaviour
     {
         if (!playerObject || !vehicleController) return;
 
-        // Réactive collisions
+        // Réactive les collisions
         if (playerColliders != null && vehicleColliders != null)
+        {
             foreach (var pCol in playerColliders)
                 foreach (var vCol in vehicleColliders)
                     Physics.IgnoreCollision(pCol, vCol, false);
+        }
 
-        // Détache le joueur et replace au point de sortie
+        // Détache le joueur
         playerObject.transform.SetParent(null);
-        Vector3 exitPos = exitPoint ? exitPoint.position : seatTransform.position + seatTransform.right * 2f;
-        playerObject.transform.SetPositionAndRotation(exitPos, seatTransform.rotation);
+
+        // --- Nouveau système de sortie ---
+        Vector3 exitPos;
+
+        if (exitPoint != null)
+        {
+            exitPos = exitPoint.position;
+        }
+        else
+        {
+            // Essaie de le faire sortir à droite du véhicule
+            exitPos = seatTransform.position + vehicleRoot.right * 2f;
+
+            // Si bloqué à droite, tente à gauche
+            if (Physics.Raycast(seatTransform.position, vehicleRoot.right, out RaycastHit hitRight, 2f))
+                exitPos = seatTransform.position - vehicleRoot.right * 2f;
+        }
+
+        // Raycast vers le bas pour poser le joueur sur le sol
+        if (Physics.Raycast(exitPos + Vector3.up * 2f, Vector3.down, out RaycastHit groundHit, 5f))
+            exitPos = groundHit.point;
+
+        // Replace et oriente correctement le joueur
+        playerObject.transform.SetPositionAndRotation(exitPos, Quaternion.Euler(0, vehicleRoot.eulerAngles.y, 0));
 
         // Réactive le joueur
         playerRb.isKinematic = false;
         playerController.canMove = true;
 
-        // Désactive le contrôle véhicule
+        // Désactive le contrôle du véhicule
         SetVehicleControl(false);
 
         isSeated = false;
@@ -144,5 +164,15 @@ public class VehicleSeatPoint : MonoBehaviour
 
         // Affecte le champ trouvé (isPiloting ou canControl)
         controlField.SetValue(vehicleController, state);
+    }
+
+    // ✅ Optionnel : affichage du point de sortie dans la scène
+    private void OnDrawGizmosSelected()
+    {
+        if (exitPoint)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawSphere(exitPoint.position, 0.2f);
+        }
     }
 }
