@@ -13,24 +13,45 @@ public class SimpleFPSController : MonoBehaviour
     public float maxLookAngle = 80f;
 
     [Header("Contrôle")]
-    public bool canMove = true; // ✅ Ajouté pour désactiver les mouvements si nécessaire
+    public bool canMove = true;
+
+    [Header("Footsteps")]
+    public AudioClip[] footstepClips;
+    public AudioSource footstepAudioSource;
+    public float stepDistance = 2f;
+    public float minMoveSpeed = 0.1f;
+    public float footstepVolume = 0.5f;
 
     private Rigidbody rb;
     private float xRotation = 0f;
     private bool isGrounded = true;
 
+    // Footstep tracking
+    private Vector3 lastPosition;
+    private float distanceMoved = 0f;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        lastPosition = transform.position;
+
+        if (!footstepAudioSource)
+        {
+            footstepAudioSource = gameObject.AddComponent<AudioSource>();
+            footstepAudioSource.spatialBlend = 1f;
+        }
     }
 
     void Update()
     {
-        HandleMouseLook(); // Toujours actif, même si canMove = false
+        HandleMouseLook();   // Caméra fluide
         HandleJump();
+        HandleFootsteps();
     }
 
     void FixedUpdate()
@@ -38,21 +59,26 @@ public class SimpleFPSController : MonoBehaviour
         HandleMovement();
     }
 
+    // ---------------- Caméra fluide ----------------
     void HandleMouseLook()
     {
+        // On récupère les axes sans multiplier par deltaTime
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
+        // Rotation verticale (caméra)
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -maxLookAngle, maxLookAngle);
-
-        transform.Rotate(Vector3.up * mouseX);
         playerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+
+        // Rotation horizontale (player)
+        transform.Rotate(Vector3.up * mouseX);
     }
 
+    // ---------------- Mouvement ----------------
     void HandleMovement()
     {
-        if (!canMove) return; // ✅ Bloque uniquement le mouvement
+        if (!canMove) return;
 
         float x = Input.GetAxisRaw("Horizontal");
         float z = Input.GetAxisRaw("Vertical");
@@ -65,7 +91,7 @@ public class SimpleFPSController : MonoBehaviour
 
     void HandleJump()
     {
-        if (!canMove) return; // ✅ Bloque le jump si canMove = false
+        if (!canMove) return;
 
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
@@ -79,5 +105,33 @@ public class SimpleFPSController : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ground"))
             isGrounded = true;
+    }
+
+    public bool IsGrounded() => isGrounded;
+
+    // ---------------- Footsteps ----------------
+    void HandleFootsteps()
+    {
+        if (!canMove || !isGrounded) return;
+        if (footstepClips.Length == 0) return;
+
+        Vector3 horizontalMovement = new Vector3(transform.position.x - lastPosition.x, 0f,
+                                                 transform.position.z - lastPosition.z);
+
+        distanceMoved += horizontalMovement.magnitude;
+
+        if (distanceMoved >= stepDistance && horizontalMovement.magnitude > minMoveSpeed)
+        {
+            PlayFootstep();
+            distanceMoved = 0f;
+        }
+
+        lastPosition = transform.position;
+    }
+
+    void PlayFootstep()
+    {
+        AudioClip clip = footstepClips[Random.Range(0, footstepClips.Length)];
+        footstepAudioSource.PlayOneShot(clip, footstepVolume);
     }
 }

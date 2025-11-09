@@ -73,13 +73,6 @@ public class PickupSpawner : MonoBehaviour
             if (dirHealth != null && directionCubeInScene != null)
                 dirHealth.directionCube = directionCubeInScene;
         }
-        else if (prefab == elevationPickupPrefab)
-        {
-            ElevationCubeHealth elevHealth = newPickup.GetComponent<ElevationCubeHealth>();
-            if (elevHealth != null && elevationCubeInScene != null)
-                elevHealth.elevationCube = elevationCubeInScene;
-        }
-
         currentPickups++;
     }
 }

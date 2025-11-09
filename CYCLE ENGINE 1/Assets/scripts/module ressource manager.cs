@@ -15,6 +15,12 @@ public class ModuleResourceManager : MonoBehaviour
     public Slider speedSlider;
     public Slider directionSlider;
 
+    [Header("Audio")]
+    public AudioClip modulePickupClip;      // Son à jouer quand un module est récupéré
+    public AudioSource audioSource;         // AudioSource pour jouer le son de pickup
+    public AudioSource alertAudioSource;    // AudioSource pour la boucle d'alerte
+    public AudioClip alertClip;             // Son de la boucle d'alerte
+
     private CubeHealth speedModule;
     private DirectionCubeHealth directionModule;
 
@@ -22,6 +28,7 @@ public class ModuleResourceManager : MonoBehaviour
     {
         UpdateSliders();
         EnforceCubeLimits();
+        HandleAlertAudio();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -50,13 +57,11 @@ public class ModuleResourceManager : MonoBehaviour
 
     private void ReplaceModule<T>(ref T slotModule, T newModule, Transform slot) where T : MonoBehaviour
     {
-        // Détruire l'ancien module si présent
         if (slotModule != null)
             Destroy(slotModule.gameObject);
 
         slotModule = newModule;
 
-        // Snap dans le slot et activer l’usure
         SnapToSlot(newModule.gameObject, slot);
     }
 
@@ -71,21 +76,23 @@ public class ModuleResourceManager : MonoBehaviour
         Rigidbody rb = moduleObj.GetComponent<Rigidbody>();
         if (rb != null) Destroy(rb);
 
-        // Activer l'usure uniquement lorsqu'il est dans la machine
         CubeHealth cubeHealth = moduleObj.GetComponent<CubeHealth>();
         if (cubeHealth != null) cubeHealth.isInMachine = true;
 
         DirectionCubeHealth dirHealth = moduleObj.GetComponent<DirectionCubeHealth>();
         if (dirHealth != null) dirHealth.isInMachine = true;
+
+        if (audioSource != null && modulePickupClip != null)
+        {
+            audioSource.PlayOneShot(modulePickupClip);
+        }
     }
 
     private void EnforceCubeLimits()
     {
-        // Si pas de module vitesse ou mort, bloquer le cube à 0
         if (speedCube != null)
             speedCube.positionNormalized = (speedModule != null && !speedModule.IsDead()) ? speedCube.positionNormalized : 0f;
 
-        // Si pas de module direction ou mort, bloquer le cube à 0.5
         if (directionCube != null)
             directionCube.positionNormalized = (directionModule != null && !directionModule.IsDead()) ? directionCube.positionNormalized : 0.5f;
     }
@@ -99,7 +106,30 @@ public class ModuleResourceManager : MonoBehaviour
             directionSlider.value = directionModule != null ? directionModule.GetHealthRatio() : 0f;
     }
 
-    // Méthodes publiques pour assigner directement un module
+    private void HandleAlertAudio()
+    {
+        // Vérifie si les modules sont absents ou morts
+        bool speedModuleDead = speedModule == null || speedModule.IsDead();
+        bool directionModuleDead = directionModule == null || directionModule.IsDead();
+
+        // Si au moins un module est mort ou absent, on joue l'alerte
+        bool shouldPlayAlert = speedModuleDead || directionModuleDead;
+
+        if (alertAudioSource != null && alertClip != null)
+        {
+            if (shouldPlayAlert && !alertAudioSource.isPlaying)
+            {
+                alertAudioSource.clip = alertClip;
+                alertAudioSource.loop = true;
+                alertAudioSource.Play();
+            }
+            else if (!shouldPlayAlert && alertAudioSource.isPlaying)
+            {
+                alertAudioSource.Stop();
+            }
+        }
+    }
+
     public void AssignSpeedModule(CubeHealth module) => ReplaceModule(ref speedModule, module, speedSlot);
     public void AssignDirectionModule(DirectionCubeHealth module) => ReplaceModule(ref directionModule, module, directionSlot);
 }
