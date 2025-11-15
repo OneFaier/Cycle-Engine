@@ -194,11 +194,29 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
         return hoverOrigin ? hoverOrigin.position : transform.position;
     }
 
-    public void ApplyCannonImpulse(Vector3 cannonDirection)
+
+
+    [Header("Recul Canon")]
+    public float cannonLinearForce = 500f;   // Force qui pousse doucement le vaisseau
+    public float cannonTorqueForce = 5f;     // Secousse très légère
+
+    public void ApplyCannonImpulse(Transform firePointTransform)
     {
-        if (rb != null)
-            rb.AddForce(-cannonDirection.normalized * cannonImpulseForce, ForceMode.Impulse);
+        if (rb == null || firePointTransform == null) return;
+
+        // 🔹 Direction opposée au tir
+        Vector3 recoilDir = -firePointTransform.forward;
+
+        // 🔹 Recul linéaire : force douce et progressive
+        rb.AddForce(recoilDir * cannonLinearForce, ForceMode.Impulse);
+
+        // 🔹 Secousse / tilt minime pour le réalisme
+        rb.AddTorque(transform.right * cannonTorqueForce, ForceMode.Impulse);
     }
+
+
+
+
 
 #if UNITY_EDITOR
     void OnDrawGizmosSelected()

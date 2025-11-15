@@ -1,10 +1,11 @@
 using UnityEngine;
 
-public class CannonProjectile : MonoBehaviour
+public class CannonBall : MonoBehaviour
 {
+    [Header("Projectile Settings")]
     public float speed = 80f;
-    public float explosionRadius = 10f;  // rayon de l'effet de repousse
-    public float explosionForce = 1000f; // force max appliquée
+    public float explosionRadius = 10f;
+    public float explosionForce = 1000f;
     public GameObject explosionVFX;
 
     private Rigidbody rb;
@@ -17,6 +18,15 @@ public class CannonProjectile : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
+        // Vérifie si l'objet touché est un BreakableRock
+        BreakableRock rock = collision.collider.GetComponentInParent<BreakableRock>();
+        if (rock != null)
+        {
+            // Applique le point d'impact pour générer l'effet
+            rock.Break();
+
+        }
+
         Explode();
     }
 
@@ -26,15 +36,13 @@ public class CannonProjectile : MonoBehaviour
         if (explosionVFX)
             Instantiate(explosionVFX, transform.position, Quaternion.identity);
 
-        // Détecte tous les rigidbodies dans le rayon
+        // Applique la force à tous les rigidbodies proches
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
         foreach (Collider col in colliders)
         {
             if (col.attachedRigidbody != null)
             {
                 Rigidbody targetRb = col.attachedRigidbody;
-
-                // Calcule la direction et la force en fonction de la distance
                 Vector3 dir = (targetRb.position - transform.position).normalized;
                 float distance = Vector3.Distance(targetRb.position, transform.position);
                 float forceMultiplier = 1f - Mathf.Clamp01(distance / explosionRadius);

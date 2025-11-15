@@ -1,36 +1,63 @@
 using UnityEngine;
 
-public class TurretControllerStable : MonoBehaviour
+[RequireComponent(typeof(Collider))]
+public class TurretControllerTrigger : MonoBehaviour
 {
     [Header("Références")]
-    public Transform turretPivot;     // 🔹 Point autour duquel tourne la tourelle (pivot horizontal)
-    public Transform turretBarrel;    // 🔹 Partie qui s’incline verticalement
-    public Transform firePoint;       // 🔹 Point de sortie du projectile
+    public Transform turretBarrel;   // Pivot vertical du canon
+    public Transform firePoint;      // Point de tir
     public GameObject projectilePrefab;
+    public HoverSpaceshipAdvanced shipEngine; // Référence au vaisseau pour le recul
 
-    [Header("Moteur (recul / physique)")]
-    public HoverSpaceshipAdvanced engine;
+    [Header("Rotation")]
+    public float horizontalSensitivity = 2f;
+    public float verticalSensitivity = 2f;
+    public float rotationSmooth = 10f;
+    public float maxPitch = 60f;
+    public float minPitch = -10f;
+    public float maxYaw = 180f;
+    public float minYaw = -180f;
 
     [Header("Tir")]
     public float projectileSpeed = 80f;
     public float fireCooldown = 0.3f;
     public KeyCode fireKey = KeyCode.Mouse0;
+    public AudioClip fireSound;
+    public AudioSource fireAudioSource;
 
-    [Header("Rotation")]
-    public float maxPitch = 60f;
-    public float minPitch = -10f;
-    public float horizontalSensitivity = 2f;
-    public float verticalSensitivity = 2f;
-    public float rotationSmooth = 10f;
-
+    private bool playerInRange = false;
+    private float targetYaw, targetPitch;
+    private float currentYaw, currentPitch;
     private float nextFireTime;
-    private float targetYaw;
-    private float targetPitch;
-    private float currentYaw;
-    private float currentPitch;
 
-    void Update()
+    private Quaternion initialTurretRotation;
+    private Quaternion initialBarrelRotation;
+    private Quaternion initialPlayerRotation;
+
+    private SimpleFPSController playerController;
+
+    private void Start()
     {
+        // Collider en trigger
+        GetComponent<Collider>().isTrigger = true;
+
+        // AudioSource si non assigné
+        if (!fireAudioSource)
+        {
+            fireAudioSource = gameObject.AddComponent<AudioSource>();
+            fireAudioSource.spatialBlend = 1f;
+        }
+
+        // Stocke les rotations initiales
+        initialTurretRotation = transform.localRotation;
+        if (turretBarrel)
+            initialBarrelRotation = turretBarrel.localRotation;
+    }
+
+    private void Update()
+    {
+        if (!playerInRange) return;
+
         HandleRotation();
         HandleFire();
     }
@@ -40,56 +67,87 @@ public class TurretControllerStable : MonoBehaviour
         float mouseX = Input.GetAxis("Mouse X") * horizontalSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * verticalSensitivity;
 
-        // 🔹 MàJ des cibles
         targetYaw += mouseX;
         targetPitch -= mouseY;
+
+        targetYaw = Mathf.Clamp(targetYaw, minYaw, maxYaw);
         targetPitch = Mathf.Clamp(targetPitch, minPitch, maxPitch);
 
-        // 🔹 Interpolation fluide
         currentYaw = Mathf.Lerp(currentYaw, targetYaw, Time.deltaTime * rotationSmooth);
         currentPitch = Mathf.Lerp(currentPitch, targetPitch, Time.deltaTime * rotationSmooth);
 
-        // 🔹 Application de la rotation autour du pivot
-        if (turretPivot)
-            turretPivot.localRotation = Quaternion.Euler(0f, currentYaw, 0f);
+        // Rotation de la base en Y
+        transform.localRotation = Quaternion.Euler(0f, currentYaw, 0f);
 
+        // Inclinaison du canon en X
         if (turretBarrel)
             turretBarrel.localRotation = Quaternion.Euler(currentPitch, 0f, 0f);
+
+        // Caméra verrouillée sur la tourelle
+        if (playerController)
+        {
+            playerController.transform.rotation = transform.rotation;
+            playerController.playerCamera.transform.localRotation =
+                Quaternion.Euler(currentPitch, 0f, 0f);
+        }
     }
 
     private void HandleFire()
     {
-        if (Input.GetKey(fireKey) && Time.time >= nextFireTime && firePoint && projectilePrefab)
+        if (!Input.GetKey(fireKey) || Time.time < nextFireTime) return;
+
+        if (firePoint && projectilePrefab)
         {
             GameObject proj = Instantiate(projectilePrefab, firePoint.position, firePoint.rotation);
             if (proj.TryGetComponent<Rigidbody>(out var rb))
-#if UNITY_6000_0_OR_NEWER
                 rb.linearVelocity = firePoint.forward * projectileSpeed;
-#else
-                rb.velocity = firePoint.forward * projectileSpeed;
-#endif
-
-            if (engine != null)
-                engine.ApplyCannonImpulse(firePoint.forward);
-
-            nextFireTime = Time.time + fireCooldown;
         }
+
+        if (fireSound && fireAudioSource)
+            fireAudioSource.PlayOneShot(fireSound);
+
+        // Recul physique du vaisseau
+        if (shipEngine != null)
+            shipEngine.ApplyCannonImpulse(firePoint);
+
+        nextFireTime = Time.time + fireCooldown;
     }
 
-#if UNITY_EDITOR
-    void OnDrawGizmosSelected()
+    private void OnTriggerEnter(Collider other)
     {
-        if (firePoint)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(firePoint.position, firePoint.position + firePoint.forward * 5f);
-        }
+        if (!other.CompareTag("Player")) return;
 
-        if (turretPivot)
+        playerInRange = true;
+        playerController = other.GetComponent<SimpleFPSController>();
+
+        if (playerController)
         {
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawSphere(turretPivot.position, 0.15f);
+            playerController.canMove = false;
+            initialPlayerRotation = playerController.transform.rotation;
         }
     }
-#endif
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (!other.CompareTag("Player")) return;
+
+        playerInRange = false;
+
+        // Reset tourelle
+        transform.localRotation = initialTurretRotation;
+        if (turretBarrel)
+            turretBarrel.localRotation = initialBarrelRotation;
+
+        // Reset joueur
+        if (playerController)
+        {
+            playerController.transform.rotation = initialPlayerRotation;
+            playerController.canMove = true;
+            playerController = null;
+        }
+
+        // Reset interne
+        targetYaw = currentYaw = 0f;
+        targetPitch = currentPitch = 0f;
+    }
 }

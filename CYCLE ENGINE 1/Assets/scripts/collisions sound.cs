@@ -4,7 +4,6 @@ using UnityEngine;
 public class SpaceshipCollisionSound : MonoBehaviour
 {
     [Header("Collision Sounds")]
-    [Tooltip("Tableau de sons de collision (metal hit, sci-fi, bump...)")]
     public AudioClip[] collisionClips;
 
     [Tooltip("Force minimale pour déclencher un son")]
@@ -12,6 +11,9 @@ public class SpaceshipCollisionSound : MonoBehaviour
 
     [Tooltip("Volume maximal du son")]
     public float collisionVolume = 1f;
+
+    [Tooltip("Pitch global du son (moins que 1 = plus grave)")]
+    public float globalPitch = 0.85f;
 
     [Tooltip("Distance minimale et maximale pour la spatialisation 3D")]
     public float minDistance = 1f;
@@ -23,7 +25,6 @@ public class SpaceshipCollisionSound : MonoBehaviour
             return;
 
         float impactForce = collision.relativeVelocity.magnitude;
-
         if (impactForce < collisionMinImpact)
             return;
 
@@ -36,13 +37,19 @@ public class SpaceshipCollisionSound : MonoBehaviour
 
         AudioSource aSource = tempAudio.AddComponent<AudioSource>();
         aSource.clip = clip;
+
+        // Volume proportionnel à l'impact
         aSource.volume = Mathf.Clamp(impactForce / 10f, 0f, collisionVolume);
-        aSource.spatialBlend = 1f; // 3D sound
+
+        // Pitch global légèrement plus grave
+        aSource.pitch = globalPitch;
+
+        aSource.spatialBlend = 1f; // son 3D
         aSource.minDistance = minDistance;
         aSource.maxDistance = maxDistance;
         aSource.Play();
 
-        // Détruire le GameObject après la durée du clip
-        Destroy(tempAudio, clip.length);
+        // Détruire le GameObject après le son
+        Destroy(tempAudio, clip.length / aSource.pitch);
     }
 }

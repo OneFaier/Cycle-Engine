@@ -62,16 +62,13 @@ public class SimpleFPSController : MonoBehaviour
     // ---------------- Caméra fluide ----------------
     void HandleMouseLook()
     {
-        // On récupère les axes sans multiplier par deltaTime
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
-        // Rotation verticale (caméra)
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -maxLookAngle, maxLookAngle);
         playerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
-        // Rotation horizontale (player)
         transform.Rotate(Vector3.up * mouseX);
     }
 
@@ -122,7 +119,10 @@ public class SimpleFPSController : MonoBehaviour
 
         if (distanceMoved >= stepDistance && horizontalMovement.magnitude > minMoveSpeed)
         {
-            PlayFootstep();
+            if (rb.linearVelocity.y <= 0.01f) // Ne joue pas le son en l'air
+            {
+                PlayFootstep();
+            }
             distanceMoved = 0f;
         }
 

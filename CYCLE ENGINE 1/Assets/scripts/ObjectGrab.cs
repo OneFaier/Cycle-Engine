@@ -9,6 +9,11 @@ public class ObjectGrabTMP : MonoBehaviour
     public float grabRange = 3f;
     public float holdDistance = 2f;
 
+    [Header("Audio")]
+    public AudioClip grabSound;
+    public AudioClip dropSound;
+    public AudioSource audioSource;
+
     private Rigidbody heldObject;
 
     void Update()
@@ -26,6 +31,10 @@ public class ObjectGrabTMP : MonoBehaviour
                     {
                         heldObject = rb;
                         heldObject.useGravity = false;
+
+                        // Jouer le son de grab
+                        if (audioSource && grabSound)
+                            audioSource.PlayOneShot(grabSound);
                     }
                 }
             }
@@ -35,6 +44,11 @@ public class ObjectGrabTMP : MonoBehaviour
         if (Input.GetMouseButtonDown(1) && heldObject != null)
         {
             heldObject.useGravity = true;
+
+            // Jouer le son de drop
+            if (audioSource && dropSound)
+                audioSource.PlayOneShot(dropSound);
+
             heldObject = null;
         }
 

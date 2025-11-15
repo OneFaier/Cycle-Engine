@@ -5,16 +5,20 @@ TagManager:
   serializedVersion: 3
   tags:
   - CinemachineTarget
+  - Ground
+  - Grabbable
+  - SnapPoint
+  - Projectile
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
   - Player
   - FirstPersonOverlay
-  - 
+  - ground
   - 
   - 
   - 

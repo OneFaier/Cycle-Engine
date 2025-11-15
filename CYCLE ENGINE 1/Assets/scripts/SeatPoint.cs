@@ -4,12 +4,8 @@ using TMPro;
 public class SeatPoint : MonoBehaviour
 {
     [Header("Références")]
-    public Transform seatTransform;
-    public Transform exitPoint;
-
-    [Header("Tourelle / Canon")]
-    public bool isTurretSeat = false;
-    public TurretControllerStable turretController;
+    public Transform seatTransform;    // Point où le joueur s'assoit
+    public Transform exitPoint;        // Point où le joueur sort
 
     [Header("Touches")]
     public KeyCode enterKey = KeyCode.F;
@@ -19,17 +15,12 @@ public class SeatPoint : MonoBehaviour
     [Header("UI")]
     public TextMeshProUGUI enterTextUI;
 
-    [Header("Tous les SeatPoints du véhicule")]
+    [Header("Tous les sièges du véhicule")]
     public SeatPoint[] allSeatPoints;
-
-    [Header("Son")]
-    public AudioClip enterSeatSound;
-    public AudioSource audioSource;
 
     private SimpleFPSController playerController;
     private Rigidbody playerRb;
     private Collider playerCollider;
-
     private bool isSeated = false;
     private bool canEnter = false;
     private int currentSeatIndex = 0;
@@ -38,10 +29,6 @@ public class SeatPoint : MonoBehaviour
     {
         if (allSeatPoints.Length == 0)
             allSeatPoints = new SeatPoint[] { this };
-
-        // Désactive le canon par défaut
-        if (turretController != null)
-            turretController.enabled = false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -49,13 +36,14 @@ public class SeatPoint : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         playerController = other.GetComponent<SimpleFPSController>();
-        if (!playerController) return;
-
         playerRb = other.GetComponent<Rigidbody>();
         playerCollider = other.GetComponent<Collider>();
 
         canEnter = true;
-        if (enterTextUI) enterTextUI.gameObject.SetActive(true);
+
+        // Affiche le texte uniquement si le joueur n'est pas déjà assis
+        if (enterTextUI && !isSeated)
+            enterTextUI.gameObject.SetActive(true);
     }
 
     private void OnTriggerExit(Collider other)
@@ -63,7 +51,9 @@ public class SeatPoint : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         canEnter = false;
-        if (enterTextUI) enterTextUI.gameObject.SetActive(false);
+
+        if (enterTextUI)
+            enterTextUI.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -76,112 +66,77 @@ public class SeatPoint : MonoBehaviour
             if (Input.GetKeyDown(exitKey))
                 ExitSeat();
 
-            if (Input.GetKeyDown(switchSeatKey))
+            if (allSeatPoints.Length > 1 && Input.GetKeyDown(switchSeatKey))
                 SwitchSeat();
         }
     }
 
     private void EnterSeat()
     {
-        if (playerController == null) return;
+        if (!playerController) return;
 
         isSeated = true;
         canEnter = false;
 
-        // 🔹 Son
-        if (audioSource && enterSeatSound)
-            audioSource.PlayOneShot(enterSeatSound);
-
-        // 🔹 Parentage
+        // Bloque le joueur dans le siège
         playerController.transform.SetParent(seatTransform);
         playerController.transform.localPosition = Vector3.zero;
         playerController.transform.localRotation = Quaternion.identity;
 
-        // 🔹 Désactivation du contrôle et physique du joueur
         playerController.canMove = false;
-        if (playerRb)
-        {
-            playerRb.isKinematic = true;
-            playerRb.detectCollisions = false;
-        }
-        if (playerCollider)
-            playerCollider.enabled = false;
 
-        // 🔹 Cache le texte d'entrée
+        if (playerRb) playerRb.isKinematic = true;
+        if (playerCollider) playerCollider.enabled = true; // collider actif pour les triggers
+
+        // 🔹 Désactive le texte dès qu'on est assis
         if (enterTextUI) enterTextUI.gameObject.SetActive(false);
 
-        // 🔹 Active le script du canon uniquement si c'est un siège canon
-        if (isTurretSeat && turretController != null)
-            turretController.enabled = true;
+        currentSeatIndex = System.Array.IndexOf(allSeatPoints, this);
     }
 
     private void ExitSeat()
     {
-        if (playerController == null) return;
+        if (!playerController) return;
 
         isSeated = false;
 
-        // 🔹 Détache le joueur du véhicule
         playerController.transform.SetParent(null);
-
-        // 🔹 Réactive la physique et le mouvement
         playerController.canMove = true;
-        if (playerRb)
-        {
-            playerRb.isKinematic = false;
-            playerRb.detectCollisions = true;
-        }
-        if (playerCollider)
-            playerCollider.enabled = true;
 
-        // 🔹 Téléporte à la sortie
+        if (playerRb) playerRb.isKinematic = false;
+        if (playerCollider) playerCollider.enabled = true;
+
         Vector3 exitPos = exitPoint ? exitPoint.position : seatTransform.position + seatTransform.right * 2f;
         playerController.transform.position = exitPos;
 
-        // 🔹 Désactive le canon si présent
-        if (turretController != null)
-            turretController.enabled = false;
+        // 🔹 Réactive le texte si le joueur sort du siège
+        if (enterTextUI) enterTextUI.gameObject.SetActive(true);
     }
 
     private void SwitchSeat()
     {
         if (allSeatPoints.Length <= 1 || playerController == null) return;
 
-        // 🔹 Désactive le canon du siège actuel si c'en est un
-        if (isTurretSeat && turretController != null)
-            turretController.enabled = false;
+        // Désactive siège actuel
+        SeatPoint currentSeat = allSeatPoints[currentSeatIndex];
+        currentSeat.isSeated = false;
 
-        // 🔹 Marque ce siège comme libre
-        isSeated = false;
-
-        // 🔹 Passe au suivant
+        // Passe au siège suivant
         currentSeatIndex = (currentSeatIndex + 1) % allSeatPoints.Length;
         SeatPoint nextSeat = allSeatPoints[currentSeatIndex];
 
-        // 🔹 Déplace le joueur
         playerController.transform.SetParent(nextSeat.seatTransform);
         playerController.transform.localPosition = Vector3.zero;
         playerController.transform.localRotation = Quaternion.identity;
 
-        // 🔹 Son
-        if (nextSeat.audioSource && nextSeat.enterSeatSound)
-            nextSeat.audioSource.PlayOneShot(nextSeat.enterSeatSound);
-
-        // 🔹 Active le canon si le nouveau siège est une tourelle
-        if (nextSeat.isTurretSeat && nextSeat.turretController != null)
-            nextSeat.turretController.enabled = true;
-
-        // 🔹 Marque le nouveau siège comme occupé
         nextSeat.isSeated = true;
+        isSeated = true;
 
-        // 🔹 Met à jour le joueur dans le nouveau siège
         playerController.canMove = false;
-        if (playerRb)
-        {
-            playerRb.isKinematic = true;
-            playerRb.detectCollisions = false;
-        }
-        if (playerCollider)
-            playerCollider.enabled = false;
+        if (playerRb) playerRb.isKinematic = true;
+        if (playerCollider) playerCollider.enabled = true;
+
+        // 🔹 Texte reste désactivé tant qu'on est assis
+        if (enterTextUI) enterTextUI.gameObject.SetActive(false);
     }
 }
