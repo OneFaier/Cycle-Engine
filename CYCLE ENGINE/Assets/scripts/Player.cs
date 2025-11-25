@@ -14,6 +14,7 @@ public class SimpleFPSController : MonoBehaviour
 
     [Header("Contrôle")]
     public bool canMove = true;
+    public bool mouseLookEnabled = true; // <--- pour la tourelle
 
     [Header("Footsteps")]
     public AudioClip[] footstepClips;
@@ -26,7 +27,6 @@ public class SimpleFPSController : MonoBehaviour
     private float xRotation = 0f;
     private bool isGrounded = true;
 
-    // Footstep tracking
     private Vector3 lastPosition;
     private float distanceMoved = 0f;
 
@@ -49,7 +49,7 @@ public class SimpleFPSController : MonoBehaviour
 
     void Update()
     {
-        HandleMouseLook();   // Caméra fluide
+        HandleMouseLook(); 
         HandleJump();
         HandleFootsteps();
     }
@@ -59,20 +59,29 @@ public class SimpleFPSController : MonoBehaviour
         HandleMovement();
     }
 
-    // ---------------- Caméra fluide ----------------
+    // ---------------------------------------------------------
+    // -------------------- CAMERA LOOK ------------------------
+    // ---------------------------------------------------------
     void HandleMouseLook()
     {
+        if (!mouseLookEnabled) return; // <--- la tourelle désactive ça
+
+        // IMPORTANT : PAS DE deltaTime sinon ça saccade !
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
 
+        // Pitch
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -maxLookAngle, maxLookAngle);
         playerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
+        // Yaw
         transform.Rotate(Vector3.up * mouseX);
     }
 
-    // ---------------- Mouvement ----------------
+    // ---------------------------------------------------------
+    // ------------------- MOVEMENT ----------------------------
+    // ---------------------------------------------------------
     void HandleMovement()
     {
         if (!canMove) return;
@@ -106,23 +115,25 @@ public class SimpleFPSController : MonoBehaviour
 
     public bool IsGrounded() => isGrounded;
 
-    // ---------------- Footsteps ----------------
+    // ---------------------------------------------------------
+    // -------------------- FOOTSTEPS --------------------------
+    // ---------------------------------------------------------
     void HandleFootsteps()
     {
         if (!canMove || !isGrounded) return;
         if (footstepClips.Length == 0) return;
 
-        Vector3 horizontalMovement = new Vector3(transform.position.x - lastPosition.x, 0f,
-                                                 transform.position.z - lastPosition.z);
+        Vector3 horizontalMovement =
+            new Vector3(transform.position.x - lastPosition.x, 0f,
+                        transform.position.z - lastPosition.z);
 
         distanceMoved += horizontalMovement.magnitude;
 
         if (distanceMoved >= stepDistance && horizontalMovement.magnitude > minMoveSpeed)
         {
-            if (rb.linearVelocity.y <= 0.01f) // Ne joue pas le son en l'air
-            {
+            if (rb.linearVelocity.y <= 0.01f)
                 PlayFootstep();
-            }
+
             distanceMoved = 0f;
         }
 

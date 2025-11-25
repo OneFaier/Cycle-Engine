@@ -638,9 +638,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AttachToVehicle
   seatTransform: {fileID: 0}
   exitPoint: {fileID: 0}
-  enterKey: 102
-  exitKey: 101
-  switchSeatKey: 98
   enterTextUI: {fileID: 0}
   allSeatPoints: []
 --- !u!23 &251873617
@@ -1344,7 +1341,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: cb55de9e938d0b2489b676b41372c79c, type: 2}
+  - {fileID: 2100000, guid: 4f8ccceacb6eea649921621e8239c19f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

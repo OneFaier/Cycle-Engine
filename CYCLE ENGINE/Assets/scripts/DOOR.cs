@@ -2,41 +2,44 @@ using UnityEngine;
 
 public class BackDoor : MonoBehaviour
 {
-    [Header("Pivot et rotation")]
-    public Transform pivot;           // Empty autour duquel la porte tourne
-    public float openAngle = 90f;     // Angle d'ouverture
-    public float openSpeed = 90f;     // Degrés par seconde
+    public Transform pivot;          // Empty pivot qui tourne en X
+    public float openAngle = 90f;
+    public float openSpeed = 90f;
 
     private bool isOpen = false;
-    private float currentAngle = 0f;  // Angle ouvert par rapport à la rotation initiale
+    private float currentAngle = 0f;
+
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip openSound;
+    public AudioClip closeSound;
 
     void Start()
     {
-        if (pivot == null) pivot = transform; // fallback si aucun pivot assigné
+        if (audioSource == null) audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
-        RotateDoor();
-    }
-
-    void RotateDoor()
-    {
-        float targetAngle = isOpen ? openAngle : 0f;
+        float target = isOpen ? openAngle : 0f;
         float step = openSpeed * Time.deltaTime;
 
-        float delta = targetAngle - currentAngle;
-        if (Mathf.Abs(delta) > 0.01f)
-        {
-            float rotateStep = Mathf.Sign(delta) * Mathf.Min(Mathf.Abs(delta), step);
-            transform.RotateAround(pivot.position, Vector3.right, rotateStep);
-            currentAngle += rotateStep;
-        }
+        currentAngle = Mathf.MoveTowards(currentAngle, target, step);
+
+        // 🔥 ROTATION EN X UNIQUEMENT
+        pivot.localRotation = Quaternion.Euler(currentAngle, 0f, 0f);
     }
 
-    // Appel public pour ouvrir/fermer la porte
     public void ToggleDoor()
     {
         isOpen = !isOpen;
+
+        if (audioSource != null)
+        {
+            if (isOpen && openSound != null)
+                audioSource.PlayOneShot(openSound);
+            else if (!isOpen && closeSound != null)
+                audioSource.PlayOneShot(closeSound);
+        }
     }
 }
