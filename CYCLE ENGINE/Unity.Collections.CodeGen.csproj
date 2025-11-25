@@ -12,7 +12,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{1e70aa18-b93a-32c3-5644-b2bf3ae8ac2e}</ProjectGuid>
+    <ProjectGuid>{429fde62-7977-73c2-cd97-b91d3d149e2c}</ProjectGuid>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -430,16 +430,16 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Rocks">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.Rocks.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.Rocks.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Pdb">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.Pdb.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.Pdb.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\mscorlib.dll</HintPath>
@@ -822,11 +822,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Unity.Burst.csproj">
-      <Project>{f12341a4-2bfe-60cd-ab92-c335c06f3e15}</Project>
+      <Project>{921fa0a5-5c17-6f28-7cb5-8f95ce3033c3}</Project>
       <Name>Unity.Burst</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Collections.csproj">
-      <Project>{76432d64-bd35-7a17-d290-d4eec1d1148d}</Project>
+      <Project>{817645b8-e6cc-117e-26f5-f93f3dd4a4c9}</Project>
       <Name>Unity.Collections</Name>
     </ProjectReference>
   </ItemGroup>

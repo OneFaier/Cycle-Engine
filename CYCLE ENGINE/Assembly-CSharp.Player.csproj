@@ -12,7 +12,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{76183150-dbe2-5113-941e-0d7f36dcd381}</ProjectGuid>
+    <ProjectGuid>{02a2542c-181d-c0a2-2e99-946c16a04bc0}</ProjectGuid>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -57,18 +57,24 @@
     <Compile Include="Assets\scripts\SPAWNER PIECES.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
     <Compile Include="Assets\scripts\reset scene.cs" />
+    <Compile Include="Assets\scripts\NewMonoBehaviourScript.cs" />
+    <Compile Include="Assets\scripts\EngineParentTrigger.cs" />
     <Compile Include="Assets\scripts\engine toggle.cs" />
     <Compile Include="Assets\scripts\Vitesse UI.cs" />
+    <Compile Include="Assets\scripts\DOOR.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_ExampleScript_01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMPro_InstructionOverlay.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\scripts\LEVIER.cs" />
+    <Compile Include="Assets\scripts\EjectButton.cs" />
     <Compile Include="Assets\scripts\module ressource manager.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
     <Compile Include="Assets\scripts\BRAKABLE ROCK.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_UiFrameRateCounter.cs" />
+    <Compile Include="Assets\scripts\BUTTON.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
+    <Compile Include="Assets\scripts\SeatSnap.cs" />
     <Compile Include="Assets\scripts\Player.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
@@ -76,11 +82,15 @@
     <Compile Include="Assets\scripts\SeatPoint.cs" />
     <Compile Include="Assets\scripts\direction helth cube.cs" />
     <Compile Include="Assets\scripts\cubes manager.cs" />
+    <Compile Include="Assets\scripts\doorbutton.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
     <Compile Include="Assets\scripts\Object Categorie.cs" />
+    <Compile Include="Assets\scripts\wheel.cs" />
+    <Compile Include="Assets\scripts\PLAYER RAYCAST DET.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01_UGUI.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SimpleScript.cs" />
+    <Compile Include="Assets\scripts\SnapWithSurface.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark04.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ChatController.cs" />
     <Compile Include="Assets\scripts\cam.cs" />
@@ -92,6 +102,7 @@
     <Compile Include="Assets\scripts\CHANGE COLOR.cs" />
     <Compile Include="Assets\scripts\spawner direction.cs" />
     <Compile Include="Assets\scripts\CANON BALL.cs" />
+    <Compile Include="Assets\scripts\CubeBlinker.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\scripts\snp point direction.cs" />
@@ -106,6 +117,11 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
     <Compile Include="Assets\scripts\overboard.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshProFloatingText.cs" />
+    <Compile Include="Assets\scripts\WheelColliderVisualizer.cs" />
+    <Compile Include="Assets\scripts\button boost.cs" />
+    <Compile Include="Assets\scripts\switch cam.cs" />
+    <Compile Include="Assets\scripts\EnterVehicleTrigger.cs" />
+    <Compile Include="Assets\scripts\SnapPoint.cs" />
     <Compile Include="Assets\scripts\SPEED HEALTH.cs" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\Variations\mono\Managed\UnityEngine.dll</HintPath>
@@ -333,22 +349,22 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\Variations\mono\Managed\UnityEngine.XRModule.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System.IO.Hashing">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime\AOT\Newtonsoft.Json.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime\AOT\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>
@@ -719,107 +735,107 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Unity.TextMeshPro.Player.csproj">
-      <Project>{ca662c1c-60ca-0356-a30b-6c00c4bb6afe}</Project>
+      <Project>{68ebdea3-8fa6-3031-b5ea-a80e2a37c0fa}</Project>
       <Name>Unity.TextMeshPro.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.AI.Navigation.Player.csproj">
-      <Project>{9656fe3d-315f-7abf-6253-2e5af5de1270}</Project>
+      <Project>{b35cf4ab-e3c0-e985-585e-3815b59145df}</Project>
       <Name>Unity.AI.Navigation.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.Core.ShaderLibrary.Player.csproj">
-      <Project>{26fd562e-4328-6206-0088-c189a4a94dfe}</Project>
+      <Project>{678fea18-db81-56fb-237f-eb1a8bb65d14}</Project>
       <Name>Unity.RenderPipelines.Core.ShaderLibrary.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Timeline.Player.csproj">
-      <Project>{808dca36-14f1-60ef-1f69-902384b6eeaa}</Project>
+      <Project>{a78be446-ae93-b142-545b-664d890a0d30}</Project>
       <Name>Unity.Timeline.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.Core.Runtime.Shared.Player.csproj">
-      <Project>{962d646f-ad6d-9bfd-15c9-c2559db3831b}</Project>
+      <Project>{ad688053-548d-d8e7-4f38-2f1074cb24d2}</Project>
       <Name>Unity.RenderPipelines.Core.Runtime.Shared.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.Universal.2D.Runtime.Player.csproj">
-      <Project>{083a210f-db50-ae39-a5d0-b12ac8667e0a}</Project>
+      <Project>{995b0e64-2ac4-91af-6059-1e1f92b7dad8}</Project>
       <Name>Unity.RenderPipelines.Universal.2D.Runtime.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.VisualScripting.Core.Player.csproj">
-      <Project>{3cc7d657-36ca-969b-4b0c-b67efce4bd09}</Project>
+      <Project>{826c4733-e25e-cf48-c1c1-24ff61395dfa}</Project>
       <Name>Unity.VisualScripting.Core.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.Player.csproj">
-      <Project>{1170d9c6-7ca3-5b9b-c8aa-c18243868ce3}</Project>
+      <Project>{2f0236a7-5db1-ff66-9808-354a049e38b2}</Project>
       <Name>Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.Core.Runtime.Player.csproj">
-      <Project>{292c2266-218e-8783-f209-d40c02b1604c}</Project>
+      <Project>{6e808da6-62b7-29a0-97af-b2f7cbcd1644}</Project>
       <Name>Unity.RenderPipelines.Core.Runtime.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.VisualScripting.Flow.Player.csproj">
-      <Project>{a51c3c4d-2e96-84df-ad56-0b78995a0686}</Project>
+      <Project>{2c23605d-8ea5-ad46-0d2a-41a6b6f869c3}</Project>
       <Name>Unity.VisualScripting.Flow.Player</Name>
     </ProjectReference>
     <ProjectReference Include="glTFast.dots.Player.csproj">
-      <Project>{7b7f5202-d639-dda9-e394-8ec6f88d2791}</Project>
+      <Project>{d69218e4-c185-ce2c-5b1f-2f57f6c2a0fe}</Project>
       <Name>glTFast.dots.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Collections.Player.csproj">
-      <Project>{588b6501-e7cc-b8d7-f844-458063e63afb}</Project>
+      <Project>{5e98b8f3-559f-c405-37c1-58d7cc3401fc}</Project>
       <Name>Unity.Collections.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.InputSystem.ForUI.Player.csproj">
-      <Project>{c89237ff-3219-2a08-0b59-ac3dc92e34dc}</Project>
+      <Project>{ddac7782-8b2f-b95c-1c17-4c71af4b7591}</Project>
       <Name>Unity.InputSystem.ForUI.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.GPUDriven.Runtime.Player.csproj">
-      <Project>{46186c49-f10e-74b7-0de4-e8790a7e6992}</Project>
+      <Project>{e32c92fa-bdfe-d05e-4e32-294b3bdd3e8e}</Project>
       <Name>Unity.RenderPipelines.GPUDriven.Runtime.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Mathematics.Player.csproj">
-      <Project>{d6bb1167-dc74-ee98-35e8-094727c22b79}</Project>
+      <Project>{842a8bdc-6543-c556-4f49-682b0f4e6574}</Project>
       <Name>Unity.Mathematics.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.Universal.Shaders.Player.csproj">
-      <Project>{38b0541e-4ca6-3b93-805a-20fd0f9c8cbe}</Project>
+      <Project>{e34deaeb-7009-f3c2-89e3-98910a0d877e}</Project>
       <Name>Unity.RenderPipelines.Universal.Shaders.Player</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEngine.UI.Player.csproj">
-      <Project>{e3bc6692-08fa-6ab6-ada7-f25991e749fc}</Project>
+      <Project>{ba7261f5-19cd-c6a6-a7f1-d26b73ce22a8}</Project>
       <Name>UnityEngine.UI.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Multiplayer.Center.Common.Player.csproj">
-      <Project>{8884bfc0-ce13-565d-381e-fe7c5520e28f}</Project>
+      <Project>{387accb5-eaef-7bc4-d701-283cf65b641e}</Project>
       <Name>Unity.Multiplayer.Center.Common.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Burst.Player.csproj">
-      <Project>{f04003a6-800a-1431-5a96-1cf31a9ffaf7}</Project>
+      <Project>{a9655aba-57b0-4462-5d37-9ee30666ae63}</Project>
       <Name>Unity.Burst.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.Universal.Runtime.Player.csproj">
-      <Project>{b052959d-bece-3d8f-f87a-48b142c47fe9}</Project>
+      <Project>{52783966-4ef5-50a7-8229-b88a61e4d430}</Project>
       <Name>Unity.RenderPipelines.Universal.Runtime.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Rendering.LightTransport.Runtime.Player.csproj">
-      <Project>{81479df9-5ef6-9c6c-c769-4e1fea708854}</Project>
+      <Project>{3bd1d3ce-3a2d-f904-db77-d56f46e93979}</Project>
       <Name>Unity.Rendering.LightTransport.Runtime.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.VisualScripting.State.Player.csproj">
-      <Project>{a81bff25-47d9-a7e0-08f7-310f72e63db2}</Project>
+      <Project>{1a95a98c-d005-6bbb-4862-e865f71f87f9}</Project>
       <Name>Unity.VisualScripting.State.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.Universal.Config.Runtime.Player.csproj">
-      <Project>{6b67a336-7ae2-9aad-56e7-f4e330daed5c}</Project>
+      <Project>{9b2e0512-b16f-ea03-0b54-0669d1f5842c}</Project>
       <Name>Unity.RenderPipelines.Universal.Config.Runtime.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipeline.Universal.ShaderLibrary.Player.csproj">
-      <Project>{e5d36bd2-c32c-9add-9134-b7b04b58bbdf}</Project>
+      <Project>{8c82d4f2-38e9-7103-322a-9d2ad3724d5d}</Project>
       <Name>Unity.RenderPipeline.Universal.ShaderLibrary.Player</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.InputSystem.Player.csproj">
-      <Project>{2f47ef3c-cf2d-36f2-c9b3-5989b2b6e518}</Project>
+      <Project>{fc110e70-1cdf-81ac-cdea-7a5715f441dd}</Project>
       <Name>Unity.InputSystem.Player</Name>
     </ProjectReference>
     <ProjectReference Include="glTFast.Player.csproj">
-      <Project>{63f1f9ef-a548-9d4e-c4e1-b08ce0a32157}</Project>
+      <Project>{ea8ebb5f-06b0-ea4c-424e-b14e9a61c798}</Project>
       <Name>glTFast.Player</Name>
     </ProjectReference>
   </ItemGroup>

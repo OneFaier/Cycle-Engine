@@ -12,7 +12,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{2fd2987c-7bd2-df70-5081-68b33991200a}</ProjectGuid>
+    <ProjectGuid>{aff262d7-cd64-450f-c118-54275b98cab8}</ProjectGuid>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -440,46 +440,46 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.YamlDotNet">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\Dependencies\YamlDotNet\Unity.VisualScripting.YamlDotNet.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Collections.LowLevel.ILSupport">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.LowLevel.ILSupport\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Plastic.Antlr3.Runtime">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\Unity.Plastic.Antlr3.Runtime.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\Unity.Plastic.Antlr3.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Plastic.Newtonsoft.Json">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\Unity.Plastic.Newtonsoft.Json.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\Unity.Plastic.Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="log4netPlastic">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\log4netPlastic.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\log4netPlastic.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.IonicZip">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\Dependencies\DotNetZip\Unity.VisualScripting.IonicZip.dll</HintPath>
     </Reference>
     <Reference Include="unityplastic">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\unityplastic.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collab-proxy@ab839cc7d2ad\Lib\Editor\unityplastic.dll</HintPath>
     </Reference>
     <Reference Include="System.IO.Hashing">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime\Newtonsoft.Json.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Unity.VisualScripting.TextureAssets">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Editor\VisualScripting.Core\EditorAssetResources\Unity.VisualScripting.TextureAssets.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collections@d49facba0036\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\mscorlib.dll</HintPath>
@@ -859,19 +859,19 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="UnityEditor.UI.csproj">
-      <Project>{c5f07c58-07a4-a23d-d92b-a82813de2c85}</Project>
+      <Project>{836d0c51-b563-3126-9590-1b43c158ec99}</Project>
       <Name>UnityEditor.UI</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEngine.UI.csproj">
-      <Project>{64c8c605-ddf4-4af1-c0b7-cab3d9b580fb}</Project>
+      <Project>{e8ad9fab-0776-7705-d9fd-11cd95e69fa5}</Project>
       <Name>UnityEngine.UI</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEditor.TestRunner.csproj">
-      <Project>{930964eb-6d49-28c7-85d2-88d4b605fc73}</Project>
+      <Project>{2625e0bb-52e5-31bf-a698-7e6ef5b69e7a}</Project>
       <Name>UnityEditor.TestRunner</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEngine.TestRunner.csproj">
-      <Project>{5fb08522-007a-3cb7-2cf4-9f99519e190c}</Project>
+      <Project>{2409f3c2-4149-39dc-fa05-4767163924a8}</Project>
       <Name>UnityEngine.TestRunner</Name>
     </ProjectReference>
   </ItemGroup>

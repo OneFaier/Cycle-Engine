@@ -12,7 +12,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{5fb08522-007a-3cb7-2cf4-9f99519e190c}</ProjectGuid>
+    <ProjectGuid>{2409f3c2-4149-39dc-fa05-4767163924a8}</ProjectGuid>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -557,7 +557,7 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\Managed\UnityEngine\UnityEditor.XRModule.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>

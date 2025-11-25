@@ -12,7 +12,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{38199fb5-5714-c7c6-d7db-dbc6d560b636}</ProjectGuid>
+    <ProjectGuid>{3a695db1-255f-0a7b-6bf8-b446e941fdfa}</ProjectGuid>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -433,19 +433,19 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Burst.Cecil">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.burst@1df634d836b8\Unity.Burst.CodeGen\Unity.Burst.Cecil.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.burst@1df634d836b8\Unity.Burst.CodeGen\Unity.Burst.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Burst.Cecil.Rocks">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.burst@1df634d836b8\Unity.Burst.CodeGen\Unity.Burst.Cecil.Rocks.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.burst@1df634d836b8\Unity.Burst.CodeGen\Unity.Burst.Cecil.Rocks.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Burst.Cecil.Pdb">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.burst@1df634d836b8\Unity.Burst.CodeGen\Unity.Burst.Cecil.Pdb.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.burst@1df634d836b8\Unity.Burst.CodeGen\Unity.Burst.Cecil.Pdb.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Burst.Cecil.Mdb">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.burst@1df634d836b8\Unity.Burst.CodeGen\Unity.Burst.Cecil.Mdb.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.burst@1df634d836b8\Unity.Burst.CodeGen\Unity.Burst.Cecil.Mdb.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\mscorlib.dll</HintPath>
@@ -828,7 +828,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Unity.Burst.csproj">
-      <Project>{f12341a4-2bfe-60cd-ab92-c335c06f3e15}</Project>
+      <Project>{921fa0a5-5c17-6f28-7cb5-8f95ce3033c3}</Project>
       <Name>Unity.Burst</Name>
     </ProjectReference>
   </ItemGroup>

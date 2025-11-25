@@ -12,7 +12,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{a25f19d1-1142-905f-1ecd-85f2229b4fa1}</ProjectGuid>
+    <ProjectGuid>{00caba4e-9ab1-cf72-1ff7-e0a5c060f9ef}</ProjectGuid>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -440,7 +440,7 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE 1\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\PROJET CYCLE ENGINE\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.2.8f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\mscorlib.dll</HintPath>
@@ -820,23 +820,23 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Unity.PerformanceTesting.csproj">
-      <Project>{393e119e-28bc-2297-08ef-5ef529149917}</Project>
+      <Project>{aa07d587-5dbb-6321-8c64-1d0aa945af82}</Project>
       <Name>Unity.PerformanceTesting</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEngine.TestRunner.csproj">
-      <Project>{5fb08522-007a-3cb7-2cf4-9f99519e190c}</Project>
+      <Project>{2409f3c2-4149-39dc-fa05-4767163924a8}</Project>
       <Name>UnityEngine.TestRunner</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEditor.TestRunner.csproj">
-      <Project>{930964eb-6d49-28c7-85d2-88d4b605fc73}</Project>
+      <Project>{2625e0bb-52e5-31bf-a698-7e6ef5b69e7a}</Project>
       <Name>UnityEditor.TestRunner</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEditor.UI.csproj">
-      <Project>{c5f07c58-07a4-a23d-d92b-a82813de2c85}</Project>
+      <Project>{836d0c51-b563-3126-9590-1b43c158ec99}</Project>
       <Name>UnityEditor.UI</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEngine.UI.csproj">
-      <Project>{64c8c605-ddf4-4af1-c0b7-cab3d9b580fb}</Project>
+      <Project>{e8ad9fab-0776-7705-d9fd-11cd95e69fa5}</Project>
       <Name>UnityEngine.UI</Name>
     </ProjectReference>
   </ItemGroup>
