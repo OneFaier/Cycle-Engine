@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class BackDoor : MonoBehaviour
 {
-    public Transform pivot;          // Empty pivot qui tourne en X
+    [Header("Porte")]
+    public Transform pivot;          
     public float openAngle = 90f;
     public float openSpeed = 90f;
 
@@ -14,21 +15,53 @@ public class BackDoor : MonoBehaviour
     public AudioClip openSound;
     public AudioClip closeSound;
 
-    void Start()
+    [Header("Lampe (Point Light)")]
+    public Light lampLight;
+    public Color colorClosed = Color.green;  // devient vert si SAS terminé
+    public Color colorOpen = Color.red;
+
+    [Header("SAS")]
+    public SasController sasAndSubmarine;
+
+
+
+    private void Start()
     {
-        if (audioSource == null) audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+            audioSource = GetComponent<AudioSource>();
+
+        UpdateLampColor(colorClosed);
     }
 
-    void Update()
+    private void Update()
     {
-        float target = isOpen ? openAngle : 0f;
+        float targetAngle = isOpen ? openAngle : 0f;
         float step = openSpeed * Time.deltaTime;
 
-        currentAngle = Mathf.MoveTowards(currentAngle, target, step);
-
-        // 🔥 ROTATION EN X UNIQUEMENT
+        currentAngle = Mathf.MoveTowards(currentAngle, targetAngle, step);
         pivot.localRotation = Quaternion.Euler(currentAngle, 0f, 0f);
+
+        UpdateLampLogic();
     }
+
+    private void UpdateLampLogic()
+    {
+        if (lampLight == null)
+            return;
+
+        if (!Mathf.Approximately(currentAngle, 0f))
+        {
+            UpdateLampColor(colorOpen); // rouge si porte ouverte
+            return;
+        }
+
+        // Porte fermée : vert si SAS terminé, sinon rouge
+        if (sasAndSubmarine != null && !sasAndSubmarine.sasInProgress)
+            UpdateLampColor(colorClosed);
+        else
+            UpdateLampColor(colorOpen);
+    }
+
 
     public void ToggleDoor()
     {
@@ -41,5 +74,12 @@ public class BackDoor : MonoBehaviour
             else if (!isOpen && closeSound != null)
                 audioSource.PlayOneShot(closeSound);
         }
+
+        // ⚠ PAS d'appel à sasZone ici : le SAS se déclenche uniquement avec le bouton
+    }
+
+    private void UpdateLampColor(Color c)
+    {
+        lampLight.color = c;
     }
 }

@@ -169,6 +169,6 @@ MonoBehaviour:
   cube: {fileID: 0}
   cubeRenderer: {fileID: 0}
   maxHealth: 100
-  depletionRate: 5
-  passiveDepletionRate: 2
+  depletionRate: 4
+  passiveDepletionRate: 1
   isInMachine: 0

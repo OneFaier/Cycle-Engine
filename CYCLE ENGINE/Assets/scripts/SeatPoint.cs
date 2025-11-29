@@ -31,8 +31,8 @@ public class SeatPoint : MonoBehaviour
         if (!other.CompareTag("Player")) return;
 
         playerController = other.GetComponent<SimpleFPSController>();
-        playerRb = other.GetComponent<Rigidbody>();
-        playerCollider = other.GetComponent<Collider>();
+        playerRb         = other.GetComponent<Rigidbody>();
+        playerCollider   = other.GetComponent<Collider>();
 
         EnterSeat();
     }
@@ -45,7 +45,7 @@ public class SeatPoint : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E))
             ExitSeat();
 
-        // 🔥 Change de siège avec B
+        // Change de siège avec B
         if (allSeatPoints.Length > 1 && Input.GetKeyDown(KeyCode.B))
             SwitchSeat();
     }
@@ -56,41 +56,54 @@ public class SeatPoint : MonoBehaviour
 
         isSeated = true;
 
+        // Place le joueur dans le siège
         playerController.transform.SetParent(seatTransform);
         playerController.transform.localPosition = Vector3.zero;
         playerController.transform.localRotation = Quaternion.identity;
 
+        // Désactive mouvement
         playerController.canMove = false;
 
-        if (playerRb) playerRb.isKinematic = true;
-        if (playerCollider) playerCollider.enabled = true;
+        // 🔥 Désactive collisions du joueur
+        if (playerCollider) playerCollider.enabled = false;
 
+        // 🔥 Physique désactivée
+        if (playerRb) playerRb.isKinematic = true;
+
+        // Cache le texte
         if (enterTextUI)
             enterTextUI.gameObject.SetActive(false);
 
+        // Définit le siège actuel
         currentSeatIndex = System.Array.IndexOf(allSeatPoints, this);
     }
 
     private void SwitchSeat()
     {
-        // Désactive l'ancien siège
-        SeatPoint oldSeat = allSeatPoints[currentSeatIndex];
-        oldSeat.isSeated = false;
+        // Quitte l'ancien siège
+        allSeatPoints[currentSeatIndex].isSeated = false;
 
-        // Passe au suivant
+        // Choisis le prochain siège
         currentSeatIndex = (currentSeatIndex + 1) % allSeatPoints.Length;
         SeatPoint newSeat = allSeatPoints[currentSeatIndex];
 
-        // Revient au même joueur
+        // Assure que le joueur est toujours en "mode assis"
         isSeated = true;
         newSeat.isSeated = true;
 
+        // Replace le joueur sur le nouveau siège
         playerController.transform.SetParent(newSeat.seatTransform);
         playerController.transform.localPosition = Vector3.zero;
         playerController.transform.localRotation = Quaternion.identity;
 
+        // Toujours pas de mouvements
         playerController.canMove = false;
-        playerRb.isKinematic = true;
+
+        // 🔥 Continue de désactiver collisions
+        if (playerCollider) playerCollider.enabled = false;
+
+        // 🔥 Continue de bloquer la physique
+        if (playerRb) playerRb.isKinematic = true;
 
         if (enterTextUI)
             enterTextUI.gameObject.SetActive(false);
@@ -102,12 +115,17 @@ public class SeatPoint : MonoBehaviour
 
         isSeated = false;
 
+        // Libère le joueur
         playerController.transform.SetParent(null);
         playerController.canMove = true;
 
-        if (playerRb) playerRb.isKinematic = false;
+        // 🔥 Réactive collisions
         if (playerCollider) playerCollider.enabled = true;
 
+        // 🔥 Réactive physique
+        if (playerRb) playerRb.isKinematic = false;
+
+        // Position de sortie
         Vector3 exitPos = exitPoint ?
             exitPoint.position :
             seatTransform.position + seatTransform.right * 2f;
