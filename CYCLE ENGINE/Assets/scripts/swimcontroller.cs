@@ -5,7 +5,6 @@ public class SwimController : MonoBehaviour
 {
     [Header("Mouvement nage")]
     public float swimSpeed = 3f;
-    public float ascendSpeed = 2f;
     public float gravity = 9.81f;
 
     [Header("Caméra")]
@@ -16,6 +15,9 @@ public class SwimController : MonoBehaviour
     [Header("Contrôle")]
     public bool canMove = true;
 
+    [Header("Limites")]
+    public float waterHeight = 0f; // hauteur de la surface de l'eau
+
     private Rigidbody rb;
     private float xRotation = 0f;
 
@@ -24,7 +26,6 @@ public class SwimController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
 
-        // Verrouille le curseur et le rend invisible
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -38,14 +39,15 @@ public class SwimController : MonoBehaviour
     {
         HandleSwimMovement();
         ApplyGravity();
+        LimitHeightSmooth();
     }
 
     void HandleMouseLook()
     {
         if (!canMove) return;
 
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -maxLookAngle, maxLookAngle);
@@ -58,14 +60,18 @@ public class SwimController : MonoBehaviour
     {
         if (!canMove) return;
 
-        float x = Input.GetAxisRaw("Horizontal");
-        float z = Input.GetAxisRaw("Vertical");
-        float y = 0f;
+        // Déplacement selon les touches
+        float x = Input.GetAxisRaw("Horizontal"); // A/D
+        float z = Input.GetAxisRaw("Vertical");   // W/S
 
-        if (Input.GetKey(KeyCode.Space)) y += ascendSpeed;
-        if (Input.GetKey(KeyCode.LeftControl)) y -= ascendSpeed;
+        // Direction du regard
+        Vector3 forward = playerCamera.transform.forward;
+        Vector3 right = playerCamera.transform.right;
 
-        Vector3 moveDir = transform.right * x + transform.forward * z + Vector3.up * y;
+        // Combinaison pour mouvement relatif à la caméra
+        Vector3 moveDir = (forward * z + right * x).normalized;
+
+        // Appliquer la vitesse
         rb.linearVelocity = moveDir * swimSpeed;
     }
 
@@ -73,7 +79,24 @@ public class SwimController : MonoBehaviour
     {
         if (!canMove) return;
 
-        if (!Input.GetKey(KeyCode.Space))
+        if (transform.position.y < waterHeight)
+        {
             rb.linearVelocity += Vector3.down * gravity * Time.fixedDeltaTime;
+        }
+    }
+
+    void LimitHeightSmooth()
+    {
+        if (transform.position.y > waterHeight)
+        {
+            Vector3 vel = rb.linearVelocity;
+
+            // Limite la vitesse ascendante pour rester à la surface
+            if (vel.y > 0)
+            {
+                vel.y = Mathf.Min(vel.y, (waterHeight - transform.position.y) / Time.fixedDeltaTime);
+                rb.linearVelocity = vel;
+            }
+        }
     }
 }
