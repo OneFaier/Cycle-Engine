@@ -2,46 +2,53 @@ using UnityEngine;
 
 public class SasButton : MonoBehaviour
 {
-    public SasController sasAndSubmarine;
-    public float maxInteractDistance = 3f;
+    public SasController sasController;
+    public float interactDistance = 3f;
     public Color highlightColor = Color.yellow;
 
     private Renderer rend;
     private Color baseColor;
     private Camera cam;
-    private bool hovered = false;
+    private bool hovered;
 
     void Start()
     {
-        rend = GetComponent<Renderer>();
-        if (rend != null) baseColor = rend.material.color;
-
         cam = Camera.main;
+        rend = GetComponent<Renderer>();
+
+        if (rend != null)
+            baseColor = rend.material.color;
     }
 
     void Update()
     {
-        HandleHover();
-        HandleInput();
+        if (cam == null) return;
+
+        CheckHover();
+        CheckClick();
     }
 
-    void HandleHover()
+    private void CheckHover()
     {
+        hovered = false;
+
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        bool hitThis = Physics.Raycast(ray, out RaycastHit hit, maxInteractDistance)
-                       && hit.collider.gameObject == gameObject;
-
-        if (hitThis != hovered)
+        if (Physics.Raycast(ray, out RaycastHit hit, interactDistance))
         {
-            hovered = hitThis;
-            if (rend != null)
-                rend.material.color = hovered ? highlightColor : baseColor;
+            if (hit.collider != null && hit.collider.gameObject == gameObject)
+                hovered = true;
         }
+
+        if (rend != null)
+            rend.material.color = hovered ? highlightColor : baseColor;
     }
 
-    void HandleInput()
+    private void CheckClick()
     {
-        if (hovered && Input.GetMouseButtonDown(0) && sasAndSubmarine != null)
-            sasAndSubmarine.PressSasButton();  // ← nouvelle méthode
+        if (!hovered) return;
+        if (sasController == null) return;
+
+        if (Input.GetMouseButtonDown(0))
+            sasController.ToggleSas();
     }
 }

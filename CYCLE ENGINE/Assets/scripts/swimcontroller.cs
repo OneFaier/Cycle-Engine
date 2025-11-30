@@ -5,7 +5,7 @@ public class SwimController : MonoBehaviour
 {
     [Header("Mouvement nage")]
     public float swimSpeed = 3f;
-    public float gravity = 9.81f;
+    public float verticalSwimSpeed = 3f;
 
     [Header("Caméra")]
     public Camera playerCamera;
@@ -16,10 +16,11 @@ public class SwimController : MonoBehaviour
     public bool canMove = true;
 
     [Header("Limites")]
-    public float waterHeight = 0f; // hauteur de la surface de l'eau
+    public float waterHeight = 0f;
 
     private Rigidbody rb;
     private float xRotation = 0f;
+    private bool isInWater = false;
 
     void Start()
     {
@@ -33,13 +34,19 @@ public class SwimController : MonoBehaviour
     void Update()
     {
         HandleMouseLook();
+        isInWater = transform.position.y < waterHeight;
     }
 
     void FixedUpdate()
     {
-        HandleSwimMovement();
-        ApplyGravity();
-        LimitHeightSmooth();
+        if (isInWater)
+        {
+            SwimMovement();
+        }
+        else
+        {
+            rb.useGravity = true;
+        }
     }
 
     void HandleMouseLook()
@@ -51,52 +58,37 @@ public class SwimController : MonoBehaviour
 
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -maxLookAngle, maxLookAngle);
-        playerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
+        playerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         transform.Rotate(Vector3.up * mouseX);
     }
 
-    void HandleSwimMovement()
+    void SwimMovement()
     {
-        if (!canMove) return;
+        rb.useGravity = false;
 
-        // Déplacement selon les touches
-        float x = Input.GetAxisRaw("Horizontal"); // A/D
-        float z = Input.GetAxisRaw("Vertical");   // W/S
+        float x = Input.GetAxis("Horizontal");
+        float z = Input.GetAxis("Vertical");
 
-        // Direction du regard
-        Vector3 forward = playerCamera.transform.forward;
-        Vector3 right = playerCamera.transform.right;
+        // Direction 3D complète basée sur la caméra (inclut haut/bas)
+        Vector3 moveDir = (playerCamera.transform.forward * z + playerCamera.transform.right * x).normalized;
 
-        // Combinaison pour mouvement relatif à la caméra
-        Vector3 moveDir = (forward * z + right * x).normalized;
+        // Inputs supplémentaires verticaux
+        float verticalInput = 0f;
+        if (Input.GetKey(KeyCode.Space)) verticalInput = 1f;
+        if (Input.GetKey(KeyCode.LeftControl)) verticalInput = -1f;
 
-        // Appliquer la vitesse
+        // Combine vertical input (space/ctrl)
+        moveDir += Vector3.up * verticalInput;
+        moveDir.Normalize();
+
+        // ARRÊT INSTANTANÉ : si pas d’input, vitesse = 0 directe
+        if (x == 0 && z == 0 && verticalInput == 0)
+        {
+            rb.linearVelocity = Vector3.zero;
+            return;
+        }
+
         rb.linearVelocity = moveDir * swimSpeed;
-    }
-
-    void ApplyGravity()
-    {
-        if (!canMove) return;
-
-        if (transform.position.y < waterHeight)
-        {
-            rb.linearVelocity += Vector3.down * gravity * Time.fixedDeltaTime;
-        }
-    }
-
-    void LimitHeightSmooth()
-    {
-        if (transform.position.y > waterHeight)
-        {
-            Vector3 vel = rb.linearVelocity;
-
-            // Limite la vitesse ascendante pour rester à la surface
-            if (vel.y > 0)
-            {
-                vel.y = Mathf.Min(vel.y, (waterHeight - transform.position.y) / Time.fixedDeltaTime);
-                rb.linearVelocity = vel;
-            }
-        }
     }
 }

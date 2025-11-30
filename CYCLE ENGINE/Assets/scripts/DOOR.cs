@@ -3,7 +3,7 @@ using UnityEngine;
 public class BackDoor : MonoBehaviour
 {
     [Header("Porte")]
-    public Transform pivot;          
+    public Transform pivot;
     public float openAngle = 90f;
     public float openSpeed = 90f;
 
@@ -17,13 +17,11 @@ public class BackDoor : MonoBehaviour
 
     [Header("Lampe (Point Light)")]
     public Light lampLight;
-    public Color colorClosed = Color.green;  // devient vert si SAS terminé
+    public Color colorClosed = Color.green; 
     public Color colorOpen = Color.red;
 
     [Header("SAS")]
     public SasController sasAndSubmarine;
-
-
 
     private void Start()
     {
@@ -49,19 +47,19 @@ public class BackDoor : MonoBehaviour
         if (lampLight == null)
             return;
 
+        // 🟥 Porte en mouvement ou ouverte → rouge
         if (!Mathf.Approximately(currentAngle, 0f))
         {
-            UpdateLampColor(colorOpen); // rouge si porte ouverte
+            UpdateLampColor(colorOpen);
             return;
         }
 
-        // Porte fermée : vert si SAS terminé, sinon rouge
-        if (sasAndSubmarine != null && !sasAndSubmarine.sasInProgress)
-            UpdateLampColor(colorClosed);
+        // 🟩 Porte fermée → vert si SAS ne travaille pas
+        if (sasAndSubmarine != null && !sasAndSubmarine.SasInProgress)
+            UpdateLampColor(colorClosed); 
         else
             UpdateLampColor(colorOpen);
     }
-
 
     public void ToggleDoor()
     {
@@ -74,8 +72,6 @@ public class BackDoor : MonoBehaviour
             else if (!isOpen && closeSound != null)
                 audioSource.PlayOneShot(closeSound);
         }
-
-        // ⚠ PAS d'appel à sasZone ici : le SAS se déclenche uniquement avec le bouton
     }
 
     private void UpdateLampColor(Color c)

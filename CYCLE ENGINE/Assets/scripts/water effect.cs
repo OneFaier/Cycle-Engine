@@ -2,67 +2,67 @@ using UnityEngine;
 
 public class WaterDrainEffect : MonoBehaviour
 {
-    public float speed = 2f;  // vitesse
-
-    private bool startDrain = false;
-    private bool startRise = false;
+    public float speed = 2f;
 
     private RectTransform rect;
-    private Vector2 topPos;    // eau haute
-    private Vector2 bottomPos; // eau basse
+    private Vector2 topPos;
+    private Vector2 bottomPos;
+
+    private bool movingDown;
+    private bool movingUp;
 
     void Start()
     {
         rect = GetComponent<RectTransform>();
 
-        topPos = rect.anchoredPosition;             // eau haute
-        bottomPos = new Vector2(topPos.x, -Screen.height); // eau basse
+        topPos = rect.anchoredPosition;
+        bottomPos = new Vector2(topPos.x, -Screen.height);
 
-        gameObject.SetActive(false); // désactivée par défaut
+        gameObject.SetActive(false);
     }
 
     void Update()
     {
-        if (startDrain)
+        if (movingDown)
         {
             rect.anchoredPosition = Vector2.Lerp(rect.anchoredPosition, bottomPos, Time.deltaTime * speed);
 
             if (Vector2.Distance(rect.anchoredPosition, bottomPos) < 1f)
             {
-                startDrain = false;
+                movingDown = false;
                 rect.anchoredPosition = bottomPos;
                 gameObject.SetActive(false);
             }
         }
 
-        if (startRise)
+        if (movingUp)
         {
             rect.anchoredPosition = Vector2.Lerp(rect.anchoredPosition, topPos, Time.deltaTime * speed);
 
             if (Vector2.Distance(rect.anchoredPosition, topPos) < 1f)
             {
-                startRise = false;
+                movingUp = false;
                 rect.anchoredPosition = topPos;
                 gameObject.SetActive(false);
             }
         }
     }
 
-    // Eau descend → vide le SAS
     public void StartWaterDrain()
     {
         gameObject.SetActive(true);
-        rect.anchoredPosition = topPos; // assure départ en haut
-        startDrain = true;
-        startRise = false;
+        rect.anchoredPosition = topPos;
+
+        movingDown = true;
+        movingUp = false;
     }
 
-    // Eau remonte → remplie le SAS
     public void StartWaterRise()
     {
         gameObject.SetActive(true);
-        rect.anchoredPosition = bottomPos; // assure départ en bas
-        startRise = true;
-        startDrain = false;
+        rect.anchoredPosition = bottomPos;
+
+        movingUp = true;
+        movingDown = false;
     }
 }

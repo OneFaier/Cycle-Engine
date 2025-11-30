@@ -2,93 +2,89 @@ using UnityEngine;
 
 public class SasController : MonoBehaviour
 {
-    [Header("Controllers")]
     public SimpleFPSController fpsController;
     public SwimController swimController;
 
     [Header("Audio & Effects")]
-    public AudioSource underwaterAudio;
-    public GameObject bubblesParticleSystem;
-    public AudioSource waterSound;
+    public AudioSource ambientWaterAudio; 
     public AudioSource sasSound;
-    public AudioClip soundDrain;
-    public AudioClip soundFill;
+    public AudioSource waterLoop;
+    public AudioClip fillClip;
+    public AudioClip drainClip;
+    public ParticleSystem bubbleFX;
     public WaterDrainEffect waterEffect;
-    public ParticleSystem sasBubbles;
-
-    [HideInInspector] public bool sasInProgress = false;
 
     [Header("Volumes")]
-    public float airVolume = 0.15f;
-    public float waterVolume = 1f;
-    [Range(0f, 1f)]
+    public float volumeWater = 1f;
+    public float volumeAir = 0.15f;
     public float volumeInsideSubmarine = 0.2f;
 
-    private enum SasMode { In, Out }
-    private SasMode currentMode = SasMode.In; // In = plein d'eau → Swim, Out = vide → FPS
+    private enum SasState { Filled, Empty }
+    private SasState state = SasState.Filled;   // plein d’eau → mode natation
 
-    private void Start()
+    public bool SasInProgress { get; private set; } = false;
+
+    void Start()
     {
-        EnableSwimController();
-
-        if (bubblesParticleSystem != null)
-            bubblesParticleSystem.SetActive(true);
+        ApplyState(state);
     }
 
-    public void PressSasButton()
+    public void ToggleSas()
     {
-        currentMode = (currentMode == SasMode.In) ? SasMode.Out : SasMode.In;
+        if (SasInProgress) return;
 
-        if (waterEffect != null)
+        SasInProgress = true;
+
+        state = state == SasState.Filled ? SasState.Empty : SasState.Filled;
+
+        ApplyState(state);
+
+        Invoke(nameof(UnlockSas), 2f); // durée approximative d’un cycle
+    }
+
+    private void UnlockSas()
+    {
+        SasInProgress = false;
+    }
+
+    private void ApplyState(SasState newState)
+    {
+        bool isFilled = (newState == SasState.Filled);
+
+        // Contrôleurs
+        if (fpsController) fpsController.enabled = !isFilled;
+        if (swimController) swimController.enabled = isFilled;
+
+        // Effet visuel eau
+        if (waterEffect)
         {
-            if (currentMode == SasMode.In)
-                waterEffect.StartWaterDrain();
-            else
-                waterEffect.StartWaterRise();
+            if (isFilled) waterEffect.StartWaterRise();
+            else waterEffect.StartWaterDrain();
         }
 
-        if (sasBubbles != null)
+        // Particules
+        if (bubbleFX)
         {
-            if (currentMode == SasMode.Out)
-                sasBubbles.Play();
-            else
-                sasBubbles.Stop();
+            if (isFilled) bubbleFX.Play();
+            else bubbleFX.Stop();
         }
 
-        if (waterSound != null)
+        // Sons
+        if (sasSound)
         {
-            waterSound.volume = (currentMode == SasMode.In) ? waterVolume : airVolume;
-            if (!waterSound.isPlaying) waterSound.Play();
-        }
-
-        if (sasSound != null)
-        {
-            sasSound.clip = (currentMode == SasMode.In) ? soundDrain : soundFill;
+            sasSound.clip = isFilled ? fillClip : drainClip;
             sasSound.Play();
         }
 
-        if (currentMode == SasMode.In)
-            EnableSwimController();
-        else
-            EnableFPSController();
+        if (waterLoop)
+        {
+            waterLoop.volume = isFilled ? volumeWater : volumeAir;
+            if (!waterLoop.isPlaying) waterLoop.Play();
+        }
 
-        // 🔄 Inversion du son global
-        if (underwaterAudio != null)
-            underwaterAudio.volume = (currentMode == SasMode.In) ? 1f : volumeInsideSubmarine;
-
-        if (bubblesParticleSystem != null)
-            bubblesParticleSystem.SetActive(currentMode == SasMode.In);
-    }
-
-    private void EnableSwimController()
-    {
-        if (fpsController != null) fpsController.enabled = false;
-        if (swimController != null) swimController.enabled = true;
-    }
-
-    private void EnableFPSController()
-    {
-        if (fpsController != null) fpsController.enabled = true;
-        if (swimController != null) swimController.enabled = false;
+        if (ambientWaterAudio)
+        {
+            ambientWaterAudio.volume = isFilled ? 1f : volumeInsideSubmarine;
+        }
     }
 }
