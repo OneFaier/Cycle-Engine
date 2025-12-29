@@ -3,7 +3,7 @@ using UnityEngine;
 public class DoorButton : MonoBehaviour
 {
     [Header("Interaction")]
-    public BackDoor targetDoor;          // La porte que ce bouton contrôle
+    public BackDoor targetDoor;
     public float maxInteractDistance = 3f;
     public Color highlightColor = Color.yellow;
 
@@ -28,12 +28,15 @@ public class DoorButton : MonoBehaviour
     void HandleHover()
     {
         Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
-        bool hitThisFrame = Physics.Raycast(ray, out RaycastHit hit, maxInteractDistance) && hit.collider.gameObject == gameObject;
+        bool hitThisFrame =
+            Physics.Raycast(ray, out RaycastHit hit, maxInteractDistance) &&
+            hit.collider.gameObject == gameObject;
 
         if (hitThisFrame != isHovered)
         {
             isHovered = hitThisFrame;
-            if (rend != null) rend.material.color = isHovered ? highlightColor : baseColor;
+            if (rend != null)
+                rend.material.color = isHovered ? highlightColor : baseColor;
         }
     }
 

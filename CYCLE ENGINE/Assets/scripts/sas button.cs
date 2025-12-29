@@ -35,7 +35,7 @@ public class SasButton : MonoBehaviour
         Ray ray = cam.ScreenPointToRay(Input.mousePosition);
         if (Physics.Raycast(ray, out RaycastHit hit, interactDistance))
         {
-            if (hit.collider != null && hit.collider.gameObject == gameObject)
+            if (hit.collider.gameObject == gameObject)
                 hovered = true;
         }
 
@@ -45,8 +45,8 @@ public class SasButton : MonoBehaviour
 
     private void CheckClick()
     {
-        if (!hovered) return;
-        if (sasController == null) return;
+        if (!hovered || sasController == null)
+            return;
 
         if (Input.GetMouseButtonDown(0))
             sasController.ToggleSas();

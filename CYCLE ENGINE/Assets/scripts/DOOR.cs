@@ -2,10 +2,17 @@ using UnityEngine;
 
 public class BackDoor : MonoBehaviour
 {
+    public enum DoorSide
+    {
+        Exterior,
+        Interior
+    }
+
     [Header("Porte")]
     public Transform pivot;
     public float openAngle = 90f;
     public float openSpeed = 90f;
+    public DoorSide doorSide;
 
     private bool isOpen = false;
     private float currentAngle = 0f;
@@ -17,11 +24,11 @@ public class BackDoor : MonoBehaviour
 
     [Header("Lampe (Point Light)")]
     public Light lampLight;
-    public Color colorClosed = Color.green; 
+    public Color colorClosed = Color.green;
     public Color colorOpen = Color.red;
 
     [Header("SAS")]
-    public SasController sasAndSubmarine;
+    public SasController sasController;
 
     private void Start()
     {
@@ -47,31 +54,59 @@ public class BackDoor : MonoBehaviour
         if (lampLight == null)
             return;
 
-        // 🟥 Porte en mouvement ou ouverte → rouge
         if (!Mathf.Approximately(currentAngle, 0f))
         {
             UpdateLampColor(colorOpen);
             return;
         }
 
-        // 🟩 Porte fermée → vert si SAS ne travaille pas
-        if (sasAndSubmarine != null && !sasAndSubmarine.SasInProgress)
-            UpdateLampColor(colorClosed); 
+        if (sasController != null && !sasController.SasInProgress)
+            UpdateLampColor(colorClosed);
         else
             UpdateLampColor(colorOpen);
     }
 
+    // 🔘 Appelé par le bouton
     public void ToggleDoor()
     {
-        isOpen = !isOpen;
-
-        if (audioSource != null)
+        if (isOpen)
         {
-            if (isOpen && openSound != null)
-                audioSource.PlayOneShot(openSound);
-            else if (!isOpen && closeSound != null)
-                audioSource.PlayOneShot(closeSound);
+            CloseDoor();
+            return;
         }
+
+        if (!CanOpenDoor())
+            return;
+
+        OpenDoor();
+    }
+
+    private bool CanOpenDoor()
+    {
+        if (sasController == null)
+            return true;
+
+        return sasController.CanOpen(
+            doorSide == DoorSide.Exterior
+                ? SasController.SasSide.Exterior
+                : SasController.SasSide.Interior
+        );
+    }
+
+    private void OpenDoor()
+    {
+        isOpen = true;
+
+        if (audioSource && openSound)
+            audioSource.PlayOneShot(openSound);
+    }
+
+    private void CloseDoor()
+    {
+        isOpen = false;
+
+        if (audioSource && closeSound)
+            audioSource.PlayOneShot(closeSound);
     }
 
     private void UpdateLampColor(Color c)

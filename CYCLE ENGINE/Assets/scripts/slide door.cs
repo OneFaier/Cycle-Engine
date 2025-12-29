@@ -2,14 +2,20 @@ using UnityEngine;
 
 public class SlidingDoorWithAudio : MonoBehaviour
 {
+    public enum DoorSide
+    {
+        Exterior,
+        Interior
+    }
+
     [Header("Positions")]
     public Transform closedPosition;
     public Transform openPosition;
     public float slideSpeed = 2f;
 
-    [Header("SAS Options")]
-    public bool isSasDoor = false;            // ⭐ Cette porte appartient au SAS
-    public SasController sasController;       // ⭐ Référence au SAS
+    [Header("SAS")]
+    public DoorSide doorSide;
+    public SasController sasController;
 
     private bool isOpen = false;
 
@@ -21,7 +27,6 @@ public class SlidingDoorWithAudio : MonoBehaviour
     void Start()
     {
         transform.position = closedPosition.position;
-
         if (audioSource == null)
             audioSource = GetComponent<AudioSource>();
     }
@@ -32,16 +37,15 @@ public class SlidingDoorWithAudio : MonoBehaviour
         transform.position = Vector3.MoveTowards(transform.position, target, slideSpeed * Time.deltaTime);
     }
 
-    // 🔥 OUVERURE PROTÉGÉE
+    // 🔘 Appelé par le bouton
     public void ToggleDoor()
     {
-        if (isOpen)  // on veut fermer → toujours autorisé
+        if (isOpen)
         {
             CloseDoor();
             return;
         }
 
-        // On veut OUVRIR la porte
         if (!CanOpenDoor())
             return;
 
@@ -67,22 +71,25 @@ public class SlidingDoorWithAudio : MonoBehaviour
             audioSource.PlayOneShot(closeSound);
     }
 
-    // ⛔ Conditions d'ouverture
-    private bool CanOpenDoor()
+    // ✅ Fermeture forcée par le SAS
+    public void ForceClose()
     {
-        // Si c’est une porte SAS → elle NE PEUT PAS s’ouvrir tant que le SAS tourne
-        if (isSasDoor && sasController != null)
-        {
-            if (sasController.SasInProgress)
-                return false;  // ⛔ SAS actif
-
-            // ⛔ SAS ne doit être ni en remplissage ni en vidange
-        }
-
-        return true;
+        if (isOpen)
+            CloseDoor();
     }
 
-    // ⭐ Utilisé par le SasController pour vérifier si on peut lancer un cycle
+    private bool CanOpenDoor()
+    {
+        if (sasController == null)
+            return true;
+
+        return sasController.CanOpen(
+            doorSide == DoorSide.Exterior
+                ? SasController.SasSide.Exterior
+                : SasController.SasSide.Interior
+        );
+    }
+
     public bool IsFullyClosed()
     {
         return Vector3.Distance(transform.position, closedPosition.position) < 0.01f;
