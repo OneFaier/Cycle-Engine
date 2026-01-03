@@ -4,10 +4,11 @@
 TagManager:
   serializedVersion: 3
   tags:
+  - CinemachineTarget
   - Grabbable
   - Ground
-  - SnapPoint
   - Projectile
+  - SnapPoint
   layers:
   - Default
   - TransparentFX
@@ -15,10 +16,10 @@ TagManager:
   - 
   - Water
   - UI
-  - Ground
-  - RadarRock
-  - RadarModule
-  - Radarcourant
+  - Player
+  - FirstPersonOverlay
+  - CAMRADAR
+  - 
   - 
   - 
   - 
@@ -54,11 +55,3 @@ TagManager:
   - Light Layer 5
   - Light Layer 6
   - Light Layer 7
-  - Decal Layer default
-  - Decal Layer 1
-  - Decal Layer 2
-  - Decal Layer 3
-  - Decal Layer 4
-  - Decal Layer 5
-  - Decal Layer 6
-  - Decal Layer 7

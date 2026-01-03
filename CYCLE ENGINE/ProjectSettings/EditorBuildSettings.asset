@@ -5,10 +5,26 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
+  - enabled: 0
+    path: Assets/IMPORT MULTI/00_MainMenu/00_MainMenu.unity
+    guid: d198b8844fa7b0b428305da711f39bc4
+  - enabled: 0
+    path: Assets/IMPORT MULTI/01_ThirdPersonCharacter/01_ThirdPersonCharacter.unity
+    guid: 9172143bd00b4ba4d925fa216d9c14d9
+  - enabled: 0
+    path: Assets/IMPORT MULTI/02_Platformer/02_Platformer.unity
+    guid: 37d65297c66bca54baa5767f6b02f252
+  - enabled: 0
+    path: Assets/IMPORT MULTI/03_Shooter/03_Shooter.unity
+    guid: 71bd13dc7c9a68e4e91e8dafb79988d6
   - enabled: 1
-    path: Assets/Scenes/scene et iterations/OutdoorsScene.unity
-    guid: 8124e5870f4fd4c779e7a5f994e84ad1
-  m_configObjects:
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 35845fe01580c41289b024647b1d1c53, type: 3}
-    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 33f68e2828f227c42a57355a10c10e13, type: 2}
+    path: Assets/Scenes/MultiplayerScene.unity
+    guid: 24993c7ecfa81d04083853cebf4b1480
+  - enabled: 1
+    path: Assets/Scenes/MENU.unity
+    guid: 29f5e03df7add264f93b7a3267f9753b
+  - enabled: 1
+    path: Assets/Scenes/SoloScene.unity
+    guid: 22dd9b481280b2c4eae92403b1b6d2c2
+  m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
