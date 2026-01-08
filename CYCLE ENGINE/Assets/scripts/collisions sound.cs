@@ -36,8 +36,8 @@ public class SpaceshipAdvanced : MonoBehaviour
     public float cameraMaxFov = 70f;
     public float cameraMinFov = 60f;
     public float cameraFovSmooth = 2f;
-    public float maxRollAngle = 20f; // inclinaison max en Z
-    public float maxPitchTilt = 10f; // inclinaison avant/arrière
+    public float maxRollAngle = 20f;
+    public float maxPitchTilt = 10f;
 
     [Header("Engine Sound")]
     public AudioSource engineAudio;
@@ -62,7 +62,7 @@ public class SpaceshipAdvanced : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation.Interpolate;
 
 #if UNITY_6000_0_OR_NEWER
-        rb.linearDamping = 0.2f;  // moins de drift
+        rb.linearDamping = 0.2f;
         rb.angularDamping = 2f;
 #else
         rb.drag = 0.2f;
@@ -81,6 +81,17 @@ public class SpaceshipAdvanced : MonoBehaviour
         ApplyHoverAndGravity();
         UpdateEngineSound();
         UpdateCameraEffects();
+    }
+
+    void Update()
+    {
+        // 🔼 Changer hoverHeight avec molette
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (scroll != 0f)
+        {
+            hoverHeight += scroll * 0.5f; // vitesse du scroll
+            hoverHeight = Mathf.Clamp(hoverHeight, 0.5f, 10f);
+        }
     }
 
     void MoveAndTurn()
@@ -111,21 +122,27 @@ public class SpaceshipAdvanced : MonoBehaviour
             if (propulsionEffect != null) propulsionEffect.Play();
             if (propulsionAudio != null) propulsionAudio.pitch = 1f + gear * propulsionPitchMultiplier;
         }
-
         lastGear = gear;
 
         // ---------- TURN ----------
         float dirVal = directionCube ? directionCube.positionNormalized : 0.5f;
         float yawInput = Mathf.Lerp(-1f, 1f, dirVal);
         yawInputSmooth = Mathf.Lerp(yawInputSmooth, yawInput, Time.fixedDeltaTime * turnSmooth);
+
         rb.AddTorque(Vector3.up * yawInputSmooth * turnSpeed, ForceMode.Acceleration);
 
-        // ---------- ROLL et PITCH ----------
-        targetRoll = -yawInput * maxRollAngle; // inclinaison selon virage
-        targetPitchTilt = Mathf.Clamp(speedError / acceleration, -maxPitchTilt, maxPitchTilt);
+        // ---------- ARC DE CERCLE ASSISTÉ ----------
+        if(rb.linearVelocity.magnitude > 0.1f) 
+        {
+            Vector3 newVelocityDir = Vector3.Slerp(rb.linearVelocity.normalized, forward, turnSmooth * Time.fixedDeltaTime);
+            rb.linearVelocity = newVelocityDir * rb.linearVelocity.magnitude;
+        }
 
-        Quaternion targetRotation = Quaternion.Euler(targetPitchTilt, transform.eulerAngles.y, targetRoll);
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.fixedDeltaTime * 3f);
+        // ---------- ROLL ----------
+        targetRoll = -yawInput * maxRollAngle;
+        Quaternion rollRot = Quaternion.Euler(0f, 0f, targetRoll);
+
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(rb.linearVelocity, Vector3.up) * rollRot, Time.fixedDeltaTime * 3f);
     }
 
     void ApplyHoverAndGravity()
@@ -184,7 +201,6 @@ public class SpaceshipAdvanced : MonoBehaviour
         currentFov = Mathf.Lerp(currentFov, targetFov, Time.fixedDeltaTime * cameraFovSmooth);
         shipCamera.fieldOfView = currentFov;
 
-        // léger tilt caméra selon roulis
         if (rb.linearVelocity.magnitude > 0.5f)
         {
             shipCamera.transform.localRotation = Quaternion.Lerp(
@@ -215,6 +231,7 @@ public class SpaceshipAdvanced : MonoBehaviour
         }
 
         if (count == 0) return false;
+
         avgPoint /= count;
         avgNormal.Normalize();
         avgDist /= count;
@@ -232,7 +249,7 @@ public class SpaceshipAdvanced : MonoBehaviour
         return hoverOrigin ? hoverOrigin.position : transform.position;
     }
 
-    // CANON / RECOIL
+    // ---------------- CANON / RECOIL ----------------
     public float cannonLinearForce = 500f;
     public float cannonTorqueForce = 5f;
     public float cannonVerticalImpulse = 800f;
