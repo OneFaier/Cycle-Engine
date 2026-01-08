@@ -7,51 +7,55 @@ public class SimpleFPSController : MonoBehaviour
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
 
-    [Header("Caméra")]
-    public Camera playerCamera;
+    [Header("Caméras")]
+    public Camera fpsCamera;           // caméra 1ᵉre personne
+    public Camera tpsCamera;           // caméra 3ᵉ personne
+    public Vector3 tpsOffset = new Vector3(0f, 2f, -4f); // offset caméra TPS
+
+    [Header("Souris / Look")]
     public float mouseSensitivity = 100f;
     public float maxLookAngle = 80f;
+    public bool mouseLookEnabled = true; // pour désactiver rotation souris (ex : siège)
 
     [Header("Contrôle")]
     public bool canMove = true;
-    public bool mouseLookEnabled = true; // <--- pour la tourelle
 
-    [Header("Footsteps")]
-    public AudioClip[] footstepClips;
-    public AudioSource footstepAudioSource;
-    public float stepDistance = 2f;
-    public float minMoveSpeed = 0.1f;
-    public float footstepVolume = 0.5f;
+    [Header("Camera Boost FPS")]
+    public float boostDistance = 0.5f;     // distance de recul lors du boost
+    public float boostDuration = 0.2f;     // durée de l’impulsion
+    private float boostTimer = 0f;
+    private Vector3 cameraBoostOffset = Vector3.zero;
 
     private Rigidbody rb;
     private float xRotation = 0f;
     private bool isGrounded = true;
+    private bool isTPS = false;
 
-    private Vector3 lastPosition;
-    private float distanceMoved = 0f;
+    // Pour détecter changement de gear / vitesse
+    private int lastGear = 0;
+    public IndicatorGearMouse gearLever;   // référence au levier de vitesse
 
-    void Start()
+    void Awake()
     {
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
 
+        if (fpsCamera != null) fpsCamera.enabled = true;
+        if (tpsCamera != null) tpsCamera.enabled = false;
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        lastPosition = transform.position;
-
-        if (!footstepAudioSource)
-        {
-            footstepAudioSource = gameObject.AddComponent<AudioSource>();
-            footstepAudioSource.spatialBlend = 1f;
-        }
     }
 
     void Update()
     {
-        HandleMouseLook(); 
+        HandleMouseLock();
+        HandleMouseLook();
         HandleJump();
-        HandleFootsteps();
+        HandleCameraSwitch();
+        UpdateTPSCameraPosition();
+        UpdateFPSCameraBoost();
+        DetectGearChange();
     }
 
     void FixedUpdate()
@@ -59,29 +63,65 @@ public class SimpleFPSController : MonoBehaviour
         HandleMovement();
     }
 
-    // ---------------------------------------------------------
-    // -------------------- CAMERA LOOK ------------------------
-    // ---------------------------------------------------------
+    // ===================== CAMERA FPS BOOST ===================
+    void DetectGearChange()
+    {
+        if (gearLever == null) return;
+        int currentGear = gearLever.GetGear();
+        if (currentGear > lastGear)
+        {
+            // déclenche le boost caméra
+            boostTimer = boostDuration;
+            cameraBoostOffset = Vector3.back * boostDistance;
+        }
+        lastGear = currentGear;
+    }
+
+    void UpdateFPSCameraBoost()
+    {
+        if (fpsCamera == null) return;
+
+        if (boostTimer > 0f)
+        {
+            boostTimer -= Time.deltaTime;
+            // interpolation pour revenir à zéro
+            cameraBoostOffset = Vector3.Lerp(cameraBoostOffset, Vector3.zero, Time.deltaTime / boostDuration);
+        }
+        else
+        {
+            cameraBoostOffset = Vector3.zero;
+        }
+
+        fpsCamera.transform.localPosition = cameraBoostOffset;
+    }
+
+    // ===================== LOCK MOUSE =====================
+    void HandleMouseLock()
+    {
+        if (Cursor.lockState != CursorLockMode.Locked)
+            Cursor.lockState = CursorLockMode.Locked;
+        if (Cursor.visible)
+            Cursor.visible = false;
+    }
+
+    // ===================== CAMERA =========================
     void HandleMouseLook()
     {
-        if (!mouseLookEnabled) return; // <--- la tourelle désactive ça
+        if (!mouseLookEnabled) return;
+        Camera cam = isTPS ? tpsCamera : fpsCamera;
+        if (cam == null) return;
 
-        // IMPORTANT : PAS DE deltaTime sinon ça saccade !
-        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
-        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+        float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
+        float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
 
-        // Pitch
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -maxLookAngle, maxLookAngle);
-        playerCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
-        // Yaw
+        cam.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         transform.Rotate(Vector3.up * mouseX);
     }
 
-    // ---------------------------------------------------------
-    // ------------------- MOVEMENT ----------------------------
-    // ---------------------------------------------------------
+    // ===================== MOVEMENT ======================
     void HandleMovement()
     {
         if (!canMove) return;
@@ -90,9 +130,7 @@ public class SimpleFPSController : MonoBehaviour
         float z = Input.GetAxisRaw("Vertical");
 
         Vector3 moveDir = (transform.right * x + transform.forward * z).normalized;
-        Vector3 targetVelocity = new Vector3(moveDir.x * moveSpeed, rb.linearVelocity.y, moveDir.z * moveSpeed);
-
-        rb.linearVelocity = targetVelocity;
+        rb.linearVelocity = new Vector3(moveDir.x * moveSpeed, rb.linearVelocity.y, moveDir.z * moveSpeed);
     }
 
     void HandleJump()
@@ -113,36 +151,24 @@ public class SimpleFPSController : MonoBehaviour
             isGrounded = true;
     }
 
-    public bool IsGrounded() => isGrounded;
-
-    // ---------------------------------------------------------
-    // -------------------- FOOTSTEPS --------------------------
-    // ---------------------------------------------------------
-    void HandleFootsteps()
+    // ===================== SWITCH FPS / TPS =====================
+    void HandleCameraSwitch()
     {
-        if (!canMove || !isGrounded) return;
-        if (footstepClips.Length == 0) return;
-
-        Vector3 horizontalMovement =
-            new Vector3(transform.position.x - lastPosition.x, 0f,
-                        transform.position.z - lastPosition.z);
-
-        distanceMoved += horizontalMovement.magnitude;
-
-        if (distanceMoved >= stepDistance && horizontalMovement.magnitude > minMoveSpeed)
+        if (Input.GetKeyDown(KeyCode.V))
         {
-            if (rb.linearVelocity.y <= 0.01f)
-                PlayFootstep();
-
-            distanceMoved = 0f;
+            isTPS = !isTPS;
+            if (fpsCamera != null) fpsCamera.enabled = !isTPS;
+            if (tpsCamera != null) tpsCamera.enabled = isTPS;
         }
-
-        lastPosition = transform.position;
     }
 
-    void PlayFootstep()
+    void UpdateTPSCameraPosition()
     {
-        AudioClip clip = footstepClips[Random.Range(0, footstepClips.Length)];
-        footstepAudioSource.PlayOneShot(clip, footstepVolume);
+        if (!isTPS || tpsCamera == null) return;
+        tpsCamera.transform.position = transform.position + tpsOffset;
+        tpsCamera.transform.LookAt(transform.position + Vector3.up * 1.5f);
     }
+
+    // ===================== UTIL ==========================
+    public bool IsGrounded() => isGrounded;
 }

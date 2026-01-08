@@ -63,7 +63,6 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
     <Compile Include="Assets\scripts\reset scene.cs" />
     <Compile Include="Assets\scripts\doorbutton3D.cs" />
-    <Compile Include="Assets\scripts\particule speed.cs" />
     <Compile Include="Assets\IMPORT MULTI\02_Platformer\Scripts\Coin.cs" />
     <Compile Include="Assets\scripts\NewMonoBehaviourScript.cs" />
     <Compile Include="Assets\scripts\EngineParentTrigger.cs" />
@@ -78,6 +77,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeB.cs" />
     <Compile Include="Assets\scripts\LEVIER.cs" />
     <Compile Include="Assets\scripts\EjectButton.cs" />
+    <Compile Include="Assets\Scenes\PROJECT N\steapoint.cs" />
     <Compile Include="Assets\IMPORT MULTI\01_ThirdPersonCharacter\Player.cs" />
     <Compile Include="Assets\Scenes\BACK.cs" />
     <Compile Include="Assets\scripts\SasZone.cs" />
@@ -106,7 +106,9 @@
     <Compile Include="Assets\scripts\doorbutton.cs" />
     <Compile Include="Assets\scripts\submarine trigger.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
+    <Compile Include="Assets\Scenes\PROJECT N\spaceship.cs" />
     <Compile Include="Assets\IMPORT MULTI\01_ThirdPersonCharacter\GameManager.cs" />
+    <Compile Include="Assets\Scenes\PROJECT N\seatpointexit.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
     <Compile Include="Assets\scripts\Object Categorie.cs" />
     <Compile Include="Assets\scripts\wheel.cs" />
@@ -124,6 +126,7 @@
     <Compile Include="Assets\scripts\water effect.cs" />
     <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
     <Compile Include="Assets\scripts\Raw Cam image.cs" />
+    <Compile Include="Assets\Scenes\PROJECT N\seatenter.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark01.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextMeshSpawner.cs" />
     <Compile Include="Assets\scripts\CHANGE COLOR.cs" />
@@ -146,12 +149,13 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
     <Compile Include="Assets\scripts\slide door.cs" />
     <Compile Include="Assets\IMPORT MULTI\03_Shooter\Scripts\SpawnPoint.cs" />
+    <Compile Include="Assets\Scenes\PROJECT N\IndicatorGearLever.cs" />
     <Compile Include="Assets\IMPORT MULTI\02_Platformer\Scripts\UIPlatformer.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ObjectSpin.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_PhoneNumberValidator.cs" />
     <Compile Include="Assets\IMPORT MULTI\03_Shooter\Scripts\PlayerInput.cs" />
-    <Compile Include="Assets\scripts\canon controller.cs" />
     <Compile Include="Assets\IMPORT MULTI\02_Platformer\Scripts\FallingPlatform.cs" />
+    <Compile Include="Assets\Scenes\PROJECT N\button3D.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TextConsoleSimulator.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TeleType.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextEventCheck.cs" />
@@ -689,50 +693,50 @@
     <Reference Include="ReportGeneratorMerged">
       <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.testtools.codecoverage@205a02cbcb39\lib\ReportGenerator\ReportGeneratorMerged.dll</HintPath>
     </Reference>
-    <Reference Include="System.IO.Hashing">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collections@aea9d3bd5e19\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
-    </Reference>
-    <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Runtime.CompilerServices.Unsafe">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collections@aea9d3bd5e19\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="NanoSockets">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Plugins\NanoSockets\NanoSockets\Dynamic\NanoSockets.dll</HintPath>
-    </Reference>
-    <Reference Include="Fusion.Addons.SimpleKCC">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\FusionAddons\SimpleKCC\Fusion.Addons.SimpleKCC.dll</HintPath>
-    </Reference>
-    <Reference Include="Fusion.Addons.SimpleKCC.Editor">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\FusionAddons\SimpleKCC\Fusion.Addons.SimpleKCC.Editor.dll</HintPath>
-    </Reference>
-    <Reference Include="Fusion.Runtime">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Fusion.Common">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Common.dll</HintPath>
-    </Reference>
-    <Reference Include="Photon3Unity3D">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\PhotonLibs\netstandard2.0\Photon3Unity3D.dll</HintPath>
-    </Reference>
-    <Reference Include="Fusion.Sockets">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Sockets.dll</HintPath>
+    <Reference Include="Fusion.Log">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Log.dll</HintPath>
     </Reference>
     <Reference Include="websocket-sharp">
       <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\PhotonLibs\WebSocket\websocket-sharp.dll</HintPath>
     </Reference>
+    <Reference Include="Fusion.Common">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Fusion.Addons.SimpleKCC.Editor">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\FusionAddons\SimpleKCC\Fusion.Addons.SimpleKCC.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="NanoSockets">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Plugins\NanoSockets\NanoSockets\Dynamic\NanoSockets.dll</HintPath>
+    </Reference>
+    <Reference Include="Fusion.Sockets">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Sockets.dll</HintPath>
+    </Reference>
+    <Reference Include="Fusion.Addons.SimpleKCC">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\FusionAddons\SimpleKCC\Fusion.Addons.SimpleKCC.dll</HintPath>
+    </Reference>
+    <Reference Include="System.IO.Hashing">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collections@aea9d3bd5e19\Unity.Collections.Tests\System.IO.Hashing\System.IO.Hashing.dll</HintPath>
+    </Reference>
+    <Reference Include="Fusion.Runtime">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.VisualScripting.Antlr3.Runtime">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.visualscripting@6279e2b7c485\Runtime\VisualScripting.Flow\Dependencies\NCalc\Unity.VisualScripting.Antlr3.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Photon3Unity3D">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\PhotonLibs\netstandard2.0\Photon3Unity3D.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Cecil">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.dll</HintPath>
+    </Reference>
     <Reference Include="Fusion.Realtime">
       <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Realtime.dll</HintPath>
     </Reference>
-    <Reference Include="Fusion.Log">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Log.dll</HintPath>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe">
+      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.collections@aea9d3bd5e19\Unity.Collections.Tests\System.Runtime.CompilerServices.Unsafe\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.60f1\Editor\Data\NetStandard\ref\2.1.0\netstandard.dll</HintPath>
@@ -1150,13 +1154,13 @@
       <Project>{32ea2eb4-1c7e-fdaf-f538-57c79a225bfc}</Project>
       <Name>Unity.Timeline</Name>
     </ProjectReference>
-    <ProjectReference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Model.csproj">
-      <Project>{3f8e3d5a-8861-3eb4-2585-ae7ea1c85b89}</Project>
-      <Name>Unity.TestTools.CodeCoverage.Editor.OpenCover.Model</Name>
-    </ProjectReference>
     <ProjectReference Include="glTFast.csproj">
       <Project>{2d4071cb-2da4-827d-de86-1ca216bd51a7}</Project>
       <Name>glTFast</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Model.csproj">
+      <Project>{3f8e3d5a-8861-3eb4-2585-ae7ea1c85b89}</Project>
+      <Name>Unity.TestTools.CodeCoverage.Editor.OpenCover.Model</Name>
     </ProjectReference>
     <ProjectReference Include="UnityEngine.UI.csproj">
       <Project>{e8ad9fab-0776-7705-d9fd-11cd95e69fa5}</Project>
@@ -1230,10 +1234,6 @@
       <Project>{c01ea92a-5b1a-5885-afd0-43dbc687f695}</Project>
       <Name>Unity.Collections.Editor</Name>
     </ProjectReference>
-    <ProjectReference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.csproj">
-      <Project>{29977014-7299-f7b3-2790-2f0749010422}</Project>
-      <Name>Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary</Name>
-    </ProjectReference>
     <ProjectReference Include="Unity.VisualScripting.Shared.Editor.csproj">
       <Project>{039411a8-b7b8-d8ec-eaa4-cfac7891aacf}</Project>
       <Name>Unity.VisualScripting.Shared.Editor</Name>
@@ -1245,6 +1245,10 @@
     <ProjectReference Include="Unity.Multiplayer.Center.Common.csproj">
       <Project>{8d89f723-3378-d75a-8da2-ea7470b09fe2}</Project>
       <Name>Unity.Multiplayer.Center.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary.csproj">
+      <Project>{29977014-7299-f7b3-2790-2f0749010422}</Project>
+      <Name>Unity.RenderPipelines.ShaderGraph.ShaderGraphLibrary</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.csproj">
       <Project>{22543914-d833-f885-96e3-1d14e6242e3f}</Project>

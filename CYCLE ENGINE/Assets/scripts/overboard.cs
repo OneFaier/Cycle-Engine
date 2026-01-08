@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class HoverSpaceshipAdvanced : MonoBehaviour
+public class overboard: MonoBehaviour
 {
     [Header("Movement Settings")]
     public float maxForwardSpeed = 60f;
