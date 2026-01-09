@@ -55,7 +55,6 @@ public class SimpleFPSController : MonoBehaviour
         HandleCameraSwitch();
         UpdateTPSCameraPosition();
         UpdateFPSCameraBoost();
-        DetectGearChange();
     }
 
     void FixedUpdate()
@@ -64,18 +63,6 @@ public class SimpleFPSController : MonoBehaviour
     }
 
     // ===================== CAMERA FPS BOOST ===================
-    void DetectGearChange()
-    {
-        if (gearLever == null) return;
-        int currentGear = gearLever.GetGear();
-        if (currentGear > lastGear)
-        {
-            // déclenche le boost caméra
-            boostTimer = boostDuration;
-            cameraBoostOffset = Vector3.back * boostDistance;
-        }
-        lastGear = currentGear;
-    }
 
     void UpdateFPSCameraBoost()
     {

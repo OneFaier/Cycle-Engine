@@ -1,13 +1,13 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
-public class HoverSpaceshipAdvanced : MonoBehaviour
+public class SpaceshipAdvanced : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float[] gearSpeeds = { 0f, 20f, 40f, 65f, 90f };
+    public float[] gearSpeeds = { 0f, 20f, 40f, 65f, 90f }; // vitesses par gear
     public float acceleration = 80f;
-    public float maxTurnSpeed = 40f; // vitesse de rotation max
-    public float turnSmooth = 3f;
+    public float turnSpeed = 40f;
+    public float turnSmooth = 5f;
 
     [Header("Hover Settings")]
     public float hoverHeight = 2f;
@@ -36,7 +36,8 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
     public float cameraMaxFov = 70f;
     public float cameraMinFov = 60f;
     public float cameraFovSmooth = 2f;
-    public float rollAngle = 20f; // inclinaison max en Z
+    public float maxRollAngle = 20f;
+    public float maxPitchTilt = 10f;
 
     [Header("Engine Sound")]
     public AudioSource engineAudio;
@@ -46,9 +47,10 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
     public float volumeSensitivity = 0.5f;
 
     Rigidbody rb;
-    float yawInputSmooth;
+    public float yawInputSmooth;
     int lastGear = 0;
     float targetRoll = 0f;
+    float targetPitchTilt = 0f;
     float hoverDisabledUntil = 0f;
     float currentFov;
 
@@ -58,29 +60,57 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
         rb.useGravity = false;
         rb.mass = 200f;
         rb.interpolation = RigidbodyInterpolation.Interpolate;
+
 #if UNITY_6000_0_OR_NEWER
-        rb.linearDamping = 0.5f;
-        rb.angularDamping = 3f;
+        rb.linearDamping = 0.2f;
+        rb.angularDamping = 2f;
 #else
-        rb.drag = 0.5f;
-        rb.angularDrag = 3f;
+        rb.drag = 0.2f;
+        rb.angularDrag = 2f;
 #endif
-        if (shipCamera != null) currentFov = shipCamera.fieldOfView;
+
+        if (shipCamera != null)
+            currentFov = shipCamera.fieldOfView;
     }
 
     void FixedUpdate()
     {
-        if (isPiloting) MoveAndTurn();
+        if (isPiloting)
+            MoveAndTurn();
+
         ApplyHoverAndGravity();
         UpdateEngineSound();
         UpdateCameraEffects();
     }
 
+    void Update()
+    {
+        // 🔼 Changer hoverHeight avec molette
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        if (scroll != 0f)
+        {
+            hoverHeight += scroll * 0.5f;
+            hoverHeight = Mathf.Clamp(hoverHeight, 0.5f, 10f);
+        }
+    }
+    public float GetCurrentGearNormalized()
+    {
+        if (gearLever == null) return 0f;
+        int gear = gearLever.GetLimitedGear();
+        return gear / (float)(gearSpeeds.Length - 1);
+    }
+
+// Et rendre yawInputSmooth accessible en lecture
+    public float YawInputSmooth => yawInputSmooth;
+
+
     void MoveAndTurn()
     {
-        int gear = gearLever ? gearLever.GetGear() : 0;
+        // --- GEAR limité par les bouteilles ---
+        int gear = gearLever ? gearLever.GetLimitedGear() : 0;
         float targetSpeed = gearSpeeds[Mathf.Clamp(gear, 0, gearSpeeds.Length - 1)];
 
+        // orientation et forward
         Vector3 forward = transform.forward;
         if (GetAverageGroundNormal(out Vector3 avgNormal))
             forward = Vector3.ProjectOnPlane(forward, avgNormal).normalized;
@@ -90,11 +120,13 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
 #else
         float currentSpeed = Vector3.Dot(rb.velocity, forward);
 #endif
+
+        // accélération
         float speedError = targetSpeed - currentSpeed;
         float accel = Mathf.Clamp(speedError, -acceleration, acceleration);
         rb.AddForce(forward * accel, ForceMode.Acceleration);
 
-        // ⚡ boost palier
+        // propulsion visuelle/audio
         if (gear > lastGear)
         {
             rb.AddForce(forward * gearImpulse, ForceMode.Impulse);
@@ -103,21 +135,24 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
         }
         lastGear = gear;
 
-        // ---------- TURN ----------
-        float dirVal = directionCube ? directionCube.positionNormalized : 0.5f;
+        // ---------- TURN limité par les bouteilles ----------
+        float dirVal = directionCube ? directionCube.GetLimitedNormalized() : 0.5f;
         float yawInput = Mathf.Lerp(-1f, 1f, dirVal);
         yawInputSmooth = Mathf.Lerp(yawInputSmooth, yawInput, Time.fixedDeltaTime * turnSmooth);
 
-        // rotation guidée type avion : limite la rotation
-        float maxYawAngle = maxTurnSpeed * Time.fixedDeltaTime;
-        Vector3 targetEuler = transform.eulerAngles;
-        float yawChange = Mathf.Clamp(yawInputSmooth * maxTurnSpeed * Time.fixedDeltaTime, -maxYawAngle, maxYawAngle);
-        transform.Rotate(0f, yawChange, 0f, Space.Self);
+        rb.AddTorque(Vector3.up * yawInputSmooth * turnSpeed, ForceMode.Acceleration);
 
-        // inclinaison en roll
-        targetRoll = -yawInput * rollAngle;
-        Quaternion rollRot = Quaternion.Euler(transform.eulerAngles.x, transform.eulerAngles.y, targetRoll);
-        transform.rotation = Quaternion.Slerp(transform.rotation, rollRot, Time.fixedDeltaTime * 3f);
+        // ---------- ARC DE CERCLE ASSISTÉ ----------
+        if(rb.linearVelocity.magnitude > 0.1f)
+        {
+            Vector3 newVelocityDir = Vector3.Slerp(rb.linearVelocity.normalized, forward, turnSmooth * Time.fixedDeltaTime);
+            rb.linearVelocity = newVelocityDir * rb.linearVelocity.magnitude;
+        }
+
+        // ---------- ROLL ----------
+        targetRoll = -yawInput * maxRollAngle;
+        Quaternion rollRot = Quaternion.Euler(0f, 0f, targetRoll);
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(rb.linearVelocity, Vector3.up) * rollRot, Time.fixedDeltaTime * 3f);
     }
 
     void ApplyHoverAndGravity()
@@ -144,7 +179,10 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
             float t = Mathf.InverseLerp(0, 20f, hit.distance);
             rb.AddForce(Vector3.down * 30f * Mathf.Lerp(0.5f, 2f, t), ForceMode.Acceleration);
         }
-        else rb.AddForce(Vector3.down * 30f, ForceMode.Acceleration);
+        else
+        {
+            rb.AddForce(Vector3.down * 30f, ForceMode.Acceleration);
+        }
     }
 
     void UpdateEngineSound()
@@ -171,6 +209,15 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
         float targetFov = cameraMinFov + cameraAccelFov * Mathf.Clamp01(speed / gearSpeeds[gearSpeeds.Length - 1]);
         currentFov = Mathf.Lerp(currentFov, targetFov, Time.fixedDeltaTime * cameraFovSmooth);
         shipCamera.fieldOfView = currentFov;
+
+        if (rb.linearVelocity.magnitude > 0.5f)
+        {
+            shipCamera.transform.localRotation = Quaternion.Lerp(
+                shipCamera.transform.localRotation,
+                Quaternion.Euler(targetPitchTilt, 0f, targetRoll * 0.5f),
+                Time.fixedDeltaTime * 3f
+            );
+        }
     }
 
     bool GetAverageGround(out Vector3 avgPoint, out Vector3 avgNormal, out float avgDist)
@@ -179,6 +226,7 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
         avgPoint = Vector3.zero;
         avgNormal = Vector3.zero;
         avgDist = 0f;
+
         foreach (var p in hoverPoints)
         {
             if (!p) continue;
@@ -190,7 +238,9 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
                 count++;
             }
         }
+
         if (count == 0) return false;
+
         avgPoint /= count;
         avgNormal.Normalize();
         avgDist /= count;
@@ -203,9 +253,12 @@ public class HoverSpaceshipAdvanced : MonoBehaviour
         return GetAverageGround(out _, out avgNormal, out _);
     }
 
-    Vector3 GetHoverOrigin() => hoverOrigin ? hoverOrigin.position : transform.position;
+    Vector3 GetHoverOrigin()
+    {
+        return hoverOrigin ? hoverOrigin.position : transform.position;
+    }
 
-    // ================= CANON =================
+    // ---------------- CANON / RECOIL ----------------
     public float cannonLinearForce = 500f;
     public float cannonTorqueForce = 5f;
     public float cannonVerticalImpulse = 800f;

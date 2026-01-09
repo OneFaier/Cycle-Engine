@@ -54,13 +54,14 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_A.cs" />
     <Compile Include="Assets\scripts\ObjectGrab.cs" />
     <Compile Include="Assets\scripts\snap with surface.cs" />
-    <Compile Include="Assets\scripts\collisions sound.cs" />
+    <Compile Include="Assets\Scenes\PROJECT N\vaisseau.cs" />
     <Compile Include="Assets\scripts\hand.cs" />
     <Compile Include="Assets\scripts\SPAWNER PIECES.cs" />
     <Compile Include="Assets\scripts\underwater.cs" />
     <Compile Include="Assets\scripts\radio.cs" />
     <Compile Include="Assets\Common\UINameplate.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark02.cs" />
+    <Compile Include="Assets\Scenes\EngineDashboardUI.cs" />
     <Compile Include="Assets\scripts\reset scene.cs" />
     <Compile Include="Assets\scripts\doorbutton3D.cs" />
     <Compile Include="Assets\IMPORT MULTI\02_Platformer\Scripts\Coin.cs" />
@@ -92,6 +93,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexZoom.cs" />
     <Compile Include="Assets\scripts\BUTTON.cs" />
     <Compile Include="Assets\Scenes\pausemenu.cs" />
+    <Compile Include="Assets\Scenes\gas spawner.cs" />
     <Compile Include="Assets\Common\DestroyAfter.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextSelector_B.cs" />
     <Compile Include="Assets\scripts\SeatSnap.cs" />
@@ -100,13 +102,13 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\SkewTextExample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\WarpTextExample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />
+    <Compile Include="Assets\Scenes\GasBottleResource.cs" />
     <Compile Include="Assets\scripts\SeatPoint.cs" />
     <Compile Include="Assets\scripts\direction helth cube.cs" />
     <Compile Include="Assets\scripts\cubes manager.cs" />
     <Compile Include="Assets\scripts\doorbutton.cs" />
     <Compile Include="Assets\scripts\submarine trigger.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\TMP_TextInfoDebugTool.cs" />
-    <Compile Include="Assets\Scenes\PROJECT N\spaceship.cs" />
     <Compile Include="Assets\IMPORT MULTI\01_ThirdPersonCharacter\GameManager.cs" />
     <Compile Include="Assets\Scenes\PROJECT N\seatpointexit.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexShakeA.cs" />
@@ -138,6 +140,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\IMPORT MULTI\03_Shooter\Scripts\GameManager.cs" />
     <Compile Include="Assets\scripts\WhaleSpawner.cs" />
+    <Compile Include="Assets\Scenes\modulemanage.cs" />
     <Compile Include="Assets\scripts\sas button.cs" />
     <Compile Include="Assets\MULTIPLAYER FORLDER\NetworkFPSController.cs" />
     <Compile Include="Assets\IMPORT MULTI\03_Shooter\Scripts\Player.cs" />
@@ -148,6 +151,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\DropdownSample.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexColorCycler.cs" />
     <Compile Include="Assets\scripts\slide door.cs" />
+    <Compile Include="Assets\Scenes\gasbottleslot.cs" />
     <Compile Include="Assets\IMPORT MULTI\03_Shooter\Scripts\SpawnPoint.cs" />
     <Compile Include="Assets\Scenes\PROJECT N\IndicatorGearLever.cs" />
     <Compile Include="Assets\IMPORT MULTI\02_Platformer\Scripts\UIPlatformer.cs" />
