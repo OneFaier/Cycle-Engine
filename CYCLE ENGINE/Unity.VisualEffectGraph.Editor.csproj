@@ -585,8 +585,8 @@
     <Compile Include="Library\PackageCache\com.unity.visualeffectgraph@e93d9f64f0b6\Editor\Models\Operators\Implementations\Lerp.cs" />
     <Compile Include="Library\PackageCache\com.unity.visualeffectgraph@e93d9f64f0b6\Editor\GraphView\BoundsRecorder\VFXBoundsRecorderField.cs" />
     <Compile Include="Library\PackageCache\com.unity.visualeffectgraph@e93d9f64f0b6\Editor\ShaderGraph\VFXOldShaderGraphHelpers.cs" />
-    <Compile Include="Library\PackageCache\com.unity.visualeffectgraph@e93d9f64f0b6\Editor\Models\Slots\Implementations\VFXSlotTexture2D.cs" />
     <Compile Include="Library\PackageCache\com.unity.visualeffectgraph@e93d9f64f0b6\Editor\Data\VFXData.cs" />
+    <Compile Include="Library\PackageCache\com.unity.visualeffectgraph@e93d9f64f0b6\Editor\Models\Slots\Implementations\VFXSlotTexture2D.cs" />
     <Compile Include="Library\PackageCache\com.unity.visualeffectgraph@e93d9f64f0b6\Editor\Models\Operators\Implementations\Rotate2D.cs" />
     <Compile Include="Library\PackageCache\com.unity.visualeffectgraph@e93d9f64f0b6\Editor\Models\Operators\Implementations\Saturate.cs" />
     <Compile Include="Library\PackageCache\com.unity.visualeffectgraph@e93d9f64f0b6\Editor\Models\Slots\Implementations\VFXSlotFloat4.cs" />

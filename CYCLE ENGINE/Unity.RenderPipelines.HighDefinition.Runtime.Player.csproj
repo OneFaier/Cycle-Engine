@@ -231,8 +231,8 @@
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Runtime\Material\Decal\DecalProjector.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Runtime\RenderPipeline\RenderPass\CustomPass\CustomPassVolume.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Runtime\Utilities\CameraPositionSettings.cs" />
-    <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Runtime\PostProcessing\Components\ColorAdjustments.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Runtime\Material\LTCAreaLight\Generated\LtcData.BRDF_OrenNayar.cs" />
+    <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Runtime\PostProcessing\Components\ColorAdjustments.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Runtime\Material\Lit\BaseLitAPI.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Runtime\VFXGraph\Utility\PropertyBinders\HDRPCameraBinder.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Runtime\Lighting\Shadow\HDCachedShadowManager.cs" />

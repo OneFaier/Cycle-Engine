@@ -30,6 +30,19 @@ public class SpaceshipAdvanced : MonoBehaviour
     public AudioSource propulsionAudio;
     public float propulsionPitchMultiplier = 0.05f;
 
+    [Header("Reactor Sound")]
+    public AudioSource reactorAudio;              // Son normal des réacteurs
+    public float reactorMinPitch = 0.8f;
+    public float reactorMaxPitch = 1.5f;
+    public float reactorPitchMultiplier = 0.1f;
+    public float reactorVolume = 0.7f;
+
+    public AudioSource reactorBoostAudio;         // Son de boost sur les 2 derniers crans
+    public float boostMinPitch = 1f;
+    public float boostMaxPitch = 1.8f;
+    public float boostPitchMultiplier = 0.1f;
+    public float boostVolume = 1f;
+
     [Header("Camera Effects")]
     public Camera shipCamera;
     public float cameraAccelFov = 5f;
@@ -80,6 +93,7 @@ public class SpaceshipAdvanced : MonoBehaviour
 
         ApplyHoverAndGravity();
         UpdateEngineSound();
+        UpdateReactorSound();
         UpdateCameraEffects();
     }
 
@@ -93,6 +107,7 @@ public class SpaceshipAdvanced : MonoBehaviour
             hoverHeight = Mathf.Clamp(hoverHeight, 0.5f, 10f);
         }
     }
+
     public float GetCurrentGearNormalized()
     {
         if (gearLever == null) return 0f;
@@ -100,9 +115,7 @@ public class SpaceshipAdvanced : MonoBehaviour
         return gear / (float)(gearSpeeds.Length - 1);
     }
 
-// Et rendre yawInputSmooth accessible en lecture
     public float YawInputSmooth => yawInputSmooth;
-
 
     void MoveAndTurn()
     {
@@ -197,6 +210,55 @@ public class SpaceshipAdvanced : MonoBehaviour
         engineAudio.pitch = Mathf.Lerp(engineAudio.pitch, Mathf.Clamp(pitch, minPitch, maxPitch), Time.fixedDeltaTime * 3f);
         engineAudio.volume = Mathf.Lerp(engineAudio.volume, 0.5f + Mathf.Abs(speed) / gearSpeeds[gearSpeeds.Length - 1] * volumeSensitivity, Time.fixedDeltaTime * 3f);
     }
+    
+    
+
+    bool isInBoost = false; // Track si on est actuellement dans la zone boost
+
+    void UpdateReactorSound()
+    {
+        if (!gearLever) return;
+
+        int gear = gearLever.GetLimitedGear();
+        int maxGear = gearSpeeds.Length - 1;
+
+        // ---- Son normal ----
+        if (reactorAudio)
+        {
+            float targetPitch = Mathf.Clamp(reactorMinPitch + gear * reactorPitchMultiplier, reactorMinPitch, reactorMaxPitch);
+            reactorAudio.pitch = Mathf.Lerp(reactorAudio.pitch, targetPitch, Time.fixedDeltaTime * 3f);
+            reactorAudio.volume = Mathf.Lerp(reactorAudio.volume, reactorVolume, Time.fixedDeltaTime * 3f);
+        }
+
+        // ---- Son boost simple avec loop forcé ----
+        if (reactorBoostAudio)
+        {
+            // On force le loop
+            reactorBoostAudio.loop = true;
+
+            bool inBoostRange = gear >= maxGear - 1;
+
+            if (inBoostRange && !isInBoost)
+            {
+                // Entrée dans la zone boost → jouer le son
+                if (!reactorBoostAudio.isPlaying)
+                    reactorBoostAudio.Play();
+                isInBoost = true;
+            }
+            else if (!inBoostRange && isInBoost)
+            {
+                // Sortie de la zone boost → arrêter le son
+                reactorBoostAudio.Stop();
+                isInBoost = false;
+            }
+        }
+    }
+
+
+
+
+
+
 
     void UpdateCameraEffects()
     {

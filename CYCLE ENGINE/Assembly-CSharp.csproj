@@ -82,6 +82,7 @@
     <Compile Include="Assets\IMPORT MULTI\01_ThirdPersonCharacter\Player.cs" />
     <Compile Include="Assets\Scenes\BACK.cs" />
     <Compile Include="Assets\scripts\SasZone.cs" />
+    <Compile Include="Assets\Scenes\PROJECT N\VehicleSpeedUI.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\VertexJitter.cs" />
     <Compile Include="Assets\scripts\module ressource manager.cs" />
     <Compile Include="Assets\IMPORT MULTI\02_Platformer\Scripts\Player.cs" />
@@ -201,6 +202,7 @@
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
     <None Include="Library\PackageCache\com.unity.cloud.gltfast@76321e455c67\Runtime\Shader\Export\glTFExportNormal.shader" />
     <None Include="Library\PackageCache\com.unity.cloud.gltfast@76321e455c67\Runtime\Shader\Built-In\glTFIncludes\glTFUnityStandardInput.cginc" />
+    <None Include="Library\PackageCache\com.unity.splines@1cb7d86fc7ff\Shader\Spline.cginc" />
     <None Include="C:\Program Files\Unity\Hub\Editor\6000.0.60f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.imgui\package.json" />
     <None Include="Assets\Photon\Fusion\package.json" />
     <None Include="C:\Program Files\Unity\Hub\Editor\6000.0.60f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.tilemap\package.json" />
@@ -326,6 +328,7 @@
     <None Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\package.json" />
     <None Include="Library\PackageCache\com.unity.collections@aea9d3bd5e19\ValidationExceptions.json" />
     <None Include="Assets\IMPORT MULTI\02_Platformer\3rdParty\Starter-Kit-3D-Platformer\fonts\license.txt" />
+    <None Include="Library\PackageCache\com.unity.splines@1cb7d86fc7ff\package.json" />
     <None Include="Assets\TextMesh Pro\Sprites\EmojiOne.json" />
     <None Include="Packages\com.unity.render-pipelines.high-definition-config\package.json" />
     <None Include="C:\Program Files\Unity\Hub\Editor\6000.0.60f1\Editor\Data\Resources\PackageManager\BuiltInPackages\com.unity.modules.ui\package.json" />
@@ -1166,13 +1169,13 @@
       <Project>{3f8e3d5a-8861-3eb4-2585-ae7ea1c85b89}</Project>
       <Name>Unity.TestTools.CodeCoverage.Editor.OpenCover.Model</Name>
     </ProjectReference>
-    <ProjectReference Include="UnityEngine.UI.csproj">
-      <Project>{e8ad9fab-0776-7705-d9fd-11cd95e69fa5}</Project>
-      <Name>UnityEngine.UI</Name>
-    </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.Core.Editor.Shared.csproj">
       <Project>{763661c9-a2b4-32e5-b6f8-5b0f9f1fde7d}</Project>
       <Name>Unity.RenderPipelines.Core.Editor.Shared</Name>
+    </ProjectReference>
+    <ProjectReference Include="UnityEngine.UI.csproj">
+      <Project>{e8ad9fab-0776-7705-d9fd-11cd95e69fa5}</Project>
+      <Name>UnityEngine.UI</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.Core.ShaderLibrary.csproj">
       <Project>{06c5e490-b4fd-164c-0e66-fe9b5d53f71b}</Project>
@@ -1185,6 +1188,10 @@
     <ProjectReference Include="Unity.Multiplayer.Center.Editor.csproj">
       <Project>{c1bb69b3-2fcc-362a-49e0-78787a72aafe}</Project>
       <Name>Unity.Multiplayer.Center.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.Splines.csproj">
+      <Project>{703c88c3-4b16-6516-78a7-dad84847c447}</Project>
+      <Name>Unity.Splines</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.Mathematics.Editor.csproj">
       <Project>{c31d4366-9ec8-c2ee-8e6e-822d88abf196}</Project>
@@ -1221,6 +1228,10 @@
     <ProjectReference Include="Unity.RenderPipelines.Universal.Config.Runtime.csproj">
       <Project>{13e593b1-db58-486a-4f6a-77e5f643387e}</Project>
       <Name>Unity.RenderPipelines.Universal.Config.Runtime</Name>
+    </ProjectReference>
+    <ProjectReference Include="Unity.Splines.Editor.csproj">
+      <Project>{15c3a2d4-9ece-996b-11ed-d36dd5dec00a}</Project>
+      <Name>Unity.Splines.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="Unity.RenderPipelines.Universal.Editor.csproj">
       <Project>{923bb2d8-dd41-f8be-1687-78d5aadff44b}</Project>

@@ -37,8 +37,12 @@ public class ModuleResourceManage : MonoBehaviour
     public int SpeedCount => Count(speedSlots);
     public int DirectionCount => Count(directionSlots);
 
-    public float SpeedEfficiency => Mathf.Clamp01(SpeedCount / (float)maxBottles);
-    public float DirectionEfficiency => Mathf.Clamp01(DirectionCount / (float)maxBottles);
+    public float SpeedEfficiency =>
+        Mathf.Clamp01(GetTotalGas(speedSlots) / maxBottles);
+
+    public float DirectionEfficiency =>
+        Mathf.Clamp01(GetTotalGas(directionSlots) / maxBottles);
+
 
     public int MaxGearAllowed => Mathf.Clamp(SpeedCount + 1, 1, maxBottles + 1);
 
@@ -67,6 +71,20 @@ public class ModuleResourceManage : MonoBehaviour
             }
         }
     }
+    
+    float GetTotalGas(GasBottleSlot[] slots)
+    {
+        float total = 0f;
+
+        foreach (var s in slots)
+        {
+            if (s.currentBottle != null)
+                total += s.currentBottle.GetRatio(); // 0 → 1
+        }
+
+        return total;
+    }
+
 
     void ApplyDirectionUsage()
     {

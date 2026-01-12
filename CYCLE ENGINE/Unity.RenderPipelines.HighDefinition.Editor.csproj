@@ -48,8 +48,8 @@
   <ItemGroup>
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Editor\AssetProcessors\ThreeDSMaterialDescriptionPostprocessor.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Editor\Lighting\VolumetricLighting\LocalVolumetricFogUI.Skin.cs" />
-    <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Editor\Lighting\LightUnit\HDLightUnitSliderUIDrawer.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Editor\Material\StackLit\ShaderGraph\StackLitSurfaceOptionPropertyBlock.cs" />
+    <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Editor\Lighting\LightUnit\HDLightUnitSliderUIDrawer.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Editor\Material\FogVolume\FogVolumePropertyBlock.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Editor\Material\ShaderGraph\HDStructFields.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.high-definition@a88b39e4c4c3\Editor\Lighting\HDLightEditor.cs" />

@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(Rigidbody))]
 public class SimpleFPSController : MonoBehaviour
@@ -8,32 +9,40 @@ public class SimpleFPSController : MonoBehaviour
     public float jumpForce = 5f;
 
     [Header("Caméras")]
-    public Camera fpsCamera;           // caméra 1ᵉre personne
-    public Camera tpsCamera;           // caméra 3ᵉ personne
-    public Vector3 tpsOffset = new Vector3(0f, 2f, -4f); // offset caméra TPS
+    public Camera fpsCamera;
+    public Camera tpsCamera;
+    public Vector3 tpsOffset = new Vector3(0f, 2f, -4f);
 
     [Header("Souris / Look")]
     public float mouseSensitivity = 100f;
     public float maxLookAngle = 80f;
-    public bool mouseLookEnabled = true; // pour désactiver rotation souris (ex : siège)
+    public bool mouseLookEnabled = true;
 
     [Header("Contrôle")]
     public bool canMove = true;
 
     [Header("Camera Boost FPS")]
-    public float boostDistance = 0.5f;     // distance de recul lors du boost
-    public float boostDuration = 0.2f;     // durée de l’impulsion
+    public float boostDistance = 0.5f;
+    public float boostDuration = 0.2f;
     private float boostTimer = 0f;
     private Vector3 cameraBoostOffset = Vector3.zero;
+
+    [Header("Gear Lever Recoil")]
+    public IndicatorGearMouse gearLever;
+    public float gearBoostStrength = 2f;      // force du recul physique
+    public float gearBoostSmoothTime = 0.2f;  // temps pour retour smooth
+    public float cameraRecoilAmount = 0.1f;   // recul caméra
+    private int lastGear = -1;
+    private Vector3 gearBoostVelocity = Vector3.zero;
+
+    // TPS smoothing
+    private Vector3 tpsVelocity = Vector3.zero;
+    public float tpsSmoothTime = 0.1f;
 
     private Rigidbody rb;
     private float xRotation = 0f;
     private bool isGrounded = true;
     private bool isTPS = false;
-
-    // Pour détecter changement de gear / vitesse
-    private int lastGear = 0;
-    public IndicatorGearMouse gearLever;   // référence au levier de vitesse
 
     void Awake()
     {
@@ -55,6 +64,7 @@ public class SimpleFPSController : MonoBehaviour
         HandleCameraSwitch();
         UpdateTPSCameraPosition();
         UpdateFPSCameraBoost();
+        HandleGearBoost();
     }
 
     void FixedUpdate()
@@ -63,7 +73,6 @@ public class SimpleFPSController : MonoBehaviour
     }
 
     // ===================== CAMERA FPS BOOST ===================
-
     void UpdateFPSCameraBoost()
     {
         if (fpsCamera == null) return;
@@ -71,7 +80,6 @@ public class SimpleFPSController : MonoBehaviour
         if (boostTimer > 0f)
         {
             boostTimer -= Time.deltaTime;
-            // interpolation pour revenir à zéro
             cameraBoostOffset = Vector3.Lerp(cameraBoostOffset, Vector3.zero, Time.deltaTime / boostDuration);
         }
         else
@@ -95,8 +103,6 @@ public class SimpleFPSController : MonoBehaviour
     void HandleMouseLook()
     {
         if (!mouseLookEnabled) return;
-        Camera cam = isTPS ? tpsCamera : fpsCamera;
-        if (cam == null) return;
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
@@ -104,7 +110,9 @@ public class SimpleFPSController : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -maxLookAngle, maxLookAngle);
 
-        cam.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+        if (fpsCamera != null && !isTPS)
+            fpsCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
+
         transform.Rotate(Vector3.up * mouseX);
     }
 
@@ -117,7 +125,9 @@ public class SimpleFPSController : MonoBehaviour
         float z = Input.GetAxisRaw("Vertical");
 
         Vector3 moveDir = (transform.right * x + transform.forward * z).normalized;
-        rb.linearVelocity = new Vector3(moveDir.x * moveSpeed, rb.linearVelocity.y, moveDir.z * moveSpeed);
+        Vector3 targetVelocity = new Vector3(moveDir.x * moveSpeed, rb.linearVelocity.y, moveDir.z * moveSpeed);
+
+        rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, targetVelocity, 0.8f);
     }
 
     void HandleJump()
@@ -152,8 +162,52 @@ public class SimpleFPSController : MonoBehaviour
     void UpdateTPSCameraPosition()
     {
         if (!isTPS || tpsCamera == null) return;
-        tpsCamera.transform.position = transform.position + tpsOffset;
-        tpsCamera.transform.LookAt(transform.position + Vector3.up * 1.5f);
+
+        Vector3 desiredPosition = transform.position + tpsOffset;
+        tpsCamera.transform.position = Vector3.SmoothDamp(tpsCamera.transform.position, desiredPosition, ref tpsVelocity, tpsSmoothTime);
+
+        Vector3 lookTarget = transform.position + Vector3.up * 1.5f;
+        tpsCamera.transform.rotation = Quaternion.Slerp(tpsCamera.transform.rotation, Quaternion.LookRotation(lookTarget - tpsCamera.transform.position), 20f * Time.deltaTime);
+    }
+
+    // ===================== GEAR BOOST =====================
+    void HandleGearBoost()
+    {
+        if (gearLever == null) return;
+
+        int currentGear = gearLever.currentGear;
+
+        if (currentGear != lastGear)
+        {
+            lastGear = currentGear;
+
+            // Recul physique du joueur
+            Vector3 backwardImpulse = -transform.forward * gearBoostStrength;
+            rb.AddForce(backwardImpulse, ForceMode.Impulse);
+
+            // Recul caméra FPS
+            if (fpsCamera != null)
+            {
+                StartCoroutine(CameraRecoil());
+            }
+        }
+    }
+
+    private IEnumerator CameraRecoil()
+    {
+        float elapsed = 0f;
+        Vector3 startPos = fpsCamera.transform.localPosition;
+        Vector3 targetOffset = -Vector3.forward * cameraRecoilAmount;
+
+        while (elapsed < gearBoostSmoothTime)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / gearBoostSmoothTime;
+            fpsCamera.transform.localPosition = Vector3.Lerp(startPos + targetOffset, startPos, t);
+            yield return null;
+        }
+
+        fpsCamera.transform.localPosition = startPos;
     }
 
     // ===================== UTIL ==========================

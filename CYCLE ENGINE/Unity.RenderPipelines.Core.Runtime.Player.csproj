@@ -266,8 +266,8 @@
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.core@3d082aa477f5\Runtime\Volume\Volume.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.core@3d082aa477f5\Runtime\Debugging\Prefabs\Scripts\DebugUIHandlerObjectList.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.core@3d082aa477f5\Runtime\Common\SerializedDictionary.cs" />
-    <Compile Include="Library\PackageCache\com.unity.render-pipelines.core@3d082aa477f5\Runtime\Volume\VolumeStack.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.core@3d082aa477f5\Runtime\Debugging\Prefabs\Scripts\DebugUIHandlerHBox.cs" />
+    <Compile Include="Library\PackageCache\com.unity.render-pipelines.core@3d082aa477f5\Runtime\Volume\VolumeStack.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.core@3d082aa477f5\Runtime\Lighting\ProbeVolume\ProbeVolumesOptions.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.core@3d082aa477f5\Runtime\Lighting\ProbeVolume\ProbeReferenceVolume.ReflProbeNormalization.cs" />
     <Compile Include="Library\PackageCache\com.unity.render-pipelines.core@3d082aa477f5\Runtime\Debugging\Prefabs\Scripts\DebugUIHandlerIntField.cs" />
