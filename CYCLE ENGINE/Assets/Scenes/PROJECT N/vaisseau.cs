@@ -43,6 +43,10 @@ public class SpaceshipAdvanced : MonoBehaviour
     float yawInputSmooth;
     int lastGear = 0;
     float targetRoll = 0f;
+    
+    
+    float currentRoll;
+    float rollVelocity;
 
     const float STOP_THRESHOLD = 0.6f;
     const float LOW_SPEED_THRESHOLD = 2f;
@@ -139,11 +143,40 @@ public class SpaceshipAdvanced : MonoBehaviour
         }
 
         // Roll selon yaw
-        targetRoll = -yawInput * maxRollAngle;
-        Quaternion rollRot = Quaternion.Euler(0f, 0f, targetRoll);
+        // Roll simple en Z
+        
 
-        if (rb.linearVelocity.magnitude > 0.1f)
-            rb.MoveRotation(Quaternion.Slerp(rb.rotation, Quaternion.LookRotation(rb.linearVelocity.normalized, Vector3.up) * rollRot, Time.fixedDeltaTime * 3f));
+// Roll selon yaw (Z seulement)
+        float targetRoll = -yawInput * maxRollAngle;
+
+// Lissage du roll (pas instant)
+        currentRoll = Mathf.SmoothDampAngle(
+            currentRoll,
+            targetRoll,
+            ref rollVelocity,
+            0.18f // plus grand = plus smooth
+        );
+
+// Rotation actuelle
+        Quaternion currentRot = rb.rotation;
+
+// On garde X et Y, on applique le Z lissé
+        Quaternion targetRot = Quaternion.Euler(
+            currentRot.eulerAngles.x,
+            currentRot.eulerAngles.y,
+            currentRoll
+        );
+
+        rb.MoveRotation(
+            Quaternion.Slerp(
+                rb.rotation,
+                targetRot,
+                Time.fixedDeltaTime * 6f
+            )
+        );
+
+
+
     }
 
     void ApplyHover()

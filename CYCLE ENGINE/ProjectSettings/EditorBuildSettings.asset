@@ -17,14 +17,17 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/IMPORT MULTI/03_Shooter/03_Shooter.unity
     guid: 71bd13dc7c9a68e4e91e8dafb79988d6
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MultiplayerScene.unity
     guid: 24993c7ecfa81d04083853cebf4b1480
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/MENU.unity
     guid: 29f5e03df7add264f93b7a3267f9753b
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/SoloScene.unity
     guid: 22dd9b481280b2c4eae92403b1b6d2c2
+  - enabled: 1
+    path: Assets/Scenes/NOUVELLESCENE.unity
+    guid: 07096ae4a90aca747b877421657fd8cb
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
