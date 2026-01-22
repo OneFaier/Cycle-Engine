@@ -15,48 +15,100 @@ public class ObjectGrabTMP : MonoBehaviour
     public AudioSource audioSource;
 
     private Rigidbody heldObject;
+    private Collider heldCollider;
 
     void Update()
     {
-        // --- Attraper un objet ---
-        if (Input.GetMouseButtonDown(0) && heldObject == null)
-        {
-            Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0f));
-            if (Physics.Raycast(ray, out RaycastHit hit, grabRange))
-            {
-                if (hit.collider.CompareTag("Grabbable"))
-                {
-                    Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
-                    if (rb != null)
-                    {
-                        heldObject = rb;
-                        heldObject.useGravity = false;
+        HandleGrabToggle();
+        HandleHold();
+    }
 
-                        // Jouer le son de grab
-                        if (audioSource && grabSound)
-                            audioSource.PlayOneShot(grabSound);
-                    }
-                }
-            }
+    // =======================
+    // GRAB TOGGLE (Left Click)
+    // =======================
+    void HandleGrabToggle()
+    {
+        if (!Input.GetMouseButtonDown(0))
+            return;
+
+        if (heldObject == null)
+        {
+            TryGrab();
+        }
+        else
+        {
+            DropObject();
+        }
+    }
+
+    void TryGrab()
+    {
+        Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f));
+        if (!Physics.Raycast(ray, out RaycastHit hit, grabRange))
+            return;
+
+        if (!hit.collider.CompareTag("Grabbable"))
+            return;
+
+        Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
+        if (rb == null)
+            return;
+
+        heldObject = rb;
+        heldCollider = hit.collider;
+
+        // 🔓 Si installé → désinstaller VIA LE SLOT
+        GasBottleResource bottle = heldObject.GetComponent<GasBottleResource>();
+        if (bottle != null && bottle.isInstalled)
+        {
+            GasBottleSlot slot = bottle.transform.parent?.GetComponent<GasBottleSlot>();
+            if (slot != null)
+                slot.Uninstall();
         }
 
-        // --- Lâcher l'objet ---
-        if (Input.GetMouseButtonDown(1) && heldObject != null)
-        {
-            heldObject.useGravity = true;
+        // --- RESET PHYSIQUE ---
+        heldObject.transform.SetParent(null);
+        heldObject.isKinematic = false;
+        heldObject.useGravity = false;
+        heldObject.linearVelocity = Vector3.zero;
+        heldObject.angularVelocity = Vector3.zero;
 
-            // Jouer le son de drop
-            if (audioSource && dropSound)
-                audioSource.PlayOneShot(dropSound);
+        // Éviter collisions joueur
+        if (heldCollider)
+            heldCollider.enabled = false;
 
-            heldObject = null;
-        }
+        if (audioSource && grabSound)
+            audioSource.PlayOneShot(grabSound);
+    }
 
-        // --- Maintenir devant soi ---
-        if (heldObject != null)
-        {
-            Vector3 targetPos = playerCamera.transform.position + playerCamera.transform.forward * holdDistance;
-            heldObject.position = targetPos;
-        }
+    void DropObject()
+    {
+        // --- RETOUR PHYSIQUE NORMAL ---
+        heldObject.useGravity = true;
+        heldObject.isKinematic = false;
+
+        if (heldCollider)
+            heldCollider.enabled = true;
+
+        if (audioSource && dropSound)
+            audioSource.PlayOneShot(dropSound);
+
+        heldObject = null;
+        heldCollider = null;
+    }
+
+    // =======================
+    // MAINTIEN
+    // =======================
+    void HandleHold()
+    {
+        if (heldObject == null)
+            return;
+
+        Vector3 targetPos =
+            playerCamera.transform.position +
+            playerCamera.transform.forward * holdDistance;
+
+        heldObject.MovePosition(targetPos);
     }
 }

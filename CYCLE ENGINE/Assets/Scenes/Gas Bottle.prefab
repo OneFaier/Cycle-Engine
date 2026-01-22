@@ -362,6 +362,10 @@ MonoBehaviour:
   isInstalled: 0
   isActive: 0
   originalScale: {x: 1, y: 1, z: 1}
+  bottleRenderer: {fileID: 7274449107870090317}
+  fullColor: {r: 0.023584902, g: 0.6504957, b: 1, a: 1}
+  midColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  emptyColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!54 &-1975615907439323858
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -503,6 +507,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 66d82f954d8c54946a2e997e9c91b68b, type: 3}
+--- !u!23 &7274449107870090317 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 66d82f954d8c54946a2e997e9c91b68b,
+    type: 3}
+  m_PrefabInstance: {fileID: 8301714445686773961}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8412482420470644514 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 66d82f954d8c54946a2e997e9c91b68b,

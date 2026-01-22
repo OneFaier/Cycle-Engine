@@ -3,69 +3,50 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class SpaceshipAdvanced : MonoBehaviour
 {
+    #region Movement Settings
     [Header("Movement Settings")]
-    public float[] gearSpeeds = { 0f, 20f, 40f, 65f, 90f }; // vitesses par gear
+    public float[] gearSpeeds = { 0f, 20f, 40f, 65f, 90f };
     public float acceleration = 80f;
     public float turnSpeed = 40f;
     public float turnSmooth = 5f;
+    #endregion
 
+    #region Hover Settings
     [Header("Hover Settings")]
     public float hoverHeight = 2f;
     public float hoverForce = 250f;
-    public float hoverDamping = 3f;
+    public float hoverDamping = 5f;
     public LayerMask groundLayer;
     public Transform[] hoverPoints;
     public Transform hoverOrigin;
+    #endregion
 
+    #region Controls
     [Header("Controls")]
     public IndicatorGearMouse gearLever;
     public IndicatorMouseClickFast directionCube;
+    #endregion
 
-    [Header("Pilotage")]
-    public bool isPiloting = true;
-
-    [Header("Gear Boost / Propulsion")]
+    #region Boost / Propulsion
+    [Header("Boost / Propulsion")]
     public float gearImpulse = 120f;
-    public ParticleSystem propulsionEffect;
     public AudioSource propulsionAudio;
     public float propulsionPitchMultiplier = 0.05f;
 
-    [Header("Reactor Sound")]
-    public AudioSource reactorAudio;              // Son normal des réacteurs
-    public float reactorMinPitch = 0.8f;
-    public float reactorMaxPitch = 1.5f;
-    public float reactorPitchMultiplier = 0.1f;
-    public float reactorVolume = 0.7f;
+    [Header("Propulsion Particles")]
+    public GameObject propulsionEffectObject; // Empty qui contient le ParticleSystem
+    public int gearToActivateParticles = 3;   // À partir de ce gear, les particules s'activent
+    #endregion
 
-    public AudioSource reactorBoostAudio;         // Son de boost sur les 2 derniers crans
-    public float boostMinPitch = 1f;
-    public float boostMaxPitch = 1.8f;
-    public float boostPitchMultiplier = 0.1f;
-    public float boostVolume = 1f;
-
-    [Header("Camera Effects")]
-    public Camera shipCamera;
-    public float cameraAccelFov = 5f;
-    public float cameraMaxFov = 70f;
-    public float cameraMinFov = 60f;
-    public float cameraFovSmooth = 2f;
-    public float maxRollAngle = 20f;
-    public float maxPitchTilt = 10f;
-
-    [Header("Engine Sound")]
-    public AudioSource engineAudio;
-    public float minPitch = 0.8f;
-    public float maxPitch = 1.2f;
-    public float pitchSensitivity = 1f;
-    public float volumeSensitivity = 0.5f;
-
+    // ================= PRIVATE =================
     Rigidbody rb;
-    public float yawInputSmooth;
+    float yawInputSmooth;
     int lastGear = 0;
     float targetRoll = 0f;
-    float targetPitchTilt = 0f;
-    float hoverDisabledUntil = 0f;
-    float currentFov;
+
+    const float STOP_THRESHOLD = 0.6f;
+    const float LOW_SPEED_THRESHOLD = 2f;
+    public float maxRollAngle = 20f;
 
     void Start()
     {
@@ -82,219 +63,137 @@ public class SpaceshipAdvanced : MonoBehaviour
         rb.angularDrag = 2f;
 #endif
 
-        if (shipCamera != null)
-            currentFov = shipCamera.fieldOfView;
+        // Désactiver l'Empty au départ
+        if (propulsionEffectObject)
+            propulsionEffectObject.SetActive(false);
     }
 
     void FixedUpdate()
     {
-        if (isPiloting)
-            MoveAndTurn();
-
-        ApplyHoverAndGravity();
-        UpdateEngineSound();
-        UpdateReactorSound();
-        UpdateCameraEffects();
+        ApplyHover();
+        HandleMovement();
+        UpdatePropulsionParticles();
     }
 
-    void Update()
+    void HandleMovement()
     {
-        // 🔼 Changer hoverHeight avec molette
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        if (scroll != 0f)
-        {
-            hoverHeight += scroll * 0.5f;
-            hoverHeight = Mathf.Clamp(hoverHeight, 0.5f, 10f);
-        }
-    }
-
-    public float GetCurrentGearNormalized()
-    {
-        if (gearLever == null) return 0f;
-        int gear = gearLever.GetLimitedGear();
-        return gear / (float)(gearSpeeds.Length - 1);
-    }
-
-    public float YawInputSmooth => yawInputSmooth;
-
-    void MoveAndTurn()
-    {
-        // --- GEAR limité par les bouteilles ---
         int gear = gearLever ? gearLever.GetLimitedGear() : 0;
         float targetSpeed = gearSpeeds[Mathf.Clamp(gear, 0, gearSpeeds.Length - 1)];
 
-        // orientation et forward
-        Vector3 forward = transform.forward;
-        if (GetAverageGroundNormal(out Vector3 avgNormal))
-            forward = Vector3.ProjectOnPlane(forward, avgNormal).normalized;
-
 #if UNITY_6000_0_OR_NEWER
-        float currentSpeed = Vector3.Dot(rb.linearVelocity, forward);
+        Vector3 velocity = rb.linearVelocity;
 #else
-        float currentSpeed = Vector3.Dot(rb.velocity, forward);
+        Vector3 velocity = rb.velocity;
 #endif
 
-        // accélération
-        float speedError = targetSpeed - currentSpeed;
-        float accel = Mathf.Clamp(speedError, -acceleration, acceleration);
-        rb.AddForce(forward * accel, ForceMode.Acceleration);
+        float speed = Vector3.Dot(velocity, transform.forward);
+        float absSpeed = velocity.magnitude;
 
-        // propulsion visuelle/audio
+        // Stabilisation à l’arrêt
+        if (gear == 0 && absSpeed < STOP_THRESHOLD)
+        {
+#if UNITY_6000_0_OR_NEWER
+            rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, Vector3.zero, Time.fixedDeltaTime * 6f);
+            rb.linearDamping = 4f;
+#else
+            rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, Time.fixedDeltaTime * 6f);
+            rb.drag = 4f;
+#endif
+            return;
+        }
+
+#if UNITY_6000_0_OR_NEWER
+        rb.linearDamping = 0.2f;
+#else
+        rb.drag = 0.2f;
+#endif
+
+        // Accélération
+        float speedError = targetSpeed - speed;
+        float accel = Mathf.Clamp(speedError, -acceleration, acceleration);
+        rb.AddForce(transform.forward * accel, ForceMode.Acceleration);
+
+        // Boost / propulsion
         if (gear > lastGear)
         {
-            rb.AddForce(forward * gearImpulse, ForceMode.Impulse);
-            if (propulsionEffect != null) propulsionEffect.Play();
-            if (propulsionAudio != null) propulsionAudio.pitch = 1f + gear * propulsionPitchMultiplier;
+            rb.AddForce(transform.forward * gearImpulse, ForceMode.Impulse);
+            if (propulsionAudio) propulsionAudio.pitch = 1f + gear * propulsionPitchMultiplier;
         }
         lastGear = gear;
 
-        // ---------- TURN limité par les bouteilles ----------
+        // Turn + Roll style avion
         float dirVal = directionCube ? directionCube.GetLimitedNormalized() : 0.5f;
         float yawInput = Mathf.Lerp(-1f, 1f, dirVal);
         yawInputSmooth = Mathf.Lerp(yawInputSmooth, yawInput, Time.fixedDeltaTime * turnSmooth);
 
         rb.AddTorque(Vector3.up * yawInputSmooth * turnSpeed, ForceMode.Acceleration);
 
-        // ---------- ARC DE CERCLE ASSISTÉ ----------
-        if(rb.linearVelocity.magnitude > 0.1f)
+        if (velocity.magnitude > LOW_SPEED_THRESHOLD)
         {
-            Vector3 newVelocityDir = Vector3.Slerp(rb.linearVelocity.normalized, forward, turnSmooth * Time.fixedDeltaTime);
-            rb.linearVelocity = newVelocityDir * rb.linearVelocity.magnitude;
+            Vector3 newDir = Vector3.Slerp(velocity.normalized, transform.forward, Time.fixedDeltaTime * turnSmooth);
+#if UNITY_6000_0_OR_NEWER
+            rb.linearVelocity = newDir * rb.linearVelocity.magnitude;
+#else
+            rb.velocity = newDir * rb.velocity.magnitude;
+#endif
         }
 
-        // ---------- ROLL ----------
+        // Roll selon yaw
         targetRoll = -yawInput * maxRollAngle;
         Quaternion rollRot = Quaternion.Euler(0f, 0f, targetRoll);
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(rb.linearVelocity, Vector3.up) * rollRot, Time.fixedDeltaTime * 3f);
+
+        if (rb.linearVelocity.magnitude > 0.1f)
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, Quaternion.LookRotation(rb.linearVelocity.normalized, Vector3.up) * rollRot, Time.fixedDeltaTime * 3f));
     }
 
-    void ApplyHoverAndGravity()
+    void ApplyHover()
     {
-        if (Time.time < hoverDisabledUntil) return;
+        if (!GetAverageGround(out Vector3 avgNormal, out float avgDist)) return;
 
-        if (GetAverageGround(out _, out Vector3 avgNormal, out float avgDist))
-        {
-            float heightError = hoverHeight - avgDist;
+        float heightError = hoverHeight - avgDist;
+
 #if UNITY_6000_0_OR_NEWER
-            float verticalSpeed = Vector3.Dot(rb.linearVelocity, transform.up);
+        float verticalSpeed = Vector3.Dot(rb.linearVelocity, transform.up);
 #else
-            float verticalSpeed = Vector3.Dot(rb.velocity, transform.up);
+        float verticalSpeed = Vector3.Dot(rb.velocity, transform.up);
 #endif
-            float lift = heightError * hoverForce - verticalSpeed * hoverDamping;
-            rb.AddForce(transform.up * lift, ForceMode.Acceleration);
 
-            Quaternion targetRot = Quaternion.FromToRotation(transform.up, avgNormal) * transform.rotation;
-            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRot, Time.fixedDeltaTime * 6f));
-        }
+        float lift = heightError * hoverForce - verticalSpeed * hoverDamping;
+        rb.AddForce(transform.up * lift, ForceMode.Acceleration);
 
-        if (Physics.Raycast(GetHoverOrigin(), Vector3.down, out RaycastHit hit, 20f, groundLayer))
+        Quaternion targetRot = Quaternion.FromToRotation(transform.up, avgNormal) * transform.rotation;
+        rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRot, Time.fixedDeltaTime * 6f));
+    }
+
+    void UpdatePropulsionParticles()
+    {
+        if (propulsionEffectObject == null) return;
+
+        int gear = gearLever ? gearLever.GetLimitedGear() : 0;
+
+        if (gear >= gearToActivateParticles)
         {
-            float t = Mathf.InverseLerp(0, 20f, hit.distance);
-            rb.AddForce(Vector3.down * 30f * Mathf.Lerp(0.5f, 2f, t), ForceMode.Acceleration);
+            if (!propulsionEffectObject.activeSelf)
+                propulsionEffectObject.SetActive(true);
         }
         else
         {
-            rb.AddForce(Vector3.down * 30f, ForceMode.Acceleration);
+            if (propulsionEffectObject.activeSelf)
+                propulsionEffectObject.SetActive(false);
         }
     }
 
-    void UpdateEngineSound()
+    bool GetAverageGround(out Vector3 avgNormal, out float avgDist)
     {
-        if (!engineAudio) return;
-#if UNITY_6000_0_OR_NEWER
-        float speed = Vector3.Dot(rb.linearVelocity, transform.forward);
-#else
-        float speed = Vector3.Dot(rb.velocity, transform.forward);
-#endif
-        float pitch = 1f + speed / gearSpeeds[gearSpeeds.Length - 1] * pitchSensitivity;
-        engineAudio.pitch = Mathf.Lerp(engineAudio.pitch, Mathf.Clamp(pitch, minPitch, maxPitch), Time.fixedDeltaTime * 3f);
-        engineAudio.volume = Mathf.Lerp(engineAudio.volume, 0.5f + Mathf.Abs(speed) / gearSpeeds[gearSpeeds.Length - 1] * volumeSensitivity, Time.fixedDeltaTime * 3f);
-    }
-    
-    
-
-    bool isInBoost = false; // Track si on est actuellement dans la zone boost
-
-    void UpdateReactorSound()
-    {
-        if (!gearLever) return;
-
-        int gear = gearLever.GetLimitedGear();
-        int maxGear = gearSpeeds.Length - 1;
-
-        // ---- Son normal ----
-        if (reactorAudio)
-        {
-            float targetPitch = Mathf.Clamp(reactorMinPitch + gear * reactorPitchMultiplier, reactorMinPitch, reactorMaxPitch);
-            reactorAudio.pitch = Mathf.Lerp(reactorAudio.pitch, targetPitch, Time.fixedDeltaTime * 3f);
-            reactorAudio.volume = Mathf.Lerp(reactorAudio.volume, reactorVolume, Time.fixedDeltaTime * 3f);
-        }
-
-        // ---- Son boost simple avec loop forcé ----
-        if (reactorBoostAudio)
-        {
-            // On force le loop
-            reactorBoostAudio.loop = true;
-
-            bool inBoostRange = gear >= maxGear - 1;
-
-            if (inBoostRange && !isInBoost)
-            {
-                // Entrée dans la zone boost → jouer le son
-                if (!reactorBoostAudio.isPlaying)
-                    reactorBoostAudio.Play();
-                isInBoost = true;
-            }
-            else if (!inBoostRange && isInBoost)
-            {
-                // Sortie de la zone boost → arrêter le son
-                reactorBoostAudio.Stop();
-                isInBoost = false;
-            }
-        }
-    }
-
-
-
-
-
-
-
-    void UpdateCameraEffects()
-    {
-        if (!shipCamera) return;
-#if UNITY_6000_0_OR_NEWER
-        float speed = Vector3.Dot(rb.linearVelocity, transform.forward);
-#else
-        float speed = Vector3.Dot(rb.velocity, transform.forward);
-#endif
-        float targetFov = cameraMinFov + cameraAccelFov * Mathf.Clamp01(speed / gearSpeeds[gearSpeeds.Length - 1]);
-        currentFov = Mathf.Lerp(currentFov, targetFov, Time.fixedDeltaTime * cameraFovSmooth);
-        shipCamera.fieldOfView = currentFov;
-
-        if (rb.linearVelocity.magnitude > 0.5f)
-        {
-            shipCamera.transform.localRotation = Quaternion.Lerp(
-                shipCamera.transform.localRotation,
-                Quaternion.Euler(targetPitchTilt, 0f, targetRoll * 0.5f),
-                Time.fixedDeltaTime * 3f
-            );
-        }
-    }
-
-    bool GetAverageGround(out Vector3 avgPoint, out Vector3 avgNormal, out float avgDist)
-    {
-        int count = 0;
-        avgPoint = Vector3.zero;
         avgNormal = Vector3.zero;
         avgDist = 0f;
+        int count = 0;
 
         foreach (var p in hoverPoints)
         {
             if (!p) continue;
             if (Physics.Raycast(p.position, -p.up, out RaycastHit hit, hoverHeight * 2f, groundLayer))
             {
-                avgPoint += hit.point;
                 avgNormal += hit.normal;
                 avgDist += hit.distance;
                 count++;
@@ -303,35 +202,8 @@ public class SpaceshipAdvanced : MonoBehaviour
 
         if (count == 0) return false;
 
-        avgPoint /= count;
         avgNormal.Normalize();
         avgDist /= count;
         return true;
-    }
-
-    bool GetAverageGroundNormal(out Vector3 avgNormal)
-    {
-        avgNormal = Vector3.up;
-        return GetAverageGround(out _, out avgNormal, out _);
-    }
-
-    Vector3 GetHoverOrigin()
-    {
-        return hoverOrigin ? hoverOrigin.position : transform.position;
-    }
-
-    // ---------------- CANON / RECOIL ----------------
-    public float cannonLinearForce = 500f;
-    public float cannonTorqueForce = 5f;
-    public float cannonVerticalImpulse = 800f;
-    public float hoverOverrideTime = 0.15f;
-
-    public void ApplyCannonImpulse(Transform firePoint)
-    {
-        Vector3 recoilDir = -firePoint.forward;
-        float downwardFactor = Mathf.Clamp01(-firePoint.forward.y);
-        rb.AddForce(recoilDir * cannonLinearForce + Vector3.up * downwardFactor * cannonVerticalImpulse, ForceMode.Impulse);
-        rb.AddTorque(transform.right * cannonTorqueForce, ForceMode.Impulse);
-        hoverDisabledUntil = Time.time + hoverOverrideTime;
     }
 }
