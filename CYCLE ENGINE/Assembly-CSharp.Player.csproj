@@ -105,6 +105,7 @@
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\ShaderPropAnimator.cs" />
     <Compile Include="Assets\Scenes\GasBottleResource.cs" />
     <Compile Include="Assets\scripts\SeatPoint.cs" />
+    <Compile Include="Assets\OutlinePass.cs" />
     <Compile Include="Assets\scripts\direction helth cube.cs" />
     <Compile Include="Assets\scripts\cubes manager.cs" />
     <Compile Include="Assets\scripts\doorbutton.cs" />
@@ -138,6 +139,7 @@
     <Compile Include="Assets\scripts\CANON BALL.cs" />
     <Compile Include="Assets\scripts\CubeBlinker.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\CameraController.cs" />
+    <Compile Include="Assets\Scenes\PROJECT N\outlinescript.cs" />
     <Compile Include="Assets\TextMesh Pro\Examples &amp; Extras\Scripts\Benchmark03.cs" />
     <Compile Include="Assets\IMPORT MULTI\03_Shooter\Scripts\GameManager.cs" />
     <Compile Include="Assets\scripts\WhaleSpawner.cs" />

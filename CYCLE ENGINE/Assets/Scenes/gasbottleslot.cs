@@ -10,6 +10,11 @@ public class GasBottleSlot : MonoBehaviour
     [Header("Bouteille actuelle")]
     public GasBottleResource currentBottle;
 
+    [Header("Audio")]
+    public AudioSource audioSource;       // AudioSource pour jouer les sons
+    public AudioClip addModuleClip;       // Son quand une bouteille est ajoutée
+    public AudioClip removeModuleClip;    // Son quand une bouteille est retirée
+
     public bool IsFree => currentBottle == null;
 
     public bool TryInstall(GasBottleResource bottle)
@@ -17,6 +22,10 @@ public class GasBottleSlot : MonoBehaviour
         if (!IsFree || bottle == null) return false;
 
         currentBottle = bottle;
+
+        // 🔊 Jouer le son d'ajout
+        if (audioSource != null && addModuleClip != null)
+            audioSource.PlayOneShot(addModuleClip, 1f);
 
         bottle.isInstalled = true;
         bottle.isActive = false;
@@ -46,6 +55,10 @@ public class GasBottleSlot : MonoBehaviour
 
         GasBottleResource bottle = currentBottle;
         currentBottle = null;
+
+        // 🔊 Jouer le son de retrait
+        if (audioSource != null && removeModuleClip != null)
+            audioSource.PlayOneShot(removeModuleClip, 1f);
 
         bottle.isInstalled = false;
 

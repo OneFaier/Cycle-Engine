@@ -21,12 +21,22 @@ public class SimpleFPSController : MonoBehaviour
     [Header("Contrôle")]
     public bool canMove = true;
 
+    [Header("Footsteps")]
+    public AudioSource footstepSource;
+    public AudioClip[] footstepClips;
+    public float stepDistance = 2f;
+    public LayerMask groundLayer; // Layer du sol sur lequel on joue les pas
+
+    private float distanceMoved = 0f;
+    private Vector3 lastPosition;
+    private int lastFootstepIndex = -1;
+
     // ===================== ACCELERATION CAMERA INERTIA =====================
     [Header("Acceleration Inertia Camera")]
-    public float accelCameraDelay = 0.08f;      // délai après changement de gear
-    public float accelCameraPull = 0.15f;       // recul max caméra
-    public float accelCameraPullSpeed = 8f;     // vitesse de tirage arrière
-    public float accelCameraReturnSpeed = 6f;   // vitesse de retour
+    public float accelCameraDelay = 0.08f;
+    public float accelCameraPull = 0.15f;
+    public float accelCameraPullSpeed = 8f;
+    public float accelCameraReturnSpeed = 6f;
 
     [Header("Gear Lever")]
     public IndicatorGearMouse gearLever;
@@ -54,6 +64,8 @@ public class SimpleFPSController : MonoBehaviour
         if (fpsCamera != null) fpsCamera.enabled = true;
         if (tpsCamera != null) tpsCamera.enabled = false;
 
+        lastPosition = transform.position;
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -66,6 +78,7 @@ public class SimpleFPSController : MonoBehaviour
         HandleCameraSwitch();
         UpdateTPSCameraPosition();
         HandleGearAccelerationCamera();
+        HandleFootsteps(); // FOOTSTEPS
     }
 
     void FixedUpdate()
@@ -73,7 +86,6 @@ public class SimpleFPSController : MonoBehaviour
         HandleMovement();
     }
 
-    // ===================== LOCK MOUSE =====================
     void HandleMouseLock()
     {
         if (Cursor.lockState != CursorLockMode.Locked)
@@ -82,7 +94,6 @@ public class SimpleFPSController : MonoBehaviour
             Cursor.visible = false;
     }
 
-    // ===================== CAMERA LOOK =====================
     void HandleMouseLook()
     {
         if (!mouseLookEnabled) return;
@@ -99,7 +110,6 @@ public class SimpleFPSController : MonoBehaviour
         transform.Rotate(Vector3.up * mouseX);
     }
 
-    // ===================== MOVEMENT =====================
     void HandleMovement()
     {
         if (!canMove) return;
@@ -127,11 +137,10 @@ public class SimpleFPSController : MonoBehaviour
 
     void OnCollisionStay(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Ground"))
+        if (((1 << collision.gameObject.layer) & groundLayer) != 0)
             isGrounded = true;
     }
 
-    // ===================== SWITCH FPS / TPS =====================
     void HandleCameraSwitch()
     {
         if (Input.GetKeyDown(KeyCode.V))
@@ -162,7 +171,6 @@ public class SimpleFPSController : MonoBehaviour
         );
     }
 
-    // ===================== GEAR ACCELERATION CAMERA =====================
     void HandleGearAccelerationCamera()
     {
         if (gearLever == null || fpsCamera == null) return;
@@ -182,34 +190,21 @@ public class SimpleFPSController : MonoBehaviour
 
     IEnumerator AccelerationCameraInertia(int gear)
     {
-        // Petit délai pour éviter le kick instantané
         yield return new WaitForSeconds(accelCameraDelay);
 
-        float gearFactor = Mathf.Clamp01(gear / 5f); // adapte si + ou - de gears
+        float gearFactor = Mathf.Clamp01(gear / 5f);
         Vector3 targetBack = -Vector3.forward * accelCameraPull * (0.5f + gearFactor);
 
-        // Tirage arrière progressif
         while (Vector3.Distance(accelCameraOffset, targetBack) > 0.01f)
         {
-            accelCameraOffset = Vector3.Lerp(
-                accelCameraOffset,
-                targetBack,
-                Time.deltaTime * accelCameraPullSpeed
-            );
-
+            accelCameraOffset = Vector3.Lerp(accelCameraOffset, targetBack, Time.deltaTime * accelCameraPullSpeed);
             fpsCamera.transform.localPosition = accelCameraOffset;
             yield return null;
         }
 
-        // Retour doux vers position neutre
         while (accelCameraOffset.magnitude > 0.01f)
         {
-            accelCameraOffset = Vector3.Lerp(
-                accelCameraOffset,
-                Vector3.zero,
-                Time.deltaTime * accelCameraReturnSpeed
-            );
-
+            accelCameraOffset = Vector3.Lerp(accelCameraOffset, Vector3.zero, Time.deltaTime * accelCameraReturnSpeed);
             fpsCamera.transform.localPosition = accelCameraOffset;
             yield return null;
         }
@@ -218,6 +213,43 @@ public class SimpleFPSController : MonoBehaviour
         fpsCamera.transform.localPosition = Vector3.zero;
     }
 
-    // ===================== UTIL =====================
+
+    // ===================== FOOTSTEPS =====================
+    void HandleFootsteps()
+    {
+        if (footstepClips.Length == 0 || footstepSource == null) return;
+
+        // Vérifie qu'on touche le sol via layer (Raycast plus long)
+        float rayDistance = 1.2f; // augmente si ton pivot est haut
+        if (!Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, rayDistance, groundLayer))
+            return;
+
+        // Calcul du déplacement horizontal
+        Vector3 delta = transform.position - lastPosition;
+        float horizontalDelta = new Vector3(delta.x, 0f, delta.z).magnitude;
+        distanceMoved += horizontalDelta;
+
+        if (distanceMoved >= stepDistance)
+        {
+            PlayFootstep();
+            distanceMoved = 0f;
+        }
+
+        lastPosition = transform.position;
+    }
+
+
+    void PlayFootstep()
+    {
+        int index;
+        do
+        {
+            index = Random.Range(0, footstepClips.Length);
+        } while (index == lastFootstepIndex && footstepClips.Length > 1);
+
+        lastFootstepIndex = index;
+        footstepSource.PlayOneShot(footstepClips[index]);
+    }
+
     public bool IsGrounded() => isGrounded;
 }
