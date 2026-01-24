@@ -11,32 +11,40 @@ public class GasBottleSlot : MonoBehaviour
     public GasBottleResource currentBottle;
 
     [Header("Audio")]
-    public AudioSource audioSource;       // AudioSource pour jouer les sons
-    public AudioClip addModuleClip;       // Son quand une bouteille est ajoutée
-    public AudioClip removeModuleClip;    // Son quand une bouteille est retirée
+    public AudioSource audioSource;
+    public AudioClip addModuleClip;
+    public AudioClip removeModuleClip;
 
     public bool IsFree => currentBottle == null;
 
+    // ===================== PREVIEW =====================
+    void PreviewSnap(GasBottleResource bottle)
+    {
+        bottle.previewSlot = this;
+
+        bottle.transform.position = transform.position;
+        bottle.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+        bottle.transform.localScale = bottle.originalScale;
+    }
+
+    // ===================== INSTALL =====================
     public bool TryInstall(GasBottleResource bottle)
     {
         if (!IsFree || bottle == null) return false;
 
         currentBottle = bottle;
-
-        // 🔊 Jouer le son d'ajout
-        if (audioSource != null && addModuleClip != null)
-            audioSource.PlayOneShot(addModuleClip, 1f);
-
+        bottle.previewSlot = null;
         bottle.isInstalled = true;
         bottle.isActive = false;
 
-        // Parent & transform
+        if (audioSource && addModuleClip)
+            audioSource.PlayOneShot(addModuleClip);
+
         bottle.transform.SetParent(transform);
         bottle.transform.localPosition = Vector3.zero;
         bottle.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
         bottle.transform.localScale = bottle.originalScale;
 
-        // 🔒 PHYSIQUE BLOQUÉE MAIS PAS DÉTRUITE
         Rigidbody rb = bottle.GetComponent<Rigidbody>();
         if (rb)
         {
@@ -56,12 +64,10 @@ public class GasBottleSlot : MonoBehaviour
         GasBottleResource bottle = currentBottle;
         currentBottle = null;
 
-        // 🔊 Jouer le son de retrait
-        if (audioSource != null && removeModuleClip != null)
-            audioSource.PlayOneShot(removeModuleClip, 1f);
+        if (audioSource && removeModuleClip)
+            audioSource.PlayOneShot(removeModuleClip);
 
         bottle.isInstalled = false;
-
         bottle.transform.SetParent(null);
 
         Rigidbody rb = bottle.GetComponent<Rigidbody>();
@@ -72,6 +78,7 @@ public class GasBottleSlot : MonoBehaviour
         }
     }
 
+    // ===================== TRIGGERS =====================
     private void OnTriggerEnter(Collider other)
     {
         if (!other.CompareTag("Grabbable")) return;
@@ -79,6 +86,16 @@ public class GasBottleSlot : MonoBehaviour
         GasBottleResource bottle = other.GetComponent<GasBottleResource>();
         if (bottle == null || bottle.isInstalled) return;
 
-        TryInstall(bottle);
+        if (bottle.isGrabbed)
+            PreviewSnap(bottle);   // 👻 prévisualisation
+        else
+            TryInstall(bottle);   // 📦 auto-install si pas grab
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        GasBottleResource bottle = other.GetComponent<GasBottleResource>();
+        if (bottle && bottle.previewSlot == this)
+            bottle.previewSlot = null;
     }
 }

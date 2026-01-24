@@ -3,130 +3,168 @@ using UnityEngine;
 public class IndicatorGearMouse : MonoBehaviour
 {
     [Header("Rails / Crans")]
-    public Transform[] gearCrans;   // Crans pour le levier (visuel)
-    public Transform[] snapPoints;  // Empties pour chaque cran
-    public int currentGear = 0;     // Cran officiel
+    public Transform[] gearCrans;
+    public Transform[] snapPoints;
+    public int currentGear = 0;
 
     [Header("Grab / Mouse")]
     public float grabDistance = 3f;
-    public float snapThreshold = 0.1f; // distance verticale pour snap au cran
+    public float snapThreshold = 0.1f;
+    public int maxSnapsPerGrab = 2;
+    public float grabMoveThreshold = 5f;
 
     [Header("Highlight")]
     public Color highlightColor = Color.yellow;
 
     [Header("Audio")]
-    public AudioSource audioSource;     // source pour le son
-    public AudioClip gearChangeClip;    // son à chaque empty ou cran
+    public AudioSource audioSource;
+    public AudioClip gearChangeClip;
+
+    [Header("Snap Indicators")]
+    public Renderer[] snapIndicators;
+    public Color passedColor = Color.green;
+    public Color notPassedColor = Color.red;
+
+    [Header("Référence Joueur / Caméra")]
+    public SimpleFPSController playerController;
+    public Camera targetCamera;
+    [Range(0f, 1f)] public float smoothAimFactor = 0.1f;
+
+    [Header("Module Manager")]
+    public ModuleResourceManage moduleManager;
+
+    [Header("Aim Zone")]
+    public float maxYawOffset = 30f;
+    public float maxPitchOffset = 20f;
+
+    [Header("Snap Settings")]
+    public float snapZone = 0.2f;      // tolérance autour du cran
+    public float snapCooldown = 0.1f;  // temps minimal entre 2 snaps
 
     private Color baseColor;
     private Renderer rend;
 
-    public ModuleResourceManage moduleManager;
-
-    private Camera playerCamera;
     private bool isGrabbed = false;
     private bool isHovered = false;
 
-    private int lastGear = -1;       // pour le cran officiel
-    private int lastSnapIndex = -1;  // pour le son à chaque empty
-    private int blockedSnapIndex = -1; // snap point où le levier est bloqué
+    private int lastGear = -1;
+    private int lastSnapIndex = -1;
+    private int grabStartIndex = 0;
+    private bool grabActivated = false;
+    private Vector3 grabStartMousePos;
+    private float lastSnapTime = -1f;
 
     void Start()
     {
-        playerCamera = Camera.main;
         rend = GetComponent<Renderer>();
-
-        if (rend != null)
-            baseColor = rend.material.color;
+        if (rend != null) baseColor = rend.material.color;
 
         if (gearCrans.Length > 0 && currentGear < gearCrans.Length)
             transform.position = gearCrans[currentGear].position;
 
         lastGear = currentGear;
         lastSnapIndex = currentGear;
-        blockedSnapIndex = -1;
+
+        if (targetCamera == null && playerController != null)
+            targetCamera = playerController.fpsCamera;
     }
 
     void Update()
     {
+        if (targetCamera == null) return;
+
         HandleHover();
 
-        // Début du grab
         if (isHovered && Input.GetMouseButtonDown(0) && !isGrabbed)
-        {
-            isGrabbed = true;
+            StartGrab();
 
-            // Relâchement précédent du snap
-            if (blockedSnapIndex != -1)
-                blockedSnapIndex = -1;
-        }
-
-        // Fin du grab manuel
         if (isGrabbed && Input.GetMouseButtonUp(0))
-        {
-            isGrabbed = false;
-
-            // Si on était bloqué sur un snap, appliquer le cran officiel maintenant
-            if (blockedSnapIndex != -1)
-            {
-                currentGear = blockedSnapIndex;
-                blockedSnapIndex = -1;
-            }
-        }
+            StopGrab();
 
         if (isGrabbed)
-            HandleGrab();
+        {
+            if (!grabActivated)
+            {
+                float dist = Vector2.Distance((Vector2)Input.mousePosition, (Vector2)grabStartMousePos);
+                if (dist >= grabMoveThreshold) grabActivated = true;
+            }
+
+            if (grabActivated)
+            {
+                HandleGrab();
+                SmoothAimAtLever();
+            }
+        }
         else if (gearCrans.Length > 0)
         {
-            // Lerp fluide vers le cran officiel
             Vector3 targetPos = gearCrans[currentGear].position;
             transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * 10f);
         }
 
-        // Jouer son si le cran officiel change
         if (currentGear != lastGear)
         {
             PlayGearSound();
             lastGear = currentGear;
         }
+
+        UpdateSnapIndicators();
     }
 
     void HandleHover()
     {
-        if (!playerCamera) return;
-
-        Vector3 screenPoint = playerCamera.WorldToScreenPoint(transform.position);
+        Vector3 screenPoint = targetCamera.WorldToScreenPoint(transform.position);
         isHovered = Vector2.Distance(Input.mousePosition, screenPoint) < 40f;
 
         if (rend != null)
             rend.material.color = isHovered ? highlightColor : baseColor;
     }
 
+    void StartGrab()
+    {
+        isGrabbed = true;
+        grabActivated = false;
+        grabStartMousePos = Input.mousePosition;
+        grabStartIndex = currentGear;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        if (playerController != null)
+            playerController.mouseLookEnabled = true;
+    }
+
+    void StopGrab()
+    {
+        isGrabbed = false;
+        grabActivated = false;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        if (playerController != null)
+            playerController.mouseLookEnabled = true;
+    }
+
     void HandleGrab()
     {
-        if (gearCrans.Length == 0 || snapPoints.Length != gearCrans.Length)
-            return;
+        if (gearCrans.Length == 0 || snapPoints.Length != gearCrans.Length) return;
 
         Plane railPlane = new Plane(Vector3.right, transform.position);
-        Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+        Ray ray = targetCamera.ScreenPointToRay(Input.mousePosition);
 
-        if (!railPlane.Raycast(ray, out float enter))
-            return;
+        if (!railPlane.Raycast(ray, out float enter)) return;
 
         Vector3 hitPoint = ray.GetPoint(enter);
 
-        float minY = gearCrans[0].position.y;
-        float maxY = gearCrans[gearCrans.Length - 1].position.y;
-        float t = Mathf.InverseLerp(minY, maxY, hitPoint.y);
-        t = Mathf.Clamp01(t);
-        float targetY = Mathf.Lerp(minY, maxY, t);
+        int minIndex = Mathf.Max(grabStartIndex - maxSnapsPerGrab, 0);
+        int maxIndex = Mathf.Min(grabStartIndex + maxSnapsPerGrab, snapPoints.Length - 1);
 
-        // Calcul du snap point le plus proche
+        int closestIndex = lastSnapIndex;
         float closestDist = float.MaxValue;
-        int closestIndex = currentGear;
-        for (int i = 0; i < snapPoints.Length; i++)
+
+        for (int i = minIndex; i <= maxIndex; i++)
         {
-            float dist = Mathf.Abs(targetY - snapPoints[i].position.y);
+            float dist = Mathf.Abs(hitPoint.y - snapPoints[i].position.y);
             if (dist < closestDist)
             {
                 closestDist = dist;
@@ -134,31 +172,56 @@ public class IndicatorGearMouse : MonoBehaviour
             }
         }
 
-        Vector3 targetPos;
+        // --- Buffer pour éviter le spam et TP ---
+        float currentTime = Time.time;
+        float distToCurrent = Mathf.Abs(hitPoint.y - snapPoints[lastSnapIndex].position.y);
 
-        // Si proche du snap point, bloquer dessus
-        if (closestDist <= snapThreshold)
+        if (closestIndex != lastSnapIndex && distToCurrent > snapZone && currentTime - lastSnapTime > snapCooldown)
         {
-            targetPos = snapPoints[closestIndex].position;
-
-            // Jouer le son si passage sur un empty différent
-            if (closestIndex != lastSnapIndex)
-            {
-                lastSnapIndex = closestIndex;
-                PlayGearSound();
-            }
-
-            // Bloquer le levier ici jusqu'à relâchement
-            blockedSnapIndex = closestIndex;
+            transform.position = snapPoints[closestIndex].position;
+            lastSnapIndex = closestIndex;
+            currentGear = closestIndex;
+            PlayGearSound();
+            lastSnapTime = currentTime;
         }
         else
         {
-            // Suivi libre tant qu’on n’est pas proche
-            targetPos = transform.position;
-            targetPos.y = targetY;
+            transform.position = snapPoints[lastSnapIndex].position;
         }
+    }
 
-        transform.position = targetPos;
+    void UpdateSnapIndicators()
+    {
+        if (snapIndicators == null || snapIndicators.Length == 0) return;
+
+        for (int i = 0; i < snapIndicators.Length; i++)
+        {
+            if (snapIndicators[i] != null)
+                snapIndicators[i].material.color = (currentGear >= i) ? passedColor : notPassedColor;
+        }
+    }
+
+    void SmoothAimAtLever()
+    {
+        if (targetCamera == null) return;
+
+        Vector3 direction = (transform.position - targetCamera.transform.position).normalized;
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+        Vector3 currentEuler = targetCamera.transform.rotation.eulerAngles;
+        Vector3 targetEuler = targetRotation.eulerAngles;
+
+        // Clamp horizontal (yaw)
+        float yawDiff = Mathf.DeltaAngle(currentEuler.y, targetEuler.y);
+        yawDiff = Mathf.Clamp(yawDiff, -maxYawOffset, maxYawOffset);
+        float yaw = currentEuler.y + yawDiff * smoothAimFactor;
+
+        // Clamp vertical (pitch)
+        float pitchDiff = Mathf.DeltaAngle(currentEuler.x, targetEuler.x);
+        pitchDiff = Mathf.Clamp(pitchDiff, -maxPitchOffset, maxPitchOffset);
+        float pitch = currentEuler.x + pitchDiff * smoothAimFactor;
+
+        targetCamera.transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
     }
 
     void PlayGearSound()
@@ -171,11 +234,7 @@ public class IndicatorGearMouse : MonoBehaviour
     {
         if (moduleManager != null)
         {
-            int maxAllowed = Mathf.Clamp(
-                moduleManager.SpeedCount + 1,
-                1,
-                moduleManager.maxBottles + 1
-            );
+            int maxAllowed = Mathf.Clamp(moduleManager.SpeedCount + 1, 1, moduleManager.maxBottles + 1);
             return Mathf.Min(currentGear, maxAllowed);
         }
         return currentGear;

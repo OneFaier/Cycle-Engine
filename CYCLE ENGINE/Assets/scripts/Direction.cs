@@ -13,7 +13,8 @@ public class IndicatorMouseClickFast : MonoBehaviour
 
     [Header("Contrôles")]
     public float sensitivity = 0.05f;
-    [Range(0f, 1f)] public float positionNormalized = 0.5f;
+    [Range(0f, 1f)]
+    public float positionNormalized = 0.5f;
     public float snapThreshold = 0.05f;
     public float maxGrabDistance = 3f;
     public float returnSpeed = 2f;
@@ -27,7 +28,10 @@ public class IndicatorMouseClickFast : MonoBehaviour
     public SimpleFPSController playerController;
     public ModuleResourceManage moduleManager;
 
-    private Camera playerCamera;
+    [Header("Camera Follow")]
+    public Camera playerCamera;
+    public float cameraSmoothSpeed = 5f;
+
     private bool isGrabbed = false;
     private bool isHovered = false;
 
@@ -36,7 +40,9 @@ public class IndicatorMouseClickFast : MonoBehaviour
 
     void Start()
     {
-        playerCamera = playerController?.fpsCamera ?? Camera.main;
+        if (playerCamera == null)
+            playerCamera = playerController?.fpsCamera ?? Camera.main;
+
         rend = GetComponent<Renderer>();
         if (rend != null)
             baseColor = rend.material.color;
@@ -51,12 +57,15 @@ public class IndicatorMouseClickFast : MonoBehaviour
         if (Input.GetMouseButtonUp(0) && isGrabbed)
             StopGrab();
 
-        // Déplacement cube
+        // Déplacement du levier
         if (isGrabbed)
         {
             float mouseX = Input.GetAxis("Mouse X");
             positionNormalized += mouseX * sensitivity;
             positionNormalized = Mathf.Clamp01(positionNormalized);
+
+            // Smooth aim caméra
+            SmoothAimAtLever();
         }
         else
         {
@@ -132,6 +141,22 @@ public class IndicatorMouseClickFast : MonoBehaviour
         Cursor.visible = true;
         if (playerController != null)
             playerController.mouseLookEnabled = true;
+
+        // Ici la caméra reste où elle est, pas de snap
+    }
+
+    void SmoothAimAtLever()
+    {
+        if (!playerCamera) return;
+
+        Vector3 direction = (transform.position - playerCamera.transform.position).normalized;
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+        playerCamera.transform.rotation = Quaternion.Slerp(
+            playerCamera.transform.rotation,
+            targetRotation,
+            Time.deltaTime * cameraSmoothSpeed
+        );
     }
 
     // ---------------- PUBLIC API ----------------

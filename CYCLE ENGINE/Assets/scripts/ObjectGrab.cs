@@ -23,57 +23,48 @@ public class ObjectGrabTMP : MonoBehaviour
         HandleHold();
     }
 
-    // =======================
-    // GRAB TOGGLE (Left Click)
-    // =======================
+    // ===================== GRAB =====================
     void HandleGrabToggle()
     {
-        if (!Input.GetMouseButtonDown(0))
-            return;
+        if (!Input.GetMouseButtonDown(0)) return;
 
         if (heldObject == null)
-        {
             TryGrab();
-        }
         else
-        {
             DropObject();
-        }
     }
 
     void TryGrab()
     {
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f));
-        if (!Physics.Raycast(ray, out RaycastHit hit, grabRange))
-            return;
-
-        if (!hit.collider.CompareTag("Grabbable"))
-            return;
+        if (!Physics.Raycast(ray, out RaycastHit hit, grabRange)) return;
+        if (!hit.collider.CompareTag("Grabbable")) return;
 
         Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
-        if (rb == null)
-            return;
+        if (!rb) return;
 
         heldObject = rb;
         heldCollider = hit.collider;
 
-        // 🔓 Si installé → désinstaller VIA LE SLOT
         GasBottleResource bottle = heldObject.GetComponent<GasBottleResource>();
-        if (bottle != null && bottle.isInstalled)
+        if (bottle != null)
         {
-            GasBottleSlot slot = bottle.transform.parent?.GetComponent<GasBottleSlot>();
-            if (slot != null)
-                slot.Uninstall();
+            bottle.isGrabbed = true;
+
+            if (bottle.isInstalled)
+            {
+                GasBottleSlot slot = bottle.transform.parent?.GetComponent<GasBottleSlot>();
+                if (slot != null)
+                    slot.Uninstall();
+            }
         }
 
-        // --- RESET PHYSIQUE ---
         heldObject.transform.SetParent(null);
         heldObject.isKinematic = false;
         heldObject.useGravity = false;
         heldObject.linearVelocity = Vector3.zero;
         heldObject.angularVelocity = Vector3.zero;
 
-        // Éviter collisions joueur
         if (heldCollider)
             heldCollider.enabled = false;
 
@@ -83,7 +74,21 @@ public class ObjectGrabTMP : MonoBehaviour
 
     void DropObject()
     {
-        // --- RETOUR PHYSIQUE NORMAL ---
+        if (heldObject == null) return;
+
+        GasBottleResource bottle = heldObject.GetComponent<GasBottleResource>();
+        if (bottle != null)
+        {
+            bottle.isGrabbed = false;
+
+            // installation finale si previewSlot
+            if (bottle.previewSlot != null)
+            {
+                bottle.previewSlot.TryInstall(bottle);
+                bottle.previewSlot = null;
+            }
+        }
+
         heldObject.useGravity = true;
         heldObject.isKinematic = false;
 
@@ -97,18 +102,26 @@ public class ObjectGrabTMP : MonoBehaviour
         heldCollider = null;
     }
 
-    // =======================
-    // MAINTIEN
-    // =======================
+    // ===================== HOLD =====================
     void HandleHold()
     {
-        if (heldObject == null)
-            return;
+        if (heldObject == null) return;
 
-        Vector3 targetPos =
-            playerCamera.transform.position +
-            playerCamera.transform.forward * holdDistance;
+        GasBottleResource bottle = heldObject.GetComponent<GasBottleResource>();
 
-        heldObject.MovePosition(targetPos);
+        if (bottle != null && bottle.previewSlot != null)
+        {
+            heldObject.MovePosition(bottle.previewSlot.transform.position);
+            heldObject.MoveRotation(bottle.previewSlot.transform.rotation);
+        }
+        else
+        {
+            Vector3 targetPos =
+                playerCamera.transform.position +
+                playerCamera.transform.forward * holdDistance;
+
+            heldObject.MovePosition(targetPos);
+        }
     }
 }
+    

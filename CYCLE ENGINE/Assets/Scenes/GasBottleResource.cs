@@ -9,7 +9,10 @@ public class GasBottleResource : MonoBehaviour
     [Header("State")]
     public bool isInstalled = false;
     public bool isActive = false;
+    public bool isGrabbed = false; // 🔑 piloté par le grab
     public Vector3 originalScale = Vector3.one;
+
+    [HideInInspector] public GasBottleSlot previewSlot; // slot survolé
 
     [Header("Visual")]
     public Renderer bottleRenderer;
@@ -28,34 +31,16 @@ public class GasBottleResource : MonoBehaviour
         UpdateColor();
     }
 
-    public void Install()
-    {
-        isInstalled = true;
-        isActive = false;
-    }
-
-    public void Uninstall()
-    {
-        isInstalled = false;
-        isActive = false;
-    }
-
-    /// <summary>
-    /// Vide la bouteille d'une quantité donnée
-    /// </summary>
     public void UseGas(float amount)
     {
         if (!isInstalled || !isActive) return;
 
         currentGas -= amount;
         currentGas = Mathf.Clamp(currentGas, 0f, maxGas);
-
         UpdateColor();
 
         if (IsEmpty())
-        {
             Destroy(gameObject);
-        }
     }
 
     void UpdateColor()
@@ -63,12 +48,9 @@ public class GasBottleResource : MonoBehaviour
         if (!bottleRenderer) return;
 
         float ratio = GetRatio();
-        Color c;
-
-        if (ratio > 0.5f)
-            c = Color.Lerp(midColor, fullColor, (ratio - 0.5f) * 2f);
-        else
-            c = Color.Lerp(emptyColor, midColor, ratio * 2f);
+        Color c = ratio > 0.5f
+            ? Color.Lerp(midColor, fullColor, (ratio - 0.5f) * 2f)
+            : Color.Lerp(emptyColor, midColor, ratio * 2f);
 
         bottleRenderer.material.color = c;
     }

@@ -79,6 +79,7 @@
     <Compile Include="Assets\scripts\LEVIER.cs" />
     <Compile Include="Assets\scripts\EjectButton.cs" />
     <Compile Include="Assets\Scenes\PROJECT N\steapoint.cs" />
+    <Compile Include="Assets\scripts\animation hand.cs" />
     <Compile Include="Assets\IMPORT MULTI\01_ThirdPersonCharacter\Player.cs" />
     <Compile Include="Assets\Scenes\BACK.cs" />
     <Compile Include="Assets\scripts\SasZone.cs" />

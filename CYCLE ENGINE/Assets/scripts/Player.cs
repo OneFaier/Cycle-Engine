@@ -12,6 +12,7 @@ public class SimpleFPSController : MonoBehaviour
     public Camera fpsCamera;
     public Camera tpsCamera;
     public Vector3 tpsOffset = new Vector3(0f, 2f, -4f);
+    public float tpsSmoothTime = 0.1f;   // Smooth TPS
 
     [Header("Souris / Look")]
     public float mouseSensitivity = 100f;
@@ -25,36 +26,21 @@ public class SimpleFPSController : MonoBehaviour
     public AudioSource footstepSource;
     public AudioClip[] footstepClips;
     public float stepDistance = 2f;
-    public LayerMask groundLayer; // Layer du sol sur lequel on joue les pas
+    public LayerMask groundLayer;
 
-    private float distanceMoved = 0f;
-    private Vector3 lastPosition;
-    private int lastFootstepIndex = -1;
-
-    // ===================== ACCELERATION CAMERA INERTIA =====================
-    [Header("Acceleration Inertia Camera")]
-    public float accelCameraDelay = 0.08f;
-    public float accelCameraPull = 0.15f;
-    public float accelCameraPullSpeed = 8f;
-    public float accelCameraReturnSpeed = 6f;
-
-    [Header("Gear Lever")]
-    public IndicatorGearMouse gearLever;
-
-    // TPS smoothing
-    public float tpsSmoothTime = 0.1f;
-
-    // ---------------- PRIVATE ----------------
     private Rigidbody rb;
     private float xRotation = 0f;
     private bool isGrounded = true;
     private bool isTPS = false;
 
-    private Vector3 tpsVelocity = Vector3.zero;
+    private Vector3 tpsVelocity;
 
-    private int lastGear = -1;
-    private Vector3 accelCameraOffset = Vector3.zero;
-    private Coroutine accelRoutine;
+    private float distanceMoved = 0f;
+    private Vector3 lastPosition;
+    private int lastFootstepIndex = -1;
+
+    [HideInInspector] public Transform seatTransform = null;
+    [HideInInspector] public bool isSeated = false;
 
     void Awake()
     {
@@ -77,8 +63,7 @@ public class SimpleFPSController : MonoBehaviour
         HandleJump();
         HandleCameraSwitch();
         UpdateTPSCameraPosition();
-        HandleGearAccelerationCamera();
-        HandleFootsteps(); // FOOTSTEPS
+        HandleFootsteps();
     }
 
     void FixedUpdate()
@@ -96,7 +81,7 @@ public class SimpleFPSController : MonoBehaviour
 
     void HandleMouseLook()
     {
-        if (!mouseLookEnabled) return;
+        if (!mouseLookEnabled || isSeated) return;
 
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
@@ -112,7 +97,7 @@ public class SimpleFPSController : MonoBehaviour
 
     void HandleMovement()
     {
-        if (!canMove) return;
+        if (!canMove || isSeated) return;
 
         float x = Input.GetAxisRaw("Horizontal");
         float z = Input.GetAxisRaw("Vertical");
@@ -125,7 +110,7 @@ public class SimpleFPSController : MonoBehaviour
 
     void HandleJump()
     {
-        if (!canMove) return;
+        if (!canMove || isSeated) return;
 
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
@@ -155,79 +140,27 @@ public class SimpleFPSController : MonoBehaviour
     {
         if (!isTPS || tpsCamera == null) return;
 
-        Vector3 desiredPosition = transform.position + tpsOffset;
+        Vector3 targetPos = transform.position + tpsOffset;
         tpsCamera.transform.position = Vector3.SmoothDamp(
             tpsCamera.transform.position,
-            desiredPosition,
+            targetPos,
             ref tpsVelocity,
             tpsSmoothTime
         );
 
         Vector3 lookTarget = transform.position + Vector3.up * 1.5f;
-        tpsCamera.transform.rotation = Quaternion.Slerp(
-            tpsCamera.transform.rotation,
-            Quaternion.LookRotation(lookTarget - tpsCamera.transform.position),
-            20f * Time.deltaTime
-        );
+        tpsCamera.transform.rotation = Quaternion.LookRotation(lookTarget - tpsCamera.transform.position);
     }
 
-    void HandleGearAccelerationCamera()
-    {
-        if (gearLever == null || fpsCamera == null) return;
-
-        int currentGear = gearLever.currentGear;
-
-        if (currentGear != lastGear)
-        {
-            lastGear = currentGear;
-
-            if (accelRoutine != null)
-                StopCoroutine(accelRoutine);
-
-            accelRoutine = StartCoroutine(AccelerationCameraInertia(currentGear));
-        }
-    }
-
-    IEnumerator AccelerationCameraInertia(int gear)
-    {
-        yield return new WaitForSeconds(accelCameraDelay);
-
-        float gearFactor = Mathf.Clamp01(gear / 5f);
-        Vector3 targetBack = -Vector3.forward * accelCameraPull * (0.5f + gearFactor);
-
-        while (Vector3.Distance(accelCameraOffset, targetBack) > 0.01f)
-        {
-            accelCameraOffset = Vector3.Lerp(accelCameraOffset, targetBack, Time.deltaTime * accelCameraPullSpeed);
-            fpsCamera.transform.localPosition = accelCameraOffset;
-            yield return null;
-        }
-
-        while (accelCameraOffset.magnitude > 0.01f)
-        {
-            accelCameraOffset = Vector3.Lerp(accelCameraOffset, Vector3.zero, Time.deltaTime * accelCameraReturnSpeed);
-            fpsCamera.transform.localPosition = accelCameraOffset;
-            yield return null;
-        }
-
-        accelCameraOffset = Vector3.zero;
-        fpsCamera.transform.localPosition = Vector3.zero;
-    }
-
-
-    // ===================== FOOTSTEPS =====================
     void HandleFootsteps()
     {
         if (footstepClips.Length == 0 || footstepSource == null) return;
+        if (isSeated) return;
 
-        // Vérifie qu'on touche le sol via layer (Raycast plus long)
-        float rayDistance = 1.2f; // augmente si ton pivot est haut
-        if (!Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, rayDistance, groundLayer))
-            return;
+        if (!Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, 1.2f, groundLayer)) return;
 
-        // Calcul du déplacement horizontal
         Vector3 delta = transform.position - lastPosition;
-        float horizontalDelta = new Vector3(delta.x, 0f, delta.z).magnitude;
-        distanceMoved += horizontalDelta;
+        distanceMoved += new Vector3(delta.x, 0f, delta.z).magnitude;
 
         if (distanceMoved >= stepDistance)
         {
@@ -237,7 +170,6 @@ public class SimpleFPSController : MonoBehaviour
 
         lastPosition = transform.position;
     }
-
 
     void PlayFootstep()
     {
