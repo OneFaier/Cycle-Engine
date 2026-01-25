@@ -3,6 +3,12 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class SpaceshipAdvanced : MonoBehaviour
 {
+    [Header("Audio Multipliers")]
+    public float propulsionVolumeMultiplier = 1.0f; // Multiplie le volume du son principal
+    public float propulsionPitchMultiplierPublic = 1.0f; // Multiplie le pitch du son principal
+    public float extraVolumeMultiplier = 1.0f; // Multiplie le volume du son secondaire
+    public float extraPitchMultiplierPublic = 1.0f; // Multiplie le pitch du son secondaire
+
     #region Movement Settings
     [Header("Movement Settings")]
     public float[] gearSpeeds = { 0f, 20f, 40f, 65f, 90f };
@@ -31,26 +37,29 @@ public class SpaceshipAdvanced : MonoBehaviour
     [Header("Boost / Propulsion")]
     public float gearImpulse = 120f;
     public AudioSource propulsionAudio;
+    public AudioSource extraAudio;
     public float propulsionPitchMultiplier = 0.05f;
 
     [Header("Propulsion Particles")]
-    public GameObject propulsionEffectObject; // Empty qui contient le ParticleSystem
-    public int gearToActivateParticles = 3;   // À partir de ce gear, les particules s'activent
+    public GameObject propulsionEffectObject;
+    public int gearToActivateParticles = 3;
     #endregion
 
-    // ================= PRIVATE =================
     Rigidbody rb;
     float yawInputSmooth;
     int lastGear = 0;
-    float targetRoll = 0f;
-    
-    
     float currentRoll;
     float rollVelocity;
 
     const float STOP_THRESHOLD = 0.6f;
     const float LOW_SPEED_THRESHOLD = 2f;
     public float maxRollAngle = 20f;
+
+    // Smoothing audio
+    float propulsionVolumeSmooth;
+    float extraVolumeSmooth;
+    float propulsionPitchSmooth;
+    float extraPitchSmooth;
 
     void Start()
     {
@@ -63,17 +72,15 @@ public class SpaceshipAdvanced : MonoBehaviour
         rb.linearDamping = 0.2f;
         rb.angularDamping = 2f;
 #else
-    rb.drag = 0.2f;
-    rb.angularDrag = 2f;
+        rb.drag = 0.2f;
+        rb.angularDrag = 2f;
 #endif
 
-        // Forcer le centre de masse sur le pivot public "hoverOrigin" ou le milieu de l'Empty
         if (hoverOrigin != null)
             rb.centerOfMass = rb.transform.InverseTransformPoint(hoverOrigin.position);
         else
-            rb.centerOfMass = Vector3.zero; // fallback : centre de l'Empty
+            rb.centerOfMass = Vector3.zero;
 
-        // Désactiver l'Empty au départ
         if (propulsionEffectObject)
             propulsionEffectObject.SetActive(false);
     }
@@ -84,112 +91,100 @@ public class SpaceshipAdvanced : MonoBehaviour
         HandleMovement();
         UpdatePropulsionParticles();
     }
+
     void UpdatePropulsionAudio(float speed, int gear)
     {
-        if (propulsionAudio == null) return;
+        if (propulsionAudio == null && extraAudio == null) return;
 
-        // 2D = son identique dans les deux oreilles
-        propulsionAudio.spatialBlend = 0f;
-
-        // Volume : faible à l'arrêt, max en vitesse
-        float minVolume = 0.2f;
-        float maxVolume = 1f;
         float maxSpeed = gearSpeeds[gearSpeeds.Length - 1];
         float speedRatio = Mathf.Clamp01(speed / maxSpeed);
-        propulsionAudio.volume = Mathf.Lerp(minVolume, maxVolume, speedRatio);
 
-        // Pitch : augmente avec la vitesse
-        float pitchBase = 1f;
-        float pitchMultiplier = 0.5f; // ajustable selon ton goût
-        propulsionAudio.pitch = pitchBase + speedRatio * pitchMultiplier;
+        // ---- Propulsion Audio ----
+        if (propulsionAudio != null)
+        {
+            propulsionAudio.spatialBlend = 0f;
+            propulsionAudio.volume = Mathf.Lerp(0.5f, 1.5f, speedRatio) * propulsionVolumeMultiplier; // Multiplicateur public
+            propulsionAudio.pitch = Mathf.Lerp(1f, 2f, speedRatio) * propulsionPitchMultiplierPublic; // Multiplicateur public
+        }
+
+        // ---- Extra Audio ----
+        if (extraAudio != null)
+        {
+            extraAudio.spatialBlend = 0f;
+            extraAudio.volume = Mathf.Lerp(0.5f, 1.5f, speedRatio) * extraVolumeMultiplier; // Multiplicateur public
+            extraAudio.pitch = Mathf.Lerp(0.8f, 1.8f, speedRatio) * extraPitchMultiplierPublic; // Multiplicateur public
+        }
     }
-
 
     void HandleMovement()
-{
-    int gear = gearLever ? gearLever.GetLimitedGear() : 0;
-    float targetSpeed = gearSpeeds[Mathf.Clamp(gear, 0, gearSpeeds.Length - 1)];
-
-#if UNITY_6000_0_OR_NEWER
-    Vector3 velocity = rb.linearVelocity;
-#else
-    Vector3 velocity = rb.velocity;
-#endif
-
-    float speed = Vector3.Dot(velocity, transform.forward);
-    float absSpeed = velocity.magnitude;
-
-    // Mise à jour du son de propulsion
-    UpdatePropulsionAudio(speed, gear);
-
-    // Stabilisation à l’arrêt
-    if (gear == 0 && absSpeed < STOP_THRESHOLD)
     {
-#if UNITY_6000_0_OR_NEWER
-        rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, Vector3.zero, Time.fixedDeltaTime * 6f);
-        rb.linearDamping = 4f;
-#else
-        rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, Time.fixedDeltaTime * 6f);
-        rb.drag = 4f;
-#endif
-        return;
-    }
+        int gear = gearLever ? gearLever.GetLimitedGear() : 0;
+        float targetSpeed = gearSpeeds[Mathf.Clamp(gear, 0, gearSpeeds.Length - 1)];
 
 #if UNITY_6000_0_OR_NEWER
-    rb.linearDamping = 0.2f;
+        Vector3 velocity = rb.linearVelocity;
 #else
-    rb.drag = 0.2f;
+        Vector3 velocity = rb.velocity;
 #endif
 
-    // Accélération
-    float speedError = targetSpeed - speed;
-    float accel = Mathf.Clamp(speedError, -acceleration, acceleration);
-    rb.AddForce(transform.forward * accel, ForceMode.Acceleration);
+        float speed = Vector3.Dot(velocity, transform.forward);
+        float absSpeed = velocity.magnitude;
 
-    // Boost / propulsion
-    if (gear > lastGear)
-    {
-        rb.AddForce(transform.forward * gearImpulse, ForceMode.Impulse);
-    }
-    lastGear = gear;
+        UpdatePropulsionAudio(speed, gear);
 
-    // Turn + Roll style avion
-    float dirVal = directionCube ? directionCube.GetLimitedNormalized() : 0.5f;
-    float yawInput = Mathf.Lerp(-1f, 1f, dirVal);
-    yawInputSmooth = Mathf.Lerp(yawInputSmooth, yawInput, Time.fixedDeltaTime * turnSmooth);
-
-    rb.AddTorque(Vector3.up * yawInputSmooth * turnSpeed, ForceMode.Acceleration);
-
-    // Re-align velocity avec forward si assez rapide
-    if (velocity.magnitude > LOW_SPEED_THRESHOLD)
-    {
-        Vector3 newDir = Vector3.Slerp(velocity.normalized, transform.forward, Time.fixedDeltaTime * turnSmooth);
+        if (gear == 0 && absSpeed < STOP_THRESHOLD)
+        {
 #if UNITY_6000_0_OR_NEWER
-        rb.linearVelocity = newDir * rb.linearVelocity.magnitude;
+            rb.linearVelocity = Vector3.Lerp(rb.linearVelocity, Vector3.zero, Time.fixedDeltaTime * 6f);
+            rb.linearDamping = 4f;
 #else
-        rb.velocity = newDir * rb.velocity.magnitude;
+            rb.velocity = Vector3.Lerp(rb.velocity, Vector3.zero, Time.fixedDeltaTime * 6f);
+            rb.drag = 4f;
 #endif
+            return;
+        }
+
+#if UNITY_6000_0_OR_NEWER
+        rb.linearDamping = 0.2f;
+#else
+        rb.drag = 0.2f;
+#endif
+
+        float speedError = targetSpeed - speed;
+        float accel = Mathf.Clamp(speedError, -acceleration, acceleration);
+        rb.AddForce(transform.forward * accel, ForceMode.Acceleration);
+
+        if (gear > lastGear)
+        {
+            rb.AddForce(transform.forward * gearImpulse, ForceMode.Impulse);
+        }
+        lastGear = gear;
+
+        float dirVal = directionCube ? directionCube.GetLimitedNormalized() : 0.5f;
+        float yawInput = Mathf.Lerp(-1f, 1f, dirVal);
+        yawInputSmooth = Mathf.Lerp(yawInputSmooth, yawInput, Time.fixedDeltaTime * turnSmooth);
+
+        rb.AddTorque(Vector3.up * yawInputSmooth * turnSpeed, ForceMode.Acceleration);
+
+        if (velocity.magnitude > LOW_SPEED_THRESHOLD)
+        {
+            Vector3 newDir = Vector3.Slerp(velocity.normalized, transform.forward, Time.fixedDeltaTime * turnSmooth);
+#if UNITY_6000_0_OR_NEWER
+            rb.linearVelocity = newDir * rb.linearVelocity.magnitude;
+#else
+            rb.velocity = newDir * rb.velocity.magnitude;
+#endif
+        }
+
+        float targetRoll = -yawInput * maxRollAngle;
+        currentRoll = Mathf.SmoothDampAngle(currentRoll, targetRoll, ref rollVelocity, 0.18f);
+
+        Quaternion rollRotation = Quaternion.AngleAxis(currentRoll, transform.forward);
+        Quaternion forwardRotation = Quaternion.LookRotation(transform.forward, transform.up);
+        Quaternion targetRotation = rollRotation * forwardRotation;
+
+        rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.fixedDeltaTime * 6f));
     }
-
-    // ---- Roll stable autour du pivot ----
-    float targetRoll = -yawInput * maxRollAngle;
-
-    // Lissage du roll
-    currentRoll = Mathf.SmoothDampAngle(currentRoll, targetRoll, ref rollVelocity, 0.18f);
-
-    // Roll autour de l'axe local Z
-    Quaternion rollRotation = Quaternion.AngleAxis(currentRoll, transform.forward);
-
-    // Orientation actuelle du vaisseau (forward + up)
-    Quaternion forwardRotation = Quaternion.LookRotation(transform.forward, transform.up);
-
-    // Combiner roll + orientation
-    Quaternion targetRotation = rollRotation * forwardRotation;
-
-    // Appliquer rotation lissée
-    rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.fixedDeltaTime * 6f));
-}
-
 
     void ApplyHover()
     {

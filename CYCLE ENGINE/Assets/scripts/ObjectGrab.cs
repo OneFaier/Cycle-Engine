@@ -5,9 +5,16 @@ public class ObjectGrabTMP : MonoBehaviour
     [Header("Références")]
     public Camera playerCamera;
 
-    [Header("Paramètres")]
+    public Rigidbody HeldObject => heldObject;
+
+    [Header("Paramètres Grab")]
     public float grabRange = 3f;
     public float holdDistance = 2f;
+    public float moveSpeed = 15f;
+    public float slotSnapSpeed = 10f;
+
+    [Header("Hold Offset (visuel uniquement)")]
+    public Vector3 holdOffset = new Vector3(0.35f, -0.15f, 0f);
 
     [Header("Audio")]
     public AudioClip grabSound;
@@ -36,6 +43,7 @@ public class ObjectGrabTMP : MonoBehaviour
 
     void TryGrab()
     {
+        // 🔥 Raycast CENTRE caméra (inchangé)
         Ray ray = playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f));
         if (!Physics.Raycast(ray, out RaycastHit hit, grabRange)) return;
         if (!hit.collider.CompareTag("Grabbable")) return;
@@ -59,14 +67,8 @@ public class ObjectGrabTMP : MonoBehaviour
             }
         }
 
-        heldObject.transform.SetParent(null);
         heldObject.isKinematic = false;
         heldObject.useGravity = false;
-        heldObject.linearVelocity = Vector3.zero;
-        heldObject.angularVelocity = Vector3.zero;
-
-        if (heldCollider)
-            heldCollider.enabled = false;
 
         if (audioSource && grabSound)
             audioSource.PlayOneShot(grabSound);
@@ -81,7 +83,6 @@ public class ObjectGrabTMP : MonoBehaviour
         {
             bottle.isGrabbed = false;
 
-            // installation finale si previewSlot
             if (bottle.previewSlot != null)
             {
                 bottle.previewSlot.TryInstall(bottle);
@@ -90,10 +91,6 @@ public class ObjectGrabTMP : MonoBehaviour
         }
 
         heldObject.useGravity = true;
-        heldObject.isKinematic = false;
-
-        if (heldCollider)
-            heldCollider.enabled = true;
 
         if (audioSource && dropSound)
             audioSource.PlayOneShot(dropSound);
@@ -102,26 +99,73 @@ public class ObjectGrabTMP : MonoBehaviour
         heldCollider = null;
     }
 
-    // ===================== HOLD =====================
+    // ===================== HOLD + PRÉVISUALISATION =====================
     void HandleHold()
     {
         if (heldObject == null) return;
 
         GasBottleResource bottle = heldObject.GetComponent<GasBottleResource>();
 
-        if (bottle != null && bottle.previewSlot != null)
+        Transform cam = playerCamera.transform;
+
+        // 🎯 Position décalée visuellement (raycast inchangé)
+        Vector3 targetPos =
+            cam.position
+            + cam.forward * holdDistance
+            + cam.right * holdOffset.x
+            + cam.up * holdOffset.y;
+
+        // --- Raycast slot ---
+        Ray ray = new Ray(cam.position, cam.forward);
+        if (Physics.Raycast(ray, out RaycastHit hit, grabRange))
         {
-            heldObject.MovePosition(bottle.previewSlot.transform.position);
-            heldObject.MoveRotation(bottle.previewSlot.transform.rotation);
+            GasBottleSlot slot = hit.collider.GetComponent<GasBottleSlot>();
+            if (slot != null && slot.IsFree)
+            {
+                bottle.previewSlot = slot;
+
+                Vector3 slotPos = slot.transform.position;
+                heldObject.MovePosition(
+                    Vector3.Lerp(
+                        heldObject.position,
+                        slotPos,
+                        slotSnapSpeed * Time.deltaTime
+                    )
+                );
+
+                Quaternion targetRot = Quaternion.Euler(-90f, 0f, 0f);
+                heldObject.rotation = Quaternion.Slerp(
+                    heldObject.rotation,
+                    targetRot,
+                    0.1f
+                );
+
+                return;
+            }
+            else
+            {
+                bottle.previewSlot = null;
+            }
         }
         else
         {
-            Vector3 targetPos =
-                playerCamera.transform.position +
-                playerCamera.transform.forward * holdDistance;
-
-            heldObject.MovePosition(targetPos);
+            bottle.previewSlot = null;
         }
+
+        // --- Hold normal ---
+        Vector3 moveDir = (targetPos - heldObject.position) * moveSpeed;
+        heldObject.linearVelocity = Vector3.Lerp(
+            heldObject.linearVelocity,
+            moveDir,
+            0.2f
+        );
+
+        heldObject.rotation = Quaternion.Slerp(
+            heldObject.rotation,
+            Quaternion.identity,
+            0.05f
+        );
+
+        heldObject.transform.localScale = bottle.originalScale;
     }
 }
-    

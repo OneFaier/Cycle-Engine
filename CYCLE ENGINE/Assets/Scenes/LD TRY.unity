@@ -2768,74 +2768,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -4168191973154114157, guid: c5bf5d211a5e38148bf5f39843cff24e, type: 3}
---- !u!1001 &648678509
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: c66b8d58b190ba747945b6027448cf00,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 586.16284
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: c66b8d58b190ba747945b6027448cf00,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.78
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: c66b8d58b190ba747945b6027448cf00,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 316.92563
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: c66b8d58b190ba747945b6027448cf00,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: c66b8d58b190ba747945b6027448cf00,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: c66b8d58b190ba747945b6027448cf00,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: c66b8d58b190ba747945b6027448cf00,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: c66b8d58b190ba747945b6027448cf00,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: c66b8d58b190ba747945b6027448cf00,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: c66b8d58b190ba747945b6027448cf00,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: c66b8d58b190ba747945b6027448cf00,
-        type: 3}
-      propertyPath: m_Name
-      value: CycleEngine_Stand_v3.1
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: c66b8d58b190ba747945b6027448cf00, type: 3}
 --- !u!1 &666790533
 GameObject:
   m_ObjectHideFlags: 0
@@ -3046,7 +2978,7 @@ AudioSource:
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: c1d09e9b21c1dc84983d417cf326b1df, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.672
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -11284,6 +11216,74 @@ MonoBehaviour:
   outlineEmpty: {fileID: 920724751}
   hoverRadius: 40
   maxDistance: 2
+--- !u!1001 &1974521518
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 563c88dbfebde4a46b513c7c30722f0e,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 593.40137
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 563c88dbfebde4a46b513c7c30722f0e,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 563c88dbfebde4a46b513c7c30722f0e,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 384.0101
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 563c88dbfebde4a46b513c7c30722f0e,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 563c88dbfebde4a46b513c7c30722f0e,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 563c88dbfebde4a46b513c7c30722f0e,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 563c88dbfebde4a46b513c7c30722f0e,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 563c88dbfebde4a46b513c7c30722f0e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 563c88dbfebde4a46b513c7c30722f0e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 563c88dbfebde4a46b513c7c30722f0e,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 563c88dbfebde4a46b513c7c30722f0e,
+        type: 3}
+      propertyPath: m_Name
+      value: CycleEngine_stand_v2 (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 563c88dbfebde4a46b513c7c30722f0e, type: 3}
 --- !u!1001 &2054396015
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -14568,4 +14568,4 @@ SceneRoots:
   - {fileID: 1235657507}
   - {fileID: 111038507}
   - {fileID: 843431312}
-  - {fileID: 648678509}
+  - {fileID: 1974521518}

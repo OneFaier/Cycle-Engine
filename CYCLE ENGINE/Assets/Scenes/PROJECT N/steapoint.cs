@@ -44,6 +44,8 @@ public class SeatButton : MonoBehaviour
     private float hoverMemoryDuration = 0.1f;
     private float maxClickDistance = 3f; // distance pour raycast
 
+    private Vector3 originalScale = Vector3.one;
+
     private void Start()
     {
         cam = Camera.main;
@@ -53,6 +55,7 @@ public class SeatButton : MonoBehaviour
             playerController = player.GetComponent<SimpleFPSController>();
             playerCollider = player.GetComponent<Collider>();
             playerRb = player.GetComponent<Rigidbody>();
+            originalScale = player.transform.localScale; // mémoriser l’échelle originale
         }
 
         if (exitButton)
@@ -151,6 +154,9 @@ public class SeatButton : MonoBehaviour
         if (playerCollider) playerCollider.enabled = false;
         if (playerRb) playerRb.isKinematic = true;
 
+        // 🔹 Changer l’échelle à 0.4
+        playerController.transform.localScale = Vector3.one * 0.4f;
+
         if (playerController.footstepSource != null)
             playerController.footstepSource.enabled = false;
 
@@ -185,7 +191,11 @@ public class SeatButton : MonoBehaviour
         if (playerRb)
         {
             playerRb.isKinematic = false;
+#if UNITY_6000_0_OR_NEWER
             playerRb.linearVelocity = Vector3.zero;
+#else
+            playerRb.velocity = Vector3.zero;
+#endif
 
             Vector3 backward = -seatTransform.forward * backwardForceFactor;
             Vector3 upward = Vector3.up * upwardForceFactor;
@@ -193,6 +203,9 @@ public class SeatButton : MonoBehaviour
 
             playerRb.AddForce(ejectDir * exitImpulseForce, ForceMode.Impulse);
         }
+
+        // 🔹 Restaurer l’échelle originale
+        playerController.transform.localScale = originalScale;
 
         if (playerController.footstepSource != null)
             playerController.footstepSource.enabled = true;

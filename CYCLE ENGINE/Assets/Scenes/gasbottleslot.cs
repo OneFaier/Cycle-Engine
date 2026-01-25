@@ -17,16 +17,6 @@ public class GasBottleSlot : MonoBehaviour
 
     public bool IsFree => currentBottle == null;
 
-    // ===================== PREVIEW =====================
-    void PreviewSnap(GasBottleResource bottle)
-    {
-        bottle.previewSlot = this;
-
-        bottle.transform.position = transform.position;
-        bottle.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
-        bottle.transform.localScale = bottle.originalScale;
-    }
-
     // ===================== INSTALL =====================
     public bool TryInstall(GasBottleResource bottle)
     {
@@ -37,14 +27,13 @@ public class GasBottleSlot : MonoBehaviour
         bottle.isInstalled = true;
         bottle.isActive = false;
 
-        if (audioSource && addModuleClip)
-            audioSource.PlayOneShot(addModuleClip);
-
+        // Parent + position
         bottle.transform.SetParent(transform);
         bottle.transform.localPosition = Vector3.zero;
         bottle.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
         bottle.transform.localScale = bottle.originalScale;
 
+        // Rigidbody
         Rigidbody rb = bottle.GetComponent<Rigidbody>();
         if (rb)
         {
@@ -53,6 +42,13 @@ public class GasBottleSlot : MonoBehaviour
             rb.linearVelocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
         }
+
+        // ⚡ Layer pour désactiver collisions avec le vaisseau
+        bottle.gameObject.layer = LayerMask.NameToLayer("Vehicule");
+
+        // Son
+        if (audioSource && addModuleClip)
+            audioSource.PlayOneShot(addModuleClip);
 
         return true;
     }
@@ -74,28 +70,10 @@ public class GasBottleSlot : MonoBehaviour
         if (rb)
         {
             rb.isKinematic = false;
-            rb.useGravity = true;
+            rb.useGravity = false;
         }
-    }
 
-    // ===================== TRIGGERS =====================
-    private void OnTriggerEnter(Collider other)
-    {
-        if (!other.CompareTag("Grabbable")) return;
-
-        GasBottleResource bottle = other.GetComponent<GasBottleResource>();
-        if (bottle == null || bottle.isInstalled) return;
-
-        if (bottle.isGrabbed)
-            PreviewSnap(bottle);   // 👻 prévisualisation
-        else
-            TryInstall(bottle);   // 📦 auto-install si pas grab
-    }
-
-    private void OnTriggerExit(Collider other)
-    {
-        GasBottleResource bottle = other.GetComponent<GasBottleResource>();
-        if (bottle && bottle.previewSlot == this)
-            bottle.previewSlot = null;
+        // ⚡ Remet layer par défaut pour collisions normales
+        bottle.gameObject.layer = LayerMask.NameToLayer("Default");
     }
 }
