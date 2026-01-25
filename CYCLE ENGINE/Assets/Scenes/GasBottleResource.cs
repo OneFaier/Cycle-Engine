@@ -9,16 +9,18 @@ public class GasBottleResource : MonoBehaviour
     [Header("State")]
     public bool isInstalled = false;
     public bool isActive = false;
-    public bool isGrabbed = false; // 🔑 piloté par le grab
+    public bool isGrabbed = false;
     public Vector3 originalScale = Vector3.one;
 
-    [HideInInspector] public GasBottleSlot previewSlot; // slot survolé
+    [HideInInspector] public GasBottleSlot previewSlot;
 
     [Header("Visual")]
     public Renderer bottleRenderer;
     public Color fullColor = Color.green;
     public Color midColor = Color.yellow;
     public Color emptyColor = Color.red;
+
+    public bool IsEmptyTriggered { get; private set; } = false;
 
     void Awake()
     {
@@ -33,14 +35,14 @@ public class GasBottleResource : MonoBehaviour
 
     public void UseGas(float amount)
     {
-        if (!isInstalled || !isActive) return;
+        if (!isInstalled || !isActive || IsEmptyTriggered) return;
 
         currentGas -= amount;
         currentGas = Mathf.Clamp(currentGas, 0f, maxGas);
         UpdateColor();
 
-        if (IsEmpty())
-            Destroy(gameObject);
+        if (currentGas <= 0f)
+            IsEmptyTriggered = true; // 🔔 signal au manager
     }
 
     void UpdateColor()

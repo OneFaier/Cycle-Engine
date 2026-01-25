@@ -9,29 +9,31 @@ public class ModuleResourceManage : MonoBehaviour
 
     [Header("Settings")]
     public int maxBottles = 3;
-    public float speedUseMultiplier = 10f;      // gas consommé par gear
-    public float directionUseMultiplier = 10f;  // gas consommé par déviation
+    public float speedUseMultiplier = 10f;
+    public float directionUseMultiplier = 10f;
 
     [Header("References")]
     public IndicatorGearMouse gearLever;
     public IndicatorMouseClickFast directionCube;
 
     [Header("UI")]
-    public Slider speedSlider;      // slider tableau de bord vitesse
-    public Slider directionSlider;  // slider tableau de bord direction
+    public Slider speedSlider;
+    public Slider directionSlider;
+
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip bottleEmptyClip;
 
     void Update()
     {
-        // Appliquer la consommation selon usage
         ApplySpeedUsage();
         ApplyDirectionUsage();
 
-        // Mettre à jour les sliders
-        if (speedSlider != null)
-            speedSlider.value = SpeedEfficiency; // 0 = vide, 1 = full
+        if (speedSlider)
+            speedSlider.value = SpeedEfficiency;
 
-        if (directionSlider != null)
-            directionSlider.value = DirectionEfficiency; // 0 = vide, 1 = full
+        if (directionSlider)
+            directionSlider.value = DirectionEfficiency;
     }
 
     public int SpeedCount => Count(speedSlots);
@@ -43,34 +45,41 @@ public class ModuleResourceManage : MonoBehaviour
     public float DirectionEfficiency =>
         Mathf.Clamp01(GetTotalGas(directionSlots) / maxBottles);
 
-    public int MaxGearAllowed => Mathf.Clamp(SpeedCount + 1, 1, maxBottles + 1);
+    public int MaxGearAllowed =>
+        Mathf.Clamp(SpeedCount + 1, 1, maxBottles + 1);
 
+    // ================= SPEED =================
     void ApplySpeedUsage()
     {
         if (gearLever == null) return;
-        int gear = gearLever.currentGear;
 
+        int gear = gearLever.currentGear;
         float amount = gear * speedUseMultiplier * Time.deltaTime;
 
         foreach (var s in speedSlots)
         {
-            if (s.currentBottle && !s.currentBottle.IsEmpty())
+            if (s.currentBottle == null) continue;
+
+            var bottle = s.currentBottle;
+
+            if (!bottle.IsEmptyTriggered)
             {
-                s.currentBottle.UseGas(amount);
-                s.currentBottle.isActive = true;
-
-                // détruire si vide
-                if (s.currentBottle.IsEmpty())
-                {
-                    Destroy(s.currentBottle.gameObject);
-                    s.currentBottle = null;
-                }
-
-                break; // une seule bouteille active à la fois
+                bottle.isActive = true;
+                bottle.UseGas(amount);
             }
+
+            if (bottle.IsEmptyTriggered)
+            {
+                PlayBottleEmptySound();
+                Destroy(bottle.gameObject);
+                s.currentBottle = null;
+            }
+
+            break;
         }
     }
 
+    // ================= DIRECTION =================
     void ApplyDirectionUsage()
     {
         if (directionCube == null) return;
@@ -80,33 +89,40 @@ public class ModuleResourceManage : MonoBehaviour
 
         foreach (var s in directionSlots)
         {
-            if (s.currentBottle && !s.currentBottle.IsEmpty())
+            if (s.currentBottle == null) continue;
+
+            var bottle = s.currentBottle;
+
+            if (!bottle.IsEmptyTriggered)
             {
-                s.currentBottle.UseGas(amount);
-                s.currentBottle.isActive = true;
-
-                // détruire si vide
-                if (s.currentBottle.IsEmpty())
-                {
-                    Destroy(s.currentBottle.gameObject);
-                    s.currentBottle = null;
-                }
-
-                break; // une seule bouteille active à la fois
+                bottle.isActive = true;
+                bottle.UseGas(amount);
             }
+
+            if (bottle.IsEmptyTriggered)
+            {
+                PlayBottleEmptySound();
+                Destroy(bottle.gameObject);
+                s.currentBottle = null;
+            }
+
+            break;
         }
+    }
+
+    // ================= UTILS =================
+    void PlayBottleEmptySound()
+    {
+        if (audioSource && bottleEmptyClip)
+            audioSource.PlayOneShot(bottleEmptyClip);
     }
 
     float GetTotalGas(GasBottleSlot[] slots)
     {
         float total = 0f;
-
         foreach (var s in slots)
-        {
             if (s.currentBottle != null)
-                total += s.currentBottle.GetRatio(); // 0 → 1
-        }
-
+                total += s.currentBottle.GetRatio();
         return total;
     }
 
@@ -114,7 +130,7 @@ public class ModuleResourceManage : MonoBehaviour
     {
         int c = 0;
         foreach (var s in slots)
-            if (s.currentBottle != null && !s.currentBottle.IsEmpty())
+            if (s.currentBottle != null && !s.currentBottle.IsEmptyTriggered)
                 c++;
         return c;
     }

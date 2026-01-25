@@ -4,10 +4,10 @@ using UnityEngine;
 public class SpaceshipAdvanced : MonoBehaviour
 {
     [Header("Audio Multipliers")]
-    public float propulsionVolumeMultiplier = 1.0f; // Multiplie le volume du son principal
-    public float propulsionPitchMultiplierPublic = 1.0f; // Multiplie le pitch du son principal
-    public float extraVolumeMultiplier = 1.0f; // Multiplie le volume du son secondaire
-    public float extraPitchMultiplierPublic = 1.0f; // Multiplie le pitch du son secondaire
+    public float propulsionVolumeMultiplier = 1.0f;
+    public float propulsionPitchMultiplierPublic = 1.0f;
+    public float extraVolumeMultiplier = 1.0f;
+    public float extraPitchMultiplierPublic = 1.0f;
 
     #region Movement Settings
     [Header("Movement Settings")]
@@ -19,7 +19,7 @@ public class SpaceshipAdvanced : MonoBehaviour
 
     #region Hover Settings
     [Header("Hover Settings")]
-    public float hoverHeight = 2f;
+    public float hoverHeight = 0.7f; // Hauteur forcée, modifiable depuis l'Inspector
     public float hoverForce = 250f;
     public float hoverDamping = 5f;
     public LayerMask groundLayer;
@@ -54,12 +54,6 @@ public class SpaceshipAdvanced : MonoBehaviour
     const float STOP_THRESHOLD = 0.6f;
     const float LOW_SPEED_THRESHOLD = 2f;
     public float maxRollAngle = 20f;
-
-    // Smoothing audio
-    float propulsionVolumeSmooth;
-    float extraVolumeSmooth;
-    float propulsionPitchSmooth;
-    float extraPitchSmooth;
 
     void Start()
     {
@@ -99,20 +93,29 @@ public class SpaceshipAdvanced : MonoBehaviour
         float maxSpeed = gearSpeeds[gearSpeeds.Length - 1];
         float speedRatio = Mathf.Clamp01(speed / maxSpeed);
 
-        // ---- Propulsion Audio ----
+        float turn = Mathf.Clamp(yawInputSmooth, -1f, 1f);
+
+        float distanceFromCenter = 0f;
+        if (turn >= 0.5f)
+            distanceFromCenter = (turn - 0.5f) / 0.5f;
+        else if (turn <= -0.5f)
+            distanceFromCenter = (-turn - 0.5f) / 0.5f;
+
+        float t = Mathf.Pow(distanceFromCenter, 1.2f);
+        float deltaDirection = t * 0.08f;
+
         if (propulsionAudio != null)
         {
             propulsionAudio.spatialBlend = 0f;
-            propulsionAudio.volume = Mathf.Lerp(0.5f, 1.5f, speedRatio) * propulsionVolumeMultiplier; // Multiplicateur public
-            propulsionAudio.pitch = Mathf.Lerp(1f, 2f, speedRatio) * propulsionPitchMultiplierPublic; // Multiplicateur public
+            propulsionAudio.volume = Mathf.Lerp(0.45f, 0.9f, speedRatio) * propulsionVolumeMultiplier;
+            propulsionAudio.pitch = Mathf.Lerp(0.9f, 1.9f, speedRatio) * propulsionPitchMultiplierPublic * (1f + deltaDirection);
         }
 
-        // ---- Extra Audio ----
         if (extraAudio != null)
         {
             extraAudio.spatialBlend = 0f;
-            extraAudio.volume = Mathf.Lerp(0.5f, 1.5f, speedRatio) * extraVolumeMultiplier; // Multiplicateur public
-            extraAudio.pitch = Mathf.Lerp(0.8f, 1.8f, speedRatio) * extraPitchMultiplierPublic; // Multiplicateur public
+            extraAudio.volume = Mathf.Lerp(0.4f, 0.8f, speedRatio) * extraVolumeMultiplier;
+            extraAudio.pitch = Mathf.Lerp(0.8f, 1.6f, speedRatio) * extraPitchMultiplierPublic * (1f + deltaDirection);
         }
     }
 
@@ -188,9 +191,29 @@ public class SpaceshipAdvanced : MonoBehaviour
 
     void ApplyHover()
     {
-        if (!GetAverageGround(out Vector3 avgNormal, out float avgDist)) return;
+        if (hoverPoints == null || hoverPoints.Length == 0) return;
 
-        float heightError = hoverHeight - avgDist;
+        Vector3 avgNormal = Vector3.zero;
+        float avgDist = 0f;
+        int count = 0;
+
+        float rayLength = hoverHeight * 5f; // raycast plus long
+
+        foreach (var p in hoverPoints)
+        {
+            if (!p) continue;
+            if (Physics.Raycast(p.position, -p.up, out RaycastHit hit, rayLength, groundLayer))
+            {
+                avgNormal += hit.normal;
+                avgDist += hit.distance;
+                count++;
+            }
+        }
+
+        if (count == 0) return;
+
+        avgNormal.Normalize();
+        avgDist /= count;
 
 #if UNITY_6000_0_OR_NEWER
         float verticalSpeed = Vector3.Dot(rb.linearVelocity, transform.up);
@@ -198,11 +221,24 @@ public class SpaceshipAdvanced : MonoBehaviour
         float verticalSpeed = Vector3.Dot(rb.velocity, transform.up);
 #endif
 
+        // Force proportionnelle + damping
+        float heightError = hoverHeight - avgDist;
         float lift = heightError * hoverForce - verticalSpeed * hoverDamping;
+        lift = Mathf.Clamp(lift, -hoverForce * 3f, hoverForce * 5f);
         rb.AddForce(transform.up * lift, ForceMode.Acceleration);
 
+        // Rotation selon le sol
         Quaternion targetRot = Quaternion.FromToRotation(transform.up, avgNormal) * transform.rotation;
         rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRot, Time.fixedDeltaTime * 6f));
+
+        // Reclamp strict à la hauteur choisie
+        if (avgDist > hoverHeight)
+        {
+            Vector3 pos = rb.position;
+            pos += transform.up * (hoverHeight - avgDist);
+            rb.position = pos;
+            rb.linearVelocity = Vector3.ProjectOnPlane(rb.linearVelocity, transform.up);
+        }
     }
 
     void UpdatePropulsionParticles()
