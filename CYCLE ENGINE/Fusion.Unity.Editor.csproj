@@ -426,34 +426,34 @@
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.60f1\Editor\Data\PlaybackEngines\WindowsStandaloneSupport\UnityEditor.WindowsStandalone.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\Protofinal Cycle Engine\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.ext.nunit@031a54704bff\net40\unity-custom\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\Protofinal Cycle Engine\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Pdb">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.Pdb.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\Protofinal Cycle Engine\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.Pdb.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Mdb">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.Mdb.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\Protofinal Cycle Engine\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.Mdb.dll</HintPath>
     </Reference>
     <Reference Include="Mono.Cecil.Rocks">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.Rocks.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\Protofinal Cycle Engine\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.mono-cecil@d78732e851eb\Mono.Cecil.Rocks.dll</HintPath>
     </Reference>
     <Reference Include="Fusion.Common">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Common.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\Protofinal Cycle Engine\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Common.dll</HintPath>
     </Reference>
     <Reference Include="Fusion.Runtime">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Runtime.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\Protofinal Cycle Engine\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Runtime.dll</HintPath>
     </Reference>
     <Reference Include="Fusion.Realtime">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Realtime.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\Protofinal Cycle Engine\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Realtime.dll</HintPath>
     </Reference>
     <Reference Include="Fusion.Log">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Log.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\Protofinal Cycle Engine\Cycle-Engine\CYCLE ENGINE\Assets\Photon\Fusion\Assemblies\Fusion.Log.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>C:\Users\hugoa\Documents\GitHub\CYCLE ENGINE GITHUB\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime\Newtonsoft.Json.dll</HintPath>
+      <HintPath>C:\Users\hugoa\Documents\GitHub\Protofinal Cycle Engine\Cycle-Engine\CYCLE ENGINE\Library\PackageCache\com.unity.nuget.newtonsoft-json@74deb55db2a0\Runtime\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib">
       <HintPath>C:\Program Files\Unity\Hub\Editor\6000.0.60f1\Editor\Data\UnityReferenceAssemblies\unity-4.8-api\mscorlib.dll</HintPath>
