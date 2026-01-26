@@ -14,8 +14,8 @@ public class GasBottleResource : MonoBehaviour
 
     [HideInInspector] public GasBottleSlot previewSlot;
 
-    [Header("Visual")]
-    public Renderer bottleRenderer;
+    [Header("Visual - Light")]
+    public Light bottleLight;
     public Color fullColor = Color.green;
     public Color midColor = Color.yellow;
     public Color emptyColor = Color.red;
@@ -30,7 +30,7 @@ public class GasBottleResource : MonoBehaviour
     void Start()
     {
         currentGas = maxGas;
-        UpdateColor();
+        UpdateLightColor();
     }
 
     public void UseGas(float amount)
@@ -39,22 +39,22 @@ public class GasBottleResource : MonoBehaviour
 
         currentGas -= amount;
         currentGas = Mathf.Clamp(currentGas, 0f, maxGas);
-        UpdateColor();
+        UpdateLightColor();
 
         if (currentGas <= 0f)
             IsEmptyTriggered = true; // 🔔 signal au manager
     }
 
-    void UpdateColor()
+    void UpdateLightColor()
     {
-        if (!bottleRenderer) return;
+        if (!bottleLight) return;
 
         float ratio = GetRatio();
         Color c = ratio > 0.5f
             ? Color.Lerp(midColor, fullColor, (ratio - 0.5f) * 2f)
             : Color.Lerp(emptyColor, midColor, ratio * 2f);
 
-        bottleRenderer.material.color = c;
+        bottleLight.color = c;
     }
 
     public bool IsEmpty() => currentGas <= 0f;

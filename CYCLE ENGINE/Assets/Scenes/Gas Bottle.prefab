@@ -255,8 +255,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lights:
   - {fileID: 7350534865816148552}
-  minIntensity: 2000000
-  maxIntensity: 2000000
+  minIntensity: 0
+  maxIntensity: 1000000
   flickerSpeed: 0.1
 --- !u!1001 &1266036794075798198
 PrefabInstance:
@@ -419,9 +419,9 @@ MonoBehaviour:
   isGrabbed: 0
   originalScale: {x: 1, y: 1, z: 1}
   previewSlot: {fileID: 0}
-  bottleRenderer: {fileID: 0}
-  fullColor: {r: 0.023584902, g: 0.6504957, b: 1, a: 1}
-  midColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  bottleLight: {fileID: 7350534865816148552}
+  fullColor: {r: 0.02352941, g: 0.94383955, b: 1, a: 1}
+  midColor: {r: 1, g: 0.6693177, b: 0.015686274, a: 1}
   emptyColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!54 &-1975615907439323858
 Rigidbody:
