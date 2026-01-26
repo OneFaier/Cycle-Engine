@@ -12,6 +12,8 @@ public class SeatButton : MonoBehaviour
     public Transform seatTransform;
     public Transform exitPoint;
     public GameObject player;
+    public SimpleFPSController playerController; // ← à forcer dans l’inspector
+    public Camera playerCamera; // ← à forcer dans l’inspector
 
     [Header("UI")]
     public TextMeshProUGUI enterTextUI;
@@ -26,36 +28,32 @@ public class SeatButton : MonoBehaviour
     public AudioClip sitClip;
     public AudioClip exitClip;
 
-    // ---------------- PRIVATE ----------------
-    private SimpleFPSController playerController;
     private Rigidbody playerRb;
     private Collider playerCollider;
+    private Renderer exitRend;
 
     private bool isSeated = false;
     private Quaternion savedWorldRotation;
     private Transform savedParent;
-    private Renderer exitRend;
-    private Camera cam;
+    private Vector3 originalScale = Vector3.one;
 
     // Hover memory
     private bool exitHovered = false;
-    private bool isHovered = false;
-    private float lastExitHoverTime = -1f;
+    private float lastHoverTime = -1f;
     private float hoverMemoryDuration = 0.1f;
-    private float maxClickDistance = 3f; // distance pour raycast
-
-    private Vector3 originalScale = Vector3.one;
+    private float maxClickDistance = 100f;
 
     private void Start()
     {
-        cam = Camera.main;
-
-        if (player)
-        {
+        if (!playerController && player != null)
             playerController = player.GetComponent<SimpleFPSController>();
+
+        if (playerController)
+        {
             playerCollider = player.GetComponent<Collider>();
             playerRb = player.GetComponent<Rigidbody>();
-            originalScale = player.transform.localScale; // mémoriser l’échelle originale
+            originalScale = player.transform.localScale;
+            if (!playerCamera) playerCamera = playerController.fpsCamera;
         }
 
         if (exitButton)
@@ -70,19 +68,55 @@ public class SeatButton : MonoBehaviour
 
     private void Update()
     {
-        if (!player || !cam) return;
+        if (!playerController || !playerCamera) return;
 
         HandleExitHover();
 
-        // Sortie via bouton si hover + clic
-        if (isSeated && isHovered && Input.GetMouseButtonDown(0))
+        // Cliquer pour sortir
+        if (isSeated && exitHovered && Input.GetMouseButtonDown(0))
         {
             ExitSeat();
         }
 
-        // Affichage du bouton uniquement si assis
         if (exitButton)
             exitButton.SetActive(isSeated);
+    }
+
+    private void HandleExitHover()
+    {
+        if (!exitButton || !playerCamera) return;
+
+        bool hitThisFrame = false;
+
+        Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit, maxClickDistance))
+        {
+            if (hit.collider.gameObject == exitButton)
+            {
+                hitThisFrame = true;
+                lastHoverTime = Time.time;
+            }
+        }
+
+        bool shouldBeHovered = hitThisFrame || (Time.time - lastHoverTime < hoverMemoryDuration);
+
+        if (!shouldBeHovered)
+        {
+            Vector3 screenPoint = playerCamera.WorldToScreenPoint(exitButton.transform.position);
+            float distToMouse = Vector2.Distance(Input.mousePosition, screenPoint);
+            if (distToMouse < 40f)
+            {
+                shouldBeHovered = true;
+                lastHoverTime = Time.time;
+            }
+        }
+
+        if (shouldBeHovered != exitHovered)
+        {
+            exitHovered = shouldBeHovered;
+            if (exitRend)
+                exitRend.material.color = exitHovered ? highlightColor : baseColor;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -90,52 +124,7 @@ public class SeatButton : MonoBehaviour
         if (isSeated || !playerController) return;
 
         if (other.gameObject == player)
-        {
             EnterSeat();
-        }
-    }
-
-    private void HandleExitHover()
-    {
-        if (!exitButton || !cam) return;
-
-        bool hitThisFrame = false;
-
-        // 1️⃣ Raycast physique
-        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, maxClickDistance))
-        {
-            if (hit.collider.gameObject == exitButton)
-            {
-                hitThisFrame = true;
-                lastExitHoverTime = Time.time;
-            }
-        }
-
-        // 2️⃣ Hover memory
-        bool shouldBeHovered = hitThisFrame || (Time.time - lastExitHoverTime < hoverMemoryDuration);
-
-        // 3️⃣ Distance écran
-        if (!shouldBeHovered)
-        {
-            Vector3 screenPoint = cam.WorldToScreenPoint(exitButton.transform.position);
-            float distToMouse = Vector2.Distance(Input.mousePosition, screenPoint);
-            if (distToMouse < 40f)
-            {
-                shouldBeHovered = true;
-                lastExitHoverTime = Time.time;
-            }
-        }
-
-        // 4️⃣ Appliquer couleur
-        if (shouldBeHovered != exitHovered)
-        {
-            exitHovered = shouldBeHovered;
-            if (exitRend)
-                exitRend.material.color = exitHovered ? highlightColor : baseColor;
-        }
-
-        isHovered = exitHovered;
     }
 
     private void EnterSeat()
@@ -154,7 +143,6 @@ public class SeatButton : MonoBehaviour
         if (playerCollider) playerCollider.enabled = false;
         if (playerRb) playerRb.isKinematic = true;
 
-        // 🔹 Changer l’échelle à 0.4
         playerController.transform.localScale = Vector3.one * 0.4f;
 
         if (playerController.footstepSource != null)
@@ -204,7 +192,6 @@ public class SeatButton : MonoBehaviour
             playerRb.AddForce(ejectDir * exitImpulseForce, ForceMode.Impulse);
         }
 
-        // 🔹 Restaurer l’échelle originale
         playerController.transform.localScale = originalScale;
 
         if (playerController.footstepSource != null)

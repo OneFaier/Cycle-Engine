@@ -10,12 +10,22 @@ public class GasBottleSlot : MonoBehaviour
     [Header("Bouteille actuelle")]
     public GasBottleResource currentBottle;
 
+    [Header("Visuel (Sprite)")]
+    public SpriteRenderer slotRenderer;
+    public Color emptyColor = Color.black;
+    public Color filledColor = new Color(0.5f, 0.8f, 1f); // bleu ciel
+
     [Header("Audio")]
     public AudioSource audioSource;
     public AudioClip addModuleClip;
     public AudioClip removeModuleClip;
 
     public bool IsFree => currentBottle == null;
+
+    void Start()
+    {
+        UpdateSlotColor();
+    }
 
     // ===================== INSTALL =====================
     public bool TryInstall(GasBottleResource bottle)
@@ -27,13 +37,11 @@ public class GasBottleSlot : MonoBehaviour
         bottle.isInstalled = true;
         bottle.isActive = false;
 
-        // Parent + position
         bottle.transform.SetParent(transform);
         bottle.transform.localPosition = Vector3.zero;
         bottle.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
         bottle.transform.localScale = bottle.originalScale;
 
-        // Rigidbody
         Rigidbody rb = bottle.GetComponent<Rigidbody>();
         if (rb)
         {
@@ -43,16 +51,16 @@ public class GasBottleSlot : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
         }
 
-        // ⚡ Layer pour désactiver collisions avec le vaisseau
         bottle.gameObject.layer = LayerMask.NameToLayer("Vehicule");
 
-        // Son
         if (audioSource && addModuleClip)
             audioSource.PlayOneShot(addModuleClip);
 
+        UpdateSlotColor();
         return true;
     }
 
+    // ===================== UNINSTALL =====================
     public void Uninstall()
     {
         if (currentBottle == null) return;
@@ -73,7 +81,15 @@ public class GasBottleSlot : MonoBehaviour
             rb.useGravity = false;
         }
 
-        // ⚡ Remet layer par défaut pour collisions normales
         bottle.gameObject.layer = LayerMask.NameToLayer("Default");
+
+        UpdateSlotColor();
+    }
+
+    // ===================== VISUEL =====================
+    void UpdateSlotColor()
+    {
+        if (slotRenderer == null) return;
+        slotRenderer.color = IsFree ? emptyColor : filledColor;
     }
 }

@@ -9,7 +9,8 @@ public class IndicatorGearMouse : MonoBehaviour
 
     [Header("Grab / Mouse")]
     public float grabDistance = 3f;
-    public float snapThreshold = 0.1f;
+    public float snapZone = 0.2f;
+    public float snapCooldown = 0.1f;
     public int maxSnapsPerGrab = 2;
     public float grabMoveThreshold = 5f;
 
@@ -37,12 +38,8 @@ public class IndicatorGearMouse : MonoBehaviour
     public float maxYawOffset = 30f;
     public float maxPitchOffset = 20f;
 
-    [Header("Snap Settings")]
-    public float snapZone = 0.2f;      // tolérance autour du cran
-    public float snapCooldown = 0.1f;  // temps minimal entre 2 snaps
-
-    private Color baseColor;
     private Renderer rend;
+    private Color baseColor;
 
     private bool isGrabbed = false;
     private bool isHovered = false;
@@ -57,7 +54,7 @@ public class IndicatorGearMouse : MonoBehaviour
     void Start()
     {
         rend = GetComponent<Renderer>();
-        if (rend != null) baseColor = rend.material.color;
+        if (rend) baseColor = rend.material.color;
 
         if (gearCrans.Length > 0 && currentGear < gearCrans.Length)
             transform.position = gearCrans[currentGear].position;
@@ -65,19 +62,17 @@ public class IndicatorGearMouse : MonoBehaviour
         lastGear = currentGear;
         lastSnapIndex = currentGear;
 
-        if (targetCamera == null && playerController != null)
-            targetCamera = playerController.fpsCamera;
+        if (!targetCamera && playerController) targetCamera = playerController.fpsCamera;
     }
 
     void Update()
     {
-        if (targetCamera == null) return;
+        if (!targetCamera) return;
 
         HandleHover();
 
         if (isHovered && Input.GetMouseButtonDown(0) && !isGrabbed)
             StartGrab();
-
         if (isGrabbed && Input.GetMouseButtonUp(0))
             StopGrab();
 
@@ -85,7 +80,7 @@ public class IndicatorGearMouse : MonoBehaviour
         {
             if (!grabActivated)
             {
-                float dist = Vector2.Distance((Vector2)Input.mousePosition, (Vector2)grabStartMousePos);
+                float dist = Vector2.Distance(Input.mousePosition, grabStartMousePos);
                 if (dist >= grabMoveThreshold) grabActivated = true;
             }
 
@@ -97,8 +92,7 @@ public class IndicatorGearMouse : MonoBehaviour
         }
         else if (gearCrans.Length > 0)
         {
-            Vector3 targetPos = gearCrans[currentGear].position;
-            transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * 10f);
+            transform.position = Vector3.Lerp(transform.position, gearCrans[currentGear].position, Time.deltaTime * 10f);
         }
 
         if (currentGear != lastGear)
@@ -114,9 +108,7 @@ public class IndicatorGearMouse : MonoBehaviour
     {
         Vector3 screenPoint = targetCamera.WorldToScreenPoint(transform.position);
         isHovered = Vector2.Distance(Input.mousePosition, screenPoint) < 40f;
-
-        if (rend != null)
-            rend.material.color = isHovered ? highlightColor : baseColor;
+        if (rend) rend.material.color = isHovered ? highlightColor : baseColor;
     }
 
     void StartGrab()
@@ -126,23 +118,24 @@ public class IndicatorGearMouse : MonoBehaviour
         grabStartMousePos = Input.mousePosition;
         grabStartIndex = currentGear;
 
+        if (snapPoints.Length > 0 && currentGear < snapPoints.Length)
+        {
+            transform.position = snapPoints[currentGear].position;
+            lastSnapIndex = currentGear;
+        }
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-
-        if (playerController != null)
-            playerController.mouseLookEnabled = true;
+        if (playerController) playerController.mouseLookEnabled = true;
     }
 
     void StopGrab()
     {
         isGrabbed = false;
         grabActivated = false;
-
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
-
-        if (playerController != null)
-            playerController.mouseLookEnabled = true;
+        if (playerController) playerController.mouseLookEnabled = true;
     }
 
     void HandleGrab()
@@ -151,11 +144,9 @@ public class IndicatorGearMouse : MonoBehaviour
 
         Plane railPlane = new Plane(Vector3.right, transform.position);
         Ray ray = targetCamera.ScreenPointToRay(Input.mousePosition);
-
         if (!railPlane.Raycast(ray, out float enter)) return;
 
         Vector3 hitPoint = ray.GetPoint(enter);
-
         int minIndex = Mathf.Max(grabStartIndex - maxSnapsPerGrab, 0);
         int maxIndex = Mathf.Min(grabStartIndex + maxSnapsPerGrab, snapPoints.Length - 1);
 
@@ -172,17 +163,16 @@ public class IndicatorGearMouse : MonoBehaviour
             }
         }
 
-        // --- Buffer pour éviter le spam et TP ---
-        float currentTime = Time.time;
+        float time = Time.time;
         float distToCurrent = Mathf.Abs(hitPoint.y - snapPoints[lastSnapIndex].position.y);
 
-        if (closestIndex != lastSnapIndex && distToCurrent > snapZone && currentTime - lastSnapTime > snapCooldown)
+        if (closestIndex != lastSnapIndex && distToCurrent > snapZone && time - lastSnapTime > snapCooldown)
         {
             transform.position = snapPoints[closestIndex].position;
             lastSnapIndex = closestIndex;
             currentGear = closestIndex;
             PlayGearSound();
-            lastSnapTime = currentTime;
+            lastSnapTime = time;
         }
         else
         {
@@ -194,39 +184,36 @@ public class IndicatorGearMouse : MonoBehaviour
     {
         if (snapIndicators == null || snapIndicators.Length == 0) return;
 
+        int maxUsefulGear = snapIndicators.Length - 1;
+        if (moduleManager != null)
+            maxUsefulGear = moduleManager.MaxGearAllowed - 1;
+
         for (int i = 0; i < snapIndicators.Length; i++)
         {
-            if (snapIndicators[i] != null)
-                snapIndicators[i].material.color = (currentGear >= i) ? passedColor : notPassedColor;
+            if (!snapIndicators[i]) continue;
+            snapIndicators[i].material.color = i <= maxUsefulGear ? passedColor : notPassedColor;
         }
     }
 
     void SmoothAimAtLever()
     {
-        if (targetCamera == null) return;
+        if (!targetCamera) return;
 
-        Vector3 direction = (transform.position - targetCamera.transform.position).normalized;
-        Quaternion targetRotation = Quaternion.LookRotation(direction);
+        Vector3 dir = (transform.position - targetCamera.transform.position).normalized;
+        Quaternion targetRot = Quaternion.LookRotation(dir);
 
-        Vector3 currentEuler = targetCamera.transform.rotation.eulerAngles;
-        Vector3 targetEuler = targetRotation.eulerAngles;
+        Vector3 cur = targetCamera.transform.rotation.eulerAngles;
+        Vector3 tgt = targetRot.eulerAngles;
 
-        // Clamp horizontal (yaw)
-        float yawDiff = Mathf.DeltaAngle(currentEuler.y, targetEuler.y);
-        yawDiff = Mathf.Clamp(yawDiff, -maxYawOffset, maxYawOffset);
-        float yaw = currentEuler.y + yawDiff * smoothAimFactor;
-
-        // Clamp vertical (pitch)
-        float pitchDiff = Mathf.DeltaAngle(currentEuler.x, targetEuler.x);
-        pitchDiff = Mathf.Clamp(pitchDiff, -maxPitchOffset, maxPitchOffset);
-        float pitch = currentEuler.x + pitchDiff * smoothAimFactor;
+        float yaw = cur.y + Mathf.Clamp(Mathf.DeltaAngle(cur.y, tgt.y), -maxYawOffset, maxYawOffset) * smoothAimFactor;
+        float pitch = cur.x + Mathf.Clamp(Mathf.DeltaAngle(cur.x, tgt.x), -maxPitchOffset, maxPitchOffset) * smoothAimFactor;
 
         targetCamera.transform.rotation = Quaternion.Euler(pitch, yaw, 0f);
     }
 
     void PlayGearSound()
     {
-        if (audioSource != null && gearChangeClip != null)
+        if (audioSource && gearChangeClip)
             audioSource.PlayOneShot(gearChangeClip);
     }
 
@@ -234,8 +221,8 @@ public class IndicatorGearMouse : MonoBehaviour
     {
         if (moduleManager != null)
         {
-            int maxAllowed = Mathf.Clamp(moduleManager.SpeedCount + 1, 1, moduleManager.maxBottles + 1);
-            return Mathf.Min(currentGear, maxAllowed);
+            int maxAllowed = moduleManager.MaxGearAllowed;
+            return Mathf.Min(currentGear, maxAllowed - 1); // indices 0-based
         }
         return currentGear;
     }

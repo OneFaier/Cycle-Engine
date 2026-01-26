@@ -8,11 +8,15 @@ public class SimpleFPSController : MonoBehaviour
     public float moveSpeed = 5f;
     public float jumpForce = 5f;
 
-    [Header("Caméras")]
+    [Header("Caméra FPS")]
     public Camera fpsCamera;
-    public Camera tpsCamera;
-    public Vector3 tpsOffset = new Vector3(0f, 2f, -4f);
-    public float tpsSmoothTime = 0.1f;   // Smooth TPS
+
+    // --- variables TPS conservées mais inutilisées pour ne rien casser ---
+    [HideInInspector] public Camera tpsCamera = null;
+    [HideInInspector] public Vector3 tpsOffset = Vector3.zero;
+    [HideInInspector] public float tpsSmoothTime = 0.1f;
+    [HideInInspector] public bool isTPS = false;
+    [HideInInspector] private Vector3 tpsVelocity;
 
     [Header("Souris / Look")]
     public float mouseSensitivity = 100f;
@@ -28,17 +32,23 @@ public class SimpleFPSController : MonoBehaviour
     public float stepDistance = 2f;
     public LayerMask groundLayer;
 
+    [Header("Gear / Camera Effects")]
+    public IndicatorGearMouse gearLever; // référence au levier
+    public float cameraShiftAmount = 0.3f; // recul / avancée
+    public float cameraShiftSpeed = 5f;    // vitesse de lerp
+    private Vector3 cameraDefaultLocalPos;
+    private float targetCameraZ = 0f;
+    private int lastGear = 0;
+
     private Rigidbody rb;
     private float xRotation = 0f;
     private bool isGrounded = true;
-    private bool isTPS = false;
-
-    private Vector3 tpsVelocity;
 
     private float distanceMoved = 0f;
     private Vector3 lastPosition;
     private int lastFootstepIndex = -1;
 
+    // Variables utilisées par d'autres scripts (steapoint, etc.)
     [HideInInspector] public Transform seatTransform = null;
     [HideInInspector] public bool isSeated = false;
 
@@ -47,8 +57,11 @@ public class SimpleFPSController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         rb.freezeRotation = true;
 
-        if (fpsCamera != null) fpsCamera.enabled = true;
-        if (tpsCamera != null) tpsCamera.enabled = false;
+        if (fpsCamera != null)
+        {
+            fpsCamera.enabled = true;
+            cameraDefaultLocalPos = fpsCamera.transform.localPosition;
+        }
 
         lastPosition = transform.position;
 
@@ -61,9 +74,8 @@ public class SimpleFPSController : MonoBehaviour
         HandleMouseLock();
         HandleMouseLook();
         HandleJump();
-        HandleCameraSwitch();
-        UpdateTPSCameraPosition();
         HandleFootsteps();
+        UpdateCameraGearEffect();
     }
 
     void FixedUpdate()
@@ -89,7 +101,7 @@ public class SimpleFPSController : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -maxLookAngle, maxLookAngle);
 
-        if (fpsCamera != null && !isTPS)
+        if (fpsCamera != null)
             fpsCamera.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
 
         transform.Rotate(Vector3.up * mouseX);
@@ -126,32 +138,6 @@ public class SimpleFPSController : MonoBehaviour
             isGrounded = true;
     }
 
-    void HandleCameraSwitch()
-    {
-        if (Input.GetKeyDown(KeyCode.V))
-        {
-            isTPS = !isTPS;
-            if (fpsCamera != null) fpsCamera.enabled = !isTPS;
-            if (tpsCamera != null) tpsCamera.enabled = isTPS;
-        }
-    }
-
-    void UpdateTPSCameraPosition()
-    {
-        if (!isTPS || tpsCamera == null) return;
-
-        Vector3 targetPos = transform.position + tpsOffset;
-        tpsCamera.transform.position = Vector3.SmoothDamp(
-            tpsCamera.transform.position,
-            targetPos,
-            ref tpsVelocity,
-            tpsSmoothTime
-        );
-
-        Vector3 lookTarget = transform.position + Vector3.up * 1.5f;
-        tpsCamera.transform.rotation = Quaternion.LookRotation(lookTarget - tpsCamera.transform.position);
-    }
-
     void HandleFootsteps()
     {
         if (footstepClips.Length == 0 || footstepSource == null) return;
@@ -184,4 +170,32 @@ public class SimpleFPSController : MonoBehaviour
     }
 
     public bool IsGrounded() => isGrounded;
+
+    // --- Effet caméra lors du changement de gear ---
+    void UpdateCameraGearEffect()
+    {
+        if (fpsCamera == null || gearLever == null) return;
+
+        int currentGear = gearLever.GetLimitedGear();
+
+        // Si la vitesse du gear change vraiment
+        if (currentGear != lastGear)
+        {
+            if (currentGear > lastGear)
+                targetCameraZ = -cameraShiftAmount; // recul
+            else if (currentGear < lastGear)
+                targetCameraZ = cameraShiftAmount * 0.6f; // avance plus soft
+
+            lastGear = currentGear;
+        }
+
+        // Lerp vers la position
+        Vector3 camPos = fpsCamera.transform.localPosition;
+        camPos.z = Mathf.Lerp(camPos.z, targetCameraZ, Time.deltaTime * cameraShiftSpeed);
+        fpsCamera.transform.localPosition = camPos;
+
+        // Reset target une fois arrivé
+        if (Mathf.Abs(camPos.z - targetCameraZ) < 0.01f)
+            targetCameraZ = 0f;
+    }
 }

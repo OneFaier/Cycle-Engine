@@ -24,6 +24,16 @@ public class ModuleResourceManage : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip bottleEmptyClip;
 
+    [Header("Visual Slots - Speed")]
+    public SpriteRenderer[] speedIndicators;
+
+    [Header("Visual Slots - Direction")]
+    public SpriteRenderer[] directionIndicators;
+
+    [Header("Colors")]
+    public Color emptyColor = Color.black;
+    public Color filledColor = new Color(0.5f, 0.8f, 1f); // bleu ciel
+
     void Update()
     {
         ApplySpeedUsage();
@@ -34,8 +44,11 @@ public class ModuleResourceManage : MonoBehaviour
 
         if (directionSlider)
             directionSlider.value = DirectionEfficiency;
+
+        UpdateVisuals();
     }
 
+    // ================= PROPERTIES =================
     public int SpeedCount => Count(speedSlots);
     public int DirectionCount => Count(directionSlots);
 
@@ -45,8 +58,43 @@ public class ModuleResourceManage : MonoBehaviour
     public float DirectionEfficiency =>
         Mathf.Clamp01(GetTotalGas(directionSlots) / maxBottles);
 
-    public int MaxGearAllowed =>
-        Mathf.Clamp(SpeedCount + 1, 1, maxBottles + 1);
+    public int MaxGearAllowed
+    {
+        get
+        {
+            int speedBottles = SpeedCount; // nombre de bouteilles actives (max 3)
+            int maxGear = 1; // Gear 0 et 1 par défaut
+
+            // Mapping spécifique
+            switch (speedBottles)
+            {
+                case 0:
+                    maxGear = 2; // Gear 0-1
+                    break;
+                case 1:
+                    maxGear = 3; // Gear 1
+                    break;
+                case 2:
+                    maxGear = 5; // Gear 3-4
+                    break;
+                case 3:
+                    maxGear = 6; // Gear 4-5
+                    break;
+            }
+
+            // Ne jamais dépasser le nombre total de gears du vaisseau
+            if (gearLever && gearLever.GetComponentInParent<SpaceshipAdvanced>())
+            {
+                int totalGears = gearLever.GetComponentInParent<SpaceshipAdvanced>().gearSpeeds.Length;
+                maxGear = Mathf.Min(maxGear, totalGears);
+            }
+
+            return maxGear;
+        }
+    }
+
+
+
 
     // ================= SPEED =================
     void ApplySpeedUsage()
@@ -75,7 +123,7 @@ public class ModuleResourceManage : MonoBehaviour
                 s.currentBottle = null;
             }
 
-            break;
+            break; // seulement une bouteille consommée par frame
         }
     }
 
@@ -106,7 +154,25 @@ public class ModuleResourceManage : MonoBehaviour
                 s.currentBottle = null;
             }
 
-            break;
+            break; // seulement une bouteille consommée par frame
+        }
+    }
+
+    // ================= VISUAL =================
+    void UpdateVisuals()
+    {
+        UpdateIndicatorGroup(speedIndicators, SpeedCount);
+        UpdateIndicatorGroup(directionIndicators, DirectionCount);
+    }
+
+    void UpdateIndicatorGroup(SpriteRenderer[] indicators, int filledCount)
+    {
+        if (indicators == null) return;
+
+        for (int i = 0; i < indicators.Length; i++)
+        {
+            if (indicators[i] == null) continue;
+            indicators[i].color = (i < filledCount) ? filledColor : emptyColor;
         }
     }
 

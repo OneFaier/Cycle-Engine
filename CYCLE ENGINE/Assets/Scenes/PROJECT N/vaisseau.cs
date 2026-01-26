@@ -11,7 +11,7 @@ public class SpaceshipAdvanced : MonoBehaviour
 
     #region Movement Settings
     [Header("Movement Settings")]
-    public float[] gearSpeeds = { 0f, 20f, 40f, 65f, 90f };
+    public float[] gearSpeeds = { 0f, 20f, 40f, 65f, 90f, 120f }; // 6 vitesses
     public float acceleration = 80f;
     public float turnSpeed = 40f;
     public float turnSmooth = 5f;
@@ -19,7 +19,7 @@ public class SpaceshipAdvanced : MonoBehaviour
 
     #region Hover Settings
     [Header("Hover Settings")]
-    public float hoverHeight = 0.7f; // Hauteur forcée, modifiable depuis l'Inspector
+    public float hoverHeight = 0.7f;
     public float hoverForce = 250f;
     public float hoverDamping = 5f;
     public LayerMask groundLayer;
@@ -46,9 +46,9 @@ public class SpaceshipAdvanced : MonoBehaviour
     #endregion
 
     Rigidbody rb;
-    float yawInputSmooth;
     int lastGear = 0;
-    float currentRoll;
+    public float currentRoll;
+    public float yawInputSmooth;
     float rollVelocity;
 
     const float STOP_THRESHOLD = 0.6f;
@@ -70,10 +70,7 @@ public class SpaceshipAdvanced : MonoBehaviour
         rb.angularDrag = 2f;
 #endif
 
-        if (hoverOrigin != null)
-            rb.centerOfMass = rb.transform.InverseTransformPoint(hoverOrigin.position);
-        else
-            rb.centerOfMass = Vector3.zero;
+        rb.centerOfMass = hoverOrigin != null ? rb.transform.InverseTransformPoint(hoverOrigin.position) : Vector3.zero;
 
         if (propulsionEffectObject)
             propulsionEffectObject.SetActive(false);
@@ -92,17 +89,14 @@ public class SpaceshipAdvanced : MonoBehaviour
 
         float maxSpeed = gearSpeeds[gearSpeeds.Length - 1];
         float speedRatio = Mathf.Clamp01(speed / maxSpeed);
-
         float turn = Mathf.Clamp(yawInputSmooth, -1f, 1f);
 
         float distanceFromCenter = 0f;
-        if (turn >= 0.5f)
-            distanceFromCenter = (turn - 0.5f) / 0.5f;
-        else if (turn <= -0.5f)
-            distanceFromCenter = (-turn - 0.5f) / 0.5f;
+        if (turn >= 0.5f) distanceFromCenter = (turn - 0.5f) / 0.5f;
+        else if (turn <= -0.5f) distanceFromCenter = (-turn - 0.5f) / 0.5f;
 
         float t = Mathf.Pow(distanceFromCenter, 1.2f);
-        float deltaDirection = t * 0.08f;
+        float deltaDirection = t * 0.03f;
 
         if (propulsionAudio != null)
         {
@@ -158,9 +152,8 @@ public class SpaceshipAdvanced : MonoBehaviour
         rb.AddForce(transform.forward * accel, ForceMode.Acceleration);
 
         if (gear > lastGear)
-        {
             rb.AddForce(transform.forward * gearImpulse, ForceMode.Impulse);
-        }
+
         lastGear = gear;
 
         float dirVal = directionCube ? directionCube.GetLimitedNormalized() : 0.5f;
@@ -184,9 +177,7 @@ public class SpaceshipAdvanced : MonoBehaviour
 
         Quaternion rollRotation = Quaternion.AngleAxis(currentRoll, transform.forward);
         Quaternion forwardRotation = Quaternion.LookRotation(transform.forward, transform.up);
-        Quaternion targetRotation = rollRotation * forwardRotation;
-
-        rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, Time.fixedDeltaTime * 6f));
+        rb.MoveRotation(Quaternion.Slerp(rb.rotation, rollRotation * forwardRotation, Time.fixedDeltaTime * 6f));
     }
 
     void ApplyHover()
@@ -196,8 +187,7 @@ public class SpaceshipAdvanced : MonoBehaviour
         Vector3 avgNormal = Vector3.zero;
         float avgDist = 0f;
         int count = 0;
-
-        float rayLength = hoverHeight * 5f; // raycast plus long
+        float rayLength = hoverHeight * 5f;
 
         foreach (var p in hoverPoints)
         {
@@ -221,17 +211,14 @@ public class SpaceshipAdvanced : MonoBehaviour
         float verticalSpeed = Vector3.Dot(rb.velocity, transform.up);
 #endif
 
-        // Force proportionnelle + damping
         float heightError = hoverHeight - avgDist;
         float lift = heightError * hoverForce - verticalSpeed * hoverDamping;
         lift = Mathf.Clamp(lift, -hoverForce * 3f, hoverForce * 5f);
         rb.AddForce(transform.up * lift, ForceMode.Acceleration);
 
-        // Rotation selon le sol
         Quaternion targetRot = Quaternion.FromToRotation(transform.up, avgNormal) * transform.rotation;
         rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRot, Time.fixedDeltaTime * 6f));
 
-        // Reclamp strict à la hauteur choisie
         if (avgDist > hoverHeight)
         {
             Vector3 pos = rb.position;
@@ -243,43 +230,9 @@ public class SpaceshipAdvanced : MonoBehaviour
 
     void UpdatePropulsionParticles()
     {
-        if (propulsionEffectObject == null) return;
+        if (!propulsionEffectObject) return;
 
         int gear = gearLever ? gearLever.GetLimitedGear() : 0;
-
-        if (gear >= gearToActivateParticles)
-        {
-            if (!propulsionEffectObject.activeSelf)
-                propulsionEffectObject.SetActive(true);
-        }
-        else
-        {
-            if (propulsionEffectObject.activeSelf)
-                propulsionEffectObject.SetActive(false);
-        }
-    }
-
-    bool GetAverageGround(out Vector3 avgNormal, out float avgDist)
-    {
-        avgNormal = Vector3.zero;
-        avgDist = 0f;
-        int count = 0;
-
-        foreach (var p in hoverPoints)
-        {
-            if (!p) continue;
-            if (Physics.Raycast(p.position, -p.up, out RaycastHit hit, hoverHeight * 2f, groundLayer))
-            {
-                avgNormal += hit.normal;
-                avgDist += hit.distance;
-                count++;
-            }
-        }
-
-        if (count == 0) return false;
-
-        avgNormal.Normalize();
-        avgDist /= count;
-        return true;
+        propulsionEffectObject.SetActive(gear >= gearToActivateParticles);
     }
 }

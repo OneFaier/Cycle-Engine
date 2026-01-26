@@ -28,10 +28,6 @@ public class IndicatorMouseClickFast : MonoBehaviour
     public SimpleFPSController playerController;
     public ModuleResourceManage moduleManager;
 
-    [Header("Camera Follow")]
-    public Camera playerCamera;
-    public float cameraSmoothSpeed = 5f;
-
     private bool isGrabbed = false;
     private bool isHovered = false;
 
@@ -40,12 +36,11 @@ public class IndicatorMouseClickFast : MonoBehaviour
 
     void Start()
     {
-        if (playerCamera == null)
-            playerCamera = playerController?.fpsCamera ?? Camera.main;
-
-        rend = GetComponent<Renderer>();
-        if (rend != null)
-            baseColor = rend.material.color;
+        // La caméra du joueur
+        if (playerController != null)
+        {
+            baseColor = GetComponent<Renderer>()?.material.color ?? Color.white;
+        }
     }
 
     void Update()
@@ -63,9 +58,6 @@ public class IndicatorMouseClickFast : MonoBehaviour
             float mouseX = Input.GetAxis("Mouse X");
             positionNormalized += mouseX * sensitivity;
             positionNormalized = Mathf.Clamp01(positionNormalized);
-
-            // Smooth aim caméra
-            SmoothAimAtLever();
         }
         else
         {
@@ -85,13 +77,15 @@ public class IndicatorMouseClickFast : MonoBehaviour
         }
 
         // Appliquer la position sur le rail
-        transform.position = Vector3.Lerp(railStart.position, railEnd.position, positionNormalized);
+        if (railStart != null && railEnd != null)
+            transform.position = Vector3.Lerp(railStart.position, railEnd.position, positionNormalized);
     }
 
     void HandleHover()
     {
-        if (!playerCamera) return;
+        if (playerController == null || playerController.fpsCamera == null) return;
 
+        Camera playerCamera = playerController.fpsCamera;
         Ray ray = playerCamera.ScreenPointToRay(Input.mousePosition);
         bool hitThisFrame = false;
 
@@ -120,55 +114,32 @@ public class IndicatorMouseClickFast : MonoBehaviour
         if (shouldBeHovered != isHovered)
         {
             isHovered = shouldBeHovered;
-            if (rend != null)
-                rend.material.color = isHovered ? highlightColor : baseColor;
+            if (GetComponent<Renderer>() != null)
+                GetComponent<Renderer>().material.color = isHovered ? highlightColor : baseColor;
         }
     }
 
     void StartGrab()
     {
         isGrabbed = true;
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        if (playerController != null)
-            playerController.mouseLookEnabled = false;
+        // La caméra reste libre → ne rien bloquer
     }
 
     void StopGrab()
     {
         isGrabbed = false;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-        if (playerController != null)
-            playerController.mouseLookEnabled = true;
-
-        // Ici la caméra reste où elle est, pas de snap
-    }
-
-    void SmoothAimAtLever()
-    {
-        if (!playerCamera) return;
-
-        Vector3 direction = (transform.position - playerCamera.transform.position).normalized;
-        Quaternion targetRotation = Quaternion.LookRotation(direction);
-
-        playerCamera.transform.rotation = Quaternion.Slerp(
-            playerCamera.transform.rotation,
-            targetRotation,
-            Time.deltaTime * cameraSmoothSpeed
-        );
+        // La caméra reste libre → ne rien bloquer
     }
 
     // ---------------- PUBLIC API ----------------
 
-    // Valeur normalisée de direction limitée par les bouteilles
     public float GetLimitedNormalized()
     {
         float limited = positionNormalized;
 
         if (cubeType == CubeType.Direction && moduleManager != null)
         {
-            float factor = Mathf.Lerp(0.2f, 1f, moduleManager.DirectionEfficiency); // 0.2 si aucune bouteille
+            float factor = Mathf.Lerp(0.2f, 1f, moduleManager.DirectionEfficiency);
             limited = 0.5f + (positionNormalized - 0.5f) * factor;
         }
 
